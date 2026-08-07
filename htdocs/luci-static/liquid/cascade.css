@@ -2717,10 +2717,10 @@ pre {
 		white-space: normal;
 	}
 
-	/* 移动端接口图标统一 18px（覆盖桌面 32px，测试尺寸） */
+	/* 移动端接口图标：宽度固定 24px，高度等比缩放（不强制高度） */
 	img[src*="icons/"][src$=".svg"] {
-		width: 18px !important;
-		height: 18px !important;
+		width: 24px !important;
+		height: auto !important;
 	}
 
 	#menubar .navigation {
