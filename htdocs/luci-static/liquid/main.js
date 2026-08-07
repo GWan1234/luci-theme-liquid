@@ -101,10 +101,12 @@
 			wrap.appendChild(btn);
 		});
 
-		var indicators = document.getElementById('indicators');
+		var menubar = document.querySelector('#mainmenu');
 
-		if (indicators && indicators.parentNode) {
-			indicators.parentNode.insertBefore(wrap, indicators);
+		if (menubar) {
+			/* 插在模式开关之后（菜单栏顶部） */
+			var ref = menubar.querySelector('.liquid-mode-switch');
+			menubar.insertBefore(wrap, ref ? ref.nextSibling : menubar.firstChild);
 		}
 		else {
 			/* lock screen / pages without a menubar */
@@ -141,10 +143,11 @@
 			wrap.appendChild(btn);
 		});
 
-		var indicators = document.getElementById('indicators');
+		var menubar = document.querySelector('#mainmenu');
 
-		if (indicators && indicators.parentNode) {
-			indicators.parentNode.insertBefore(wrap, indicators);
+		if (menubar) {
+			/* 菜单栏顶部（桌面/移动端都安全） */
+			menubar.insertBefore(wrap, menubar.firstChild);
 		}
 		else {
 			/* lock screen / pages without a menubar */
