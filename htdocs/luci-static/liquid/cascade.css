@@ -455,9 +455,7 @@ header [data-indicator][data-style="inactive"],
 	display: flex;
 	align-items: stretch;
 	width: 100%;
-	max-width: 1920px;
 	min-height: calc(100vh - 56px);
-	margin: 0 auto;
 }
 
 #maincontent {
