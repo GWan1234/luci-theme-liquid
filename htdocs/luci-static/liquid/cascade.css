@@ -2883,7 +2883,8 @@ pre {
 	.cbi-section-table-row {
 		display: flex;
 		flex-wrap: wrap;
-		align-items: flex-start;
+		/* 图标列与详细信息列等高对齐；二者合在一起超宽时才允许分行 */
+		align-items: stretch;
 		gap: 2px 6px;
 	}
 
@@ -2897,7 +2898,7 @@ pre {
 		order: 99;
 		display: flex;
 		flex-wrap: wrap;
-		justify-content: flex-end;
+		justify-content: center;
 		align-items: center;
 		gap: 4px;
 		padding: 6px 0 0;
