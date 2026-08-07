@@ -2124,6 +2124,24 @@ div[style*="grid-template-columns:repeat(auto-fit, minmax(70px, 1fr))"] .ifacebo
 	vertical-align: middle;
 }
 
+/* 网络 tooltip 接口徽章：横杠/圆点/接口名/图标同一行垂直居中 */
+.ifacebadge {
+	display: inline-flex;
+	align-items: center;
+	gap: 5px;
+	vertical-align: middle;
+}
+
+.ifacebadge .zonebadge {
+	flex-shrink: 0;
+	padding: 2px 6px;
+	line-height: 1;
+}
+
+.ifacebadge img {
+	vertical-align: middle;
+}
+
 .zonebadge {
 	display: inline-block;
 	padding: 2px 8px;
