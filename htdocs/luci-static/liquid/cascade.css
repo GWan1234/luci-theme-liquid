@@ -1695,10 +1695,10 @@ input[type="radio"] {
 	cursor: pointer;
 }
 
-/* 下拉选项 hover：更实的背景 + 高对比文字（原 --glass-bg-hover 偏淡，
-   暗黑模式下悬浮选项看不清） */
+/* 下拉选项 hover：更实的背景 + 高对比文字。
+   亮色用主题色浅 tint（白色背景上白 hover 看不清），暗黑用实色蓝灰 */
 .cbi-dropdown > ul > li:hover {
-	background: rgba(255, 255, 255, 0.92);
+	background: color-mix(in srgb, var(--primary-color-high) 16%, #ffffff);
 	color: var(--text-color-highest);
 }
 
