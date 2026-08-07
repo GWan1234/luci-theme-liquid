@@ -2883,24 +2883,16 @@ pre {
 	.cbi-section-table-row {
 		display: flex;
 		flex-wrap: wrap;
-		/* 图标列与详细信息列等高对齐；二者合在一起超宽时才允许分行 */
+		/* 图标列与详细信息列等高对齐；二者合在一起超宽时才允许分行。
+		   横向 gap 归零：各 td 本来自带的分割线（border-bottom）就能
+		   首尾相连成一条连续线；垂直 gap 保留作换行/与按钮行的间距 */
 		align-items: stretch;
-		gap: 2px 6px;
-		/* 行分隔线画在行容器上（横跨含 gap 的整行），取代每个 td
-		   各自的分割线，保证下边线连续一致 */
-		border-bottom: 1px solid var(--border-color-low);
-		padding-bottom: 6px;
-		margin-bottom: 6px;
-	}
-
-	.cbi-section-table-row:last-child {
-		border-bottom: 0;
+		gap: 6px 0;
 	}
 
 	.cbi-section-table-row > td {
 		flex: 0 1 auto;
 		min-width: 0;
-		border-bottom: 0;
 	}
 
 	.cbi-section-table-row > td.cbi-section-actions {
@@ -2911,9 +2903,7 @@ pre {
 		justify-content: center;
 		align-items: center;
 		gap: 4px;
-		padding: 6px 0 0;
-		border-top: 1px solid var(--border-color);
-		margin-top: 4px;
+		padding: 2px 0 4px;
 	}
 
 	#menubar .navigation {
