@@ -1435,37 +1435,33 @@ input[type="radio"] {
 	background: var(--glass-bg-hover);
 }
 
-/* 表格显式保持行布局（防 td 被块级化堆叠） */
-.table,
-.cbi-section-table {
-	display: table;
+/* 用量表格（内存/存储等）：表格转 block、行用 flex 强制同行
+   （与移动端同一方案；标题列约 16ch 允许内部换行，值列占剩余宽度） */
+.table:has(td[width="33%"]) {
+	display: block;
+	overflow-x: auto;
 }
 
-.table tr,
-.cbi-section-table tr {
-	display: table-row;
+.table:has(td[width="33%"]) tr {
+	display: flex;
+	align-items: center;
+	white-space: nowrap;
 }
 
-.table td,
-.table th,
-.cbi-section-table td,
-.cbi-section-table th {
-	display: table-cell;
+.table:has(td[width="33%"]) tr > td {
+	flex: 0 1 auto;
 }
 
-/* 用量表格（内存/存储等）：左侧标题列约 16 字符宽（允许内部换行），
-   右侧值列占剩余宽度，标题与值始终同一行 */
-.table td[width="33%"] {
-	width: 16ch;
+.table:has(td[width="33%"]) tr > td[width="33%"] {
+	flex: 0 0 16ch;
 	max-width: 16ch;
-	min-width: 16ch;
 	white-space: normal;
 	overflow-wrap: break-word;
 	word-break: break-word;
 }
 
-.table tr > td[width="33%"] + td {
-	width: 100%;
+.table:has(td[width="33%"]) tr > td:last-child {
+	flex: 1 1 100%;
 	white-space: nowrap;
 }
 
