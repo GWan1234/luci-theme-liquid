@@ -2185,6 +2185,26 @@ body.modal-overlay-active #modal_overlay {
 	margin-right: auto;
 }
 
+/* 按钮/操作元素并排时留空隙（表格操作列、内联按钮组、section 创建区等） */
+.cbi-button + .cbi-button,
+.cbi-button + button,
+button + .cbi-button,
+button + button,
+.btn + .btn,
+.btn + button,
+button + .btn,
+.td.cbi-section-actions > * + *,
+.cbi-section-create > * + * {
+	margin-left: 8px;
+}
+
+/* 已是 flex gap 的容器（页面操作区、modal 按钮行）自带间距，
+   去掉叠加的 margin，避免间距翻倍 */
+.cbi-page-actions > * + *,
+#modal_overlay > .modal .button-row > * + * {
+	margin-left: 0;
+}
+
 /* ==========================================================================
    17. Labels, notices, alerts
    ========================================================================== */
