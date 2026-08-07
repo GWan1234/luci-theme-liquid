@@ -2419,11 +2419,16 @@ button + .btn,
 }
 
 /* 未加入任何防火墙区域的接口：luci 渲染的 head 色条内联为白色
-   （--zone-color-rgb:255,255,255 或浅灰 238,238,238），暗色模式下
-   与白色接口名冲突看不清。统一改为中性灰，黑白模式都有可读性 */
+   （--zone-color-rgb:255,255,255 或浅灰 238,238,238），与接口名冲突。
+   按模式改为中性灰：亮色浅灰（黑字可读），暗色深灰（白字清晰） */
 .ifacebox-head[style*="--zone-color-rgb:255, 255, 255"],
 .ifacebox-head[style*="--zone-color-rgb:238, 238, 238"] {
 	--zone-color-rgb: 125, 125, 125;
+}
+
+:root[data-darkmode="true"] .ifacebox-head[style*="--zone-color-rgb:255, 255, 255"],
+:root[data-darkmode="true"] .ifacebox-head[style*="--zone-color-rgb:238, 238, 238"] {
+	--zone-color-rgb: 60, 60, 60;
 }
 
 .ifacebox-head {
