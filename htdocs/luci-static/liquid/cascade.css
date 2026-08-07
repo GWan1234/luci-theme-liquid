@@ -2662,10 +2662,11 @@ pre {
 		margin-top: 2px;
 	}
 
-	/* 移动端：接口卡片不撑宽表格（fit-content 拉伸会把操作列
-	   推到视口右侧），子接口图标行允许换行避免溢出 */
+	/* 移动端：接口卡片列限宽（fit-content 拉伸会把相邻列挤爆，
+	   拓宽后的卡片与文字重叠），子接口图标行允许换行避免溢出 */
 	.cbi-section-table td[data-name="_ifacebox"] {
 		width: auto;
+		max-width: 42%;
 	}
 
 	.cbi-section-table .ifacebox {
