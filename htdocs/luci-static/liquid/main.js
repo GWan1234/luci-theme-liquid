@@ -227,6 +227,26 @@
 		});
 	}
 
+	/* 下拉框自动避让：按钮靠近视口底部（或被页脚遮挡）时向上弹出，
+	   下方空间足够则照常向下 */
+	function adjustDropdownDirection() {
+		document.querySelectorAll('.cbi-dropdown[open] > ul.dropdown').forEach(function (ul) {
+			var dd = ul.closest('.cbi-dropdown');
+			if (!dd)
+				return;
+			var r = dd.getBoundingClientRect();
+			var vh = window.innerHeight;
+			var listH = ul.offsetHeight || 220;
+			if (r.bottom + listH + 12 > vh) {
+				ul.style.top = 'auto';
+				ul.style.bottom = 'calc(100% + 4px)';
+			} else {
+				ul.style.top = 'calc(100% + 4px)';
+				ul.style.bottom = 'auto';
+			}
+		});
+	}
+
 	/* cbi-dropdown：选择后确保 li[display] 跟随选中项（当前值显示兜底） */
 	function syncDropdownValues() {
 		document.querySelectorAll('.cbi-dropdown').forEach(function (dd) {
@@ -249,8 +269,11 @@
 
 			sync();
 			if (window.MutationObserver) {
-				var mo = new MutationObserver(sync);
-				mo.observe(dd, { attributes: true, subtree: true, attributeFilter: ['class', 'display'] });
+				var mo = new MutationObserver(function () {
+					sync();
+					adjustDropdownDirection();
+				});
+				mo.observe(dd, { attributes: true, subtree: true, attributeFilter: ['class', 'display', 'open'] });
 			}
 
 			/* 兜底：点击选项后（ui.js toggleItem/closeDropdown 之后），
@@ -361,6 +384,11 @@
 		w.innerHTML = '<svg class="liquid-logo" viewBox="0 0 64 68" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs><linearGradient id="liquid-lg-login" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--primary-color-high)" stop-opacity="0.85"/><stop offset="0.5" stop-color="var(--primary-color-high)" stop-opacity="0.4"/><stop offset="1" stop-color="var(--primary-color-low)" stop-opacity="0.92"/></linearGradient></defs><path d="M32 3 C46 20 57 30 57 42 a25 25 0 0 1 -50 0 C7 30 18 20 32 3 Z" fill="url(#liquid-lg-login)" stroke="rgba(255,255,255,0.7)" stroke-width="1.5"/><ellipse cx="23" cy="39" rx="9.5" ry="6" fill="#ffffff" opacity="0.6"/></svg>';
 		m.insertBefore(w.firstChild, m.firstChild);
 	}
+
+	/* 窗口尺寸变化时重新计算已打开下拉框的方向 */
+	window.addEventListener('resize', function () {
+		setTimeout(adjustDropdownDirection, 60);
+	});
 
 	/* 移动端菜单 top 跟随顶栏实际高度（防顶栏被撑高后菜单盖住它） */
 	function syncMenuTop() {
