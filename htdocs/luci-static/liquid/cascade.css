@@ -2893,6 +2893,8 @@ pre {
 	.cbi-section-table-row > td {
 		flex: 0 1 auto;
 		min-width: 0;
+		/* 移动端接口页：隐藏行分割线（线与列对齐难兼顾，先试无分割线） */
+		border-bottom: 0 !important;
 	}
 
 	.cbi-section-table-row > td.cbi-section-actions {
