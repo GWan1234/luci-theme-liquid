@@ -2418,18 +2418,27 @@ button + .btn,
 	box-shadow: var(--glass-shadow-soft), inset 0 1px 0 var(--glass-inset);
 }
 
-/* 未加入任何防火墙区域的接口：luci 渲染的 head 色条内联为白色
-   （--zone-color-rgb:255,255,255 或浅灰 238,238,238），与接口名冲突。
-   按模式改为中性灰：亮色浅灰（黑字可读），暗色深灰（白字清晰） */
+/* 未加入任何防火墙区域的接口：luci 渲染的 head 色条内联为浅灰/白色
+   （#eeeeee / #ffffff），且不同 luci 版本输出不同：
+   - '--zone-color-rgb:238, 238, 238'（冒号后有无空格两种）
+   - 或直接 'background-color: rgb(238, 238, 238)'
+   统一覆盖变量与直接色值，按模式改为中性灰：
+   亮色浅灰（黑字可读），暗色近黑（白字清晰） */
+.ifacebox-head[style*="--zone-color-rgb:238, 238, 238"],
+.ifacebox-head[style*="--zone-color-rgb: 238, 238, 238"],
 .ifacebox-head[style*="--zone-color-rgb:255, 255, 255"],
-.ifacebox-head[style*="--zone-color-rgb:238, 238, 238"] {
+.ifacebox-head[style*="--zone-color-rgb: 255, 255, 255"] {
 	--zone-color-rgb: 125, 125, 125;
+	background-color: rgb(125, 125, 125) !important;
 }
 
+:root[data-darkmode="true"] .ifacebox-head[style*="--zone-color-rgb:238, 238, 238"],
+:root[data-darkmode="true"] .ifacebox-head[style*="--zone-color-rgb: 238, 238, 238"],
 :root[data-darkmode="true"] .ifacebox-head[style*="--zone-color-rgb:255, 255, 255"],
-:root[data-darkmode="true"] .ifacebox-head[style*="--zone-color-rgb:238, 238, 238"] {
+:root[data-darkmode="true"] .ifacebox-head[style*="--zone-color-rgb: 255, 255, 255"] {
 	/* 暗色下：比黑色浅一点点（近黑），白色接口名清晰可读 */
 	--zone-color-rgb: 24, 26, 30;
+	background-color: rgb(24, 26, 30) !important;
 }
 
 .ifacebox-head {
