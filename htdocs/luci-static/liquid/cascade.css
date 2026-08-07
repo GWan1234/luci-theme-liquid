@@ -2678,6 +2678,19 @@ pre {
 		white-space: normal;
 	}
 
+	/* 移动端：接口图标强制统一 32px，防止被列宽挤压变形 */
+	.cbi-section-table .ifacebox img {
+		width: 32px !important;
+		height: 32px !important;
+		flex-shrink: 0;
+	}
+
+	/* 移动端：操作按钮列右对齐，避让接口信息文字；允许换行 */
+	.cbi-section-table td.cbi-section-actions {
+		text-align: right;
+		white-space: normal;
+	}
+
 	#menubar .navigation {
 		display: flex;
 	}
