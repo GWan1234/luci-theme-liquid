@@ -64,7 +64,7 @@
 <p class="luci luci-foot">
 	<a href="https://github.com/zzsj0928/luci-theme-liquid" target="_blank" rel="noopener">Liquid Theme {# PKG_VERSION #}</a>
 	<span class="luci-sep">·</span>
-	<a href="{{ fw_release }}" target="_blank" rel="noopener">{{ fw_text }}</a>
+	<a class="luci-fw" href="{{ fw_release }}" target="_blank" rel="noopener">{{ fw_text }}</a>
 	<span class="luci-sep">·</span>
 	<span>Kernel: {{ boardinfo.kernel ?? '?' }}</span>
 	<span class="luci-sep">·</span>

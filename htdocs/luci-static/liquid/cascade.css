@@ -2156,6 +2156,11 @@ pre {
 		left: 0;
 	}
 
+	/* 移动端 foot 横幅只保留固件版本 */
+	body:not(.liquid-login) p.luci > *:not(.luci-fw) {
+		display: none;
+	}
+
 	#menubar .distversion {
 		display: none;
 	}
