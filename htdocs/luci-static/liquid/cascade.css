@@ -2420,6 +2420,9 @@ div[style*="grid-template-columns:repeat(auto-fit, minmax(70px, 1fr))"] .ifacebo
    防止图标溢出卡片；max-width 不限制，让列随内容拉伸 */
 .cbi-section-table td[data-name="_ifacebox"] {
 	width: fit-content;
+	/* 卡片左右对称留空：多图标扩宽后右侧不贴相邻列 */
+	padding-left: 14px;
+	padding-right: 14px;
 }
 
 .cbi-section-table .ifacebox {
