@@ -1430,13 +1430,13 @@ input[type="radio"] {
 	background: var(--glass-bg-hover);
 }
 
-/* 用量表格（内存/存储等）：标题列自适应不换行，用量条占剩余宽度 */
+/* 用量表格（内存/存储等）：标题列自适应不换行，用量条列占剩余宽度 */
 .table td[width="33%"] {
 	width: auto;
 	white-space: nowrap;
 }
 
-.table tr > td:last-child {
+.table tr > td[width="33%"] + td {
 	width: 100%;
 }
 
@@ -2187,6 +2187,31 @@ pre {
 	.table {
 		display: block;
 		overflow-x: auto;
+	}
+
+	/* 行内单元格同行排列，标题列紧凑、值列占剩余宽度 */
+	.cbi-section-table tr,
+	.table tr {
+		display: flex;
+		align-items: center;
+		white-space: nowrap;
+	}
+
+	.cbi-section-table tr > td,
+	.cbi-section-table tr > th,
+	.table tr > td,
+	.table tr > th {
+		flex: 0 1 auto;
+	}
+
+	.cbi-section-table tr > td:last-child,
+	.table tr > td:last-child {
+		flex: 1 1 100%;
+	}
+
+	.cbi-section-table tr > td[width="33%"],
+	.table tr > td[width="33%"] {
+		flex: 0 0 auto;
 	}
 
 	.Dashboard .section-content {
