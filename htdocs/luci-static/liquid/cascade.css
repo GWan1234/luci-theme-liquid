@@ -558,15 +558,17 @@ header [data-indicator][data-style="inactive"],
 }
 
 /* submenu */
-#mainmenu li > ul {
-	display: none;
+#mainmenu li > ul,
+#mainmenu li > ul.mainmenu {
+	display: none !important;
 	margin: 2px 0 6px 10px;
 	padding-left: 8px;
 	border-left: 1px solid var(--border-color-low);
 }
 
-#mainmenu li.active > ul {
-	display: block;
+#mainmenu li.active > ul,
+#mainmenu li.active > ul.mainmenu {
+	display: block !important;
 	animation: liquid-fade-in .22s ease;
 }
 
