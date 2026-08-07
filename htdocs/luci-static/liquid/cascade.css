@@ -1562,10 +1562,14 @@ input[type="radio"] {
 	min-width: 300px;
 	padding: 8px 34px 8px 12px;
 	font-size: 13px;
-	color: var(--text-color-high);
-	background: var(--field-bg);
-	border: 1px solid var(--border-color-medium);
+	/* 闭合按钮：参照"保存并应用"（ComboButton）的一体化设计——
+	   accent 渐变胶囊 + 右侧分隔的下拉箭头区。只改闭合显示，
+	   点开后的选项列表样式保持不变 */
+	color: var(--on-primary-color);
+	background: var(--accent-grad);
+	border: 1px solid transparent;
 	border-radius: 10px;
+	box-shadow: 0 6px 16px var(--accent-glow), inset 0 1px 0 rgba(255, 255, 255, 0.35);
 	cursor: pointer;
 }
 
@@ -1582,8 +1586,8 @@ input[type="radio"] {
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	border-left: 1px solid var(--border-color-medium);
-	color: var(--text-color-medium);
+	border-left: 1px solid rgba(255, 255, 255, 0.35);
+	color: var(--on-primary-color);
 	cursor: pointer;
 	z-index: 1;
 }
@@ -1663,6 +1667,7 @@ input[type="radio"] {
 
 /* ComboButton 闭合时：按钮本身已有渐变底色，内部当前值行
    不再叠加 accent 底色（打开后的弹出列表里选中项仍保留高亮） */
+.cbi-dropdown:not([open]) > ul > li[selected],
 .cbi-dropdown.cbi-button-apply:not([open]) > ul > li[selected],
 .cbi-dropdown.cbi-button-negative:not([open]) > ul > li[selected] {
 	background: transparent;
@@ -1675,9 +1680,11 @@ input[type="radio"] {
 	align-items: center;
 	min-width: 300px;
 	padding: 8px 34px 8px 12px;
-	background: var(--field-bg);
-	border: 1px solid var(--border-color-medium);
+	/* 与 cbi-dropdown 统一的渐变按钮风格 */
+	background: var(--accent-grad);
+	border: 1px solid transparent;
 	border-radius: 10px;
+	box-shadow: 0 6px 16px var(--accent-glow), inset 0 1px 0 rgba(255, 255, 255, 0.35);
 	cursor: pointer;
 }
 
@@ -1708,8 +1715,8 @@ input[type="radio"] {
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	border-left: 1px solid var(--border-color-medium);
-	color: var(--text-color-medium);
+	border-left: 1px solid rgba(255, 255, 255, 0.35);
+	color: var(--on-primary-color);
 	pointer-events: none;
 }
 
