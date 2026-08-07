@@ -1606,14 +1606,13 @@ input[type="radio"] {
    两个下拉菜单堆叠。ui.js 打开时会把原 ul 克隆为 ul.preview，
    弹出规则只作用于 ul.dropdown。 */
 .cbi-dropdown[open] {
-	background: transparent;
+	/* 打开时按钮保持渐变胶囊（一体但分割），下拉列表照常弹出 */
+	background: var(--accent-grad);
 	border-color: transparent;
-	box-shadow: none;
+	box-shadow: 0 6px 16px var(--accent-glow), inset 0 1px 0 rgba(255, 255, 255, 0.35);
 }
 
-.cbi-dropdown[open] > ul.preview,
 .cbi-dropdown[open] > .more,
-.cbi-dropdown[open] > .open,
 .cbi-dropdown[open] > div {
 	display: none;
 }
@@ -1717,7 +1716,7 @@ input[type="radio"] {
 	left: 0;
 	right: 0;
 	top: calc(100% + 4px);
-	z-index: 1200;
+	z-index: 9999;
 	max-height: 260px;
 	overflow-y: auto;
 	padding: 5px;
