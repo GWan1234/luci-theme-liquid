@@ -2241,6 +2241,15 @@ div[style*="grid-template-columns:repeat(auto-fit, minmax(70px, 1fr))"] .ifacebo
 	z-index: 9999 !important;
 }
 
+/* hover 时提升卡片本身的层叠顺序：
+   .ifacebox 的 backdrop-filter 会创建 stacking context，把 tooltip 的
+   z-index:9999 锁在卡片内部，卡片之间的遮挡由 DOM 顺序决定——后一张
+   卡片会盖住前一张卡片的 tooltip。hover 提升卡片（z-index:1001）即可
+   让 tooltip 随卡片整体盖过相邻卡片（tooltip 的 9999 在卡片内部仍生效）。 */
+.ifacebox:hover {
+	z-index: 1001;
+}
+
 .ifacebox .cbi-tooltip-container {
 	position: relative;
 }
