@@ -2103,15 +2103,36 @@ div[style*="grid-template-columns:repeat(auto-fit, minmax(70px, 1fr))"] .ifacebo
 	margin-bottom: 14px;
 }
 
-/* 端口流量统计：tooltip 内容在 ▼ 下方换行显示 */
+/* 统计 tooltip：默认隐藏，悬停 📊/统计区域时在下方悬浮显示（DHCPv6/端口统计） */
+.ifacebox .cbi-tooltip-container {
+	position: relative;
+}
+
 .ifacebox .cbi-tooltip {
-	position: static !important;
-	left: auto !important;
-	opacity: 1 !important;
+	position: absolute;
+	left: -10000px;
+	top: 100%;
+	opacity: 0;
 	display: block;
-	margin: 6px 0 0;
+	min-width: 220px;
+	margin: 4px 0 0;
+	padding: 8px 10px;
+	border-radius: 10px;
+	background: var(--glass-bg-strong);
+	-webkit-backdrop-filter: blur(12px);
+	backdrop-filter: blur(12px);
+	border: 1px solid var(--glass-border);
+	box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+	z-index: 50;
 	white-space: normal;
 	line-height: 1.55;
+	pointer-events: none;
+	transition: opacity .15s ease;
+}
+
+.ifacebox .cbi-tooltip-container:hover .cbi-tooltip {
+	left: 0;
+	opacity: 1;
 }
 
 /* 接口总览表格：列宽自适应 */
