@@ -1,10 +1,10 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=luci-theme-liquid
-PKG_VERSION:=0.1
-PKG_RELEASE:=94
+PKG_VERSION:=0.2
+PKG_RELEASE:=9
 
-PKG_MAINTAINER:=然后七年 <69092025+zzsj0928@users.noreply.github.com>
+PKG_MAINTAINER:=然后七年 <z@7ze.top>
 PKG_LICENSE:=Apache-2.0
 
 LUCI_TITLE:=Liquid glass theme for LuCI (>= 23)

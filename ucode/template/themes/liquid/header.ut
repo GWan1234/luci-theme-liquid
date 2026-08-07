@@ -13,6 +13,53 @@
 	http.prepare_content('text/html; charset=UTF-8');
 
 	let ptitle = (node ?? dispatched)?.title;
+
+	/* ---- 主题配置（uci /etc/config/liquid，换客户端保留） ---- */
+	let cfg_mode = 'auto';
+	let cfg_accent = 'blue';
+	let cfg_bing = '0';
+	let cfg = fs.readfile('/etc/config/liquid') ?? '';
+	let cm = match(cfg, /option[ \t]+mode[ \t]+'?([^' \t\n]+)'?/);
+	if (cm !== null)
+		cfg_mode = cm[1];
+	let ca = match(cfg, /option[ \t]+accent[ \t]+'?([^' \t\n]+)'?/);
+	if (ca !== null)
+		cfg_accent = ca[1];
+	let cb = match(cfg, /option[ \t]+bing[ \t]+'?([^' \t\n]+)'?/);
+	if (cb !== null)
+		cfg_bing = cb[1];
+
+	/* ---- Bing 每日壁纸：缓存到各设备自己的 /tmp/liquid/，
+	   软链 /www/liquid-cache 供 http 访问（/www 为 overlay 可写）。
+	   system() 只透传 stdout（返回退出码），因此用"写临时文件 +
+	   fs.readfile"获取 wget 输出 ---- */
+	let bing_style = '';
+	let bing_ok = '0';
+	if (cfg_bing == '1') {
+		system('mkdir -p /tmp/liquid && ln -sfn /tmp/liquid /www/liquid-cache && date +%Y%m%d > /tmp/liquid-date.txt');
+		let today = trim(fs.readfile('/tmp/liquid-date.txt') ?? '');
+		if (today != '') {
+			let bing_file = sprintf('/tmp/liquid/bing-%s.jpg', today);
+			if (fs.stat(bing_file)) {
+				bing_style = sprintf(":root{--liquid-bing:url('/liquid-cache/bing-%s.jpg');}", today);
+				bing_ok = '1';
+			} else {
+				system('wget -qO /tmp/liquid-bing-api.json -T 8 "https://www.bing.com/HPImageArchive.aspx?format=js&idx=0&n=1&mkt=zh-CN"');
+				let api = fs.readfile('/tmp/liquid-bing-api.json') ?? '';
+				if (api != '') {
+					let j = json(api);
+					if (j && j.images && j.images[0] && j.images[0].urlbase) {
+						let u = sprintf('https://www.bing.com%s_1920x1080.jpg', j.images[0].urlbase);
+						system(sprintf('wget -qO "%s" -T 20 "%s"', bing_file, u));
+						if (fs.stat(bing_file)) {
+							bing_style = sprintf(":root{--liquid-bing:url('/liquid-cache/bing-%s.jpg');}", today);
+							bing_ok = '1';
+						}
+					}
+				}
+			}
+		}
+	}
 -%}
 
 <!DOCTYPE html>
@@ -22,15 +69,23 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="darkreader-lock">
+{% if (bing_style != ''): %}<style>{{ bing_style }}</style>{% endif %}
 <script>
-	/* Liquid theme: apply persisted light/dark/auto mode + accent before CSS paints */
+	/* Liquid theme: apply uci-persisted light/dark/auto mode + accent before CSS paints.
+	   uci（服务端模板读取）优先：其他客户端修改后本机刷新即生效；
+	   仅当 uci 未配置时回退 localStorage。锁屏页同样按 uci 显示（只读）。 */
 	(function () {
 		try {
-			var m = localStorage.getItem('liquid-theme-mode');
+			var m = "{{ cfg_mode }}";
+			var a = "{{ cfg_accent }}";
+			if (!m)
+				m = localStorage.getItem('liquid-theme-mode') || 'auto';
+			if (!a)
+				a = localStorage.getItem('liquid-accent') || 'blue';
 			var dark = (m == 'dark') || ((m != 'light') && window.matchMedia('(prefers-color-scheme: dark)').matches);
 			document.documentElement.setAttribute('data-darkmode', dark ? 'true' : 'false');
-			document.documentElement.setAttribute('data-liquid-mode', m || 'auto');
-			document.documentElement.setAttribute('data-accent', localStorage.getItem('liquid-accent') || 'blue');
+			document.documentElement.setAttribute('data-liquid-mode', m);
+			document.documentElement.setAttribute('data-accent', a);
 		} catch (e) {}
 	})();
 </script>
@@ -44,7 +99,7 @@
 <style title="text/css">{{ css }}</style>
 {% endif %}
 </head>
-<body class="lang_{{ dispatcher.lang }}{% if (blank_page): %} liquid-login{% endif %}" data-page="{{ entityencode(join('-', ctx.request_path), true) }}" data-hostname="{{ striptags(boardinfo.hostname ?? '') }}">
+<body class="lang_{{ dispatcher.lang }}{% if (blank_page): %} liquid-login{% endif %}" data-page="{{ entityencode(join('-', ctx.request_path), true) }}" data-hostname="{{ striptags(boardinfo.hostname ?? '') }}" data-liquid-mode="{{ cfg_mode }}" data-liquid-accent="{{ cfg_accent }}" data-liquid-bing="{{ cfg_bing }}" data-liquid-bing-ok="{{ bing_ok }}">
 
 <p class="skiplink">
 <span id="skiplink1"><a href="#navigation">{{ _('Skip to navigation') }}</a></span>

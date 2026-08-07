@@ -23,7 +23,7 @@
 [luci-mod]: https://github.com/xylz0928/luci-mod
 
 <div align="center">
-<img src="logo.svg">
+<p align="center"><img src="logo.svg" width="300"></p>
 
 # 💧 luci-theme-liquid
 
@@ -63,6 +63,15 @@
 - **SVG 图标**：网络 / 接口状态图标取自 [xylz0928/luci-mod][luci-mod] `immortalwrt-24.10` 分支的 SVG 图标集；UI 元素图标（sun / moon / auto / refresh / lock / search / close / chevron）为内置 SVG。
 
 ## 更新日志
+
+- **2026-08-07 · v0.2**：配置持久化（uci）+ Bing 每日壁纸 + 多项修复
+  - **配置持久化（uci）**：亮/暗/自动模式、5 套主题色、Bing 开关统一存入 `uci /etc/config/liquid`，换客户端（浏览器/设备）仍保留；改动经 LuCI RPC 直接提交，立即生效、无"待应用"提示
+  - **Bing 每日壁纸（锁屏）**：主题色前新增 Bing 开关按钮（字母 b logo）；启用后锁屏显示 Bing 当日壁纸（缓存于各设备 `/tmp/liquid/`）；无互联网或按钮关闭时自动回退默认壁纸（亮/暗各按模式）
+  - **锁屏只读**：登录页仅本地预览，不写入配置
+  - **uci 优先**：修复本地 localStorage 旧值覆盖 uci 新配置的问题，页面加载即应用路由器端配置
+  - **接口页修复**：未加入防火墙区域的接口 head 色条由白色改为灰色（亮色浅灰 / 暗色近黑），暗色下接口名不再不可见
+  - **CI**：GitHub Actions 双平台（x86 + MT798x）× 双格式（ipk / apk）自动构建发布
+  - 版本号 0.2-r1
 
 - **2026-08-07 · v0.1 首次发布**：全新 macOS 风格 Liquid Glass（液态玻璃）LuCI 主题，带来以下功能：
   - **液态玻璃设计语言**：侧栏、内容卡片、登录页、页脚统一 frosted-glass（模糊 + 高光 + 主题色光晕），暗色下玻璃更实、文字更清晰
@@ -106,10 +115,10 @@ make package/luci-theme-liquid/compile -j4 V=s
 
 > 注意：`make package/<name>/compile` 只对已在 `.config` 中启用（`=y`/`=m`）的包真正执行构建，未启用时 make 会空转（`Entering/Leaving` 无任何动作），不要误判为成功。
 
-生成的 `bin/packages/<arch>/base/luci-theme-liquid-0.1-r<rel>.apk`（或 `.ipk`）可通过 `apk` / `opkg` 安装：
+生成的 `bin/packages/<arch>/base/luci-theme-liquid-0.2-r<rel>.apk`（或 `.ipk`）可通过 `apk` / `opkg` 安装：
 
 ```sh
-apk add --allow-untrusted luci-theme-liquid-0.1-r94.apk
+apk add --allow-untrusted luci-theme-liquid-0.2-r1.apk
 ```
 
 首次安装会自动注册主题（`luci.themes.Liquid=/luci-static/liquid`）；若 `luci.main.mediaurlbase` 尚未配置则自动设为该主题，否则请在 **System → Advanced → Theme** 中手动选择 **Liquid**。

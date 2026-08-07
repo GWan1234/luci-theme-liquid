@@ -587,6 +587,35 @@ header [data-indicator][data-style="inactive"],
 	transition: transform .15s ease, box-shadow .15s ease;
 }
 
+/* Bing 壁纸按钮（五色之前）：点亮 = 启用 Bing 每日壁纸 */
+.liquid-bing-btn {
+	position: relative;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 20px;
+	height: 20px;
+	padding: 0;
+	border-radius: 50%;
+	border: 2px solid transparent;
+	background: transparent;
+	cursor: pointer;
+	transition: transform .15s ease, box-shadow .15s ease, opacity .15s ease;
+	opacity: .55;
+}
+
+.liquid-bing-btn:hover {
+	transform: scale(1.15);
+	opacity: 1;
+}
+
+.liquid-bing-btn.active {
+	transform: scale(1.15);
+	border-color: var(--primary-color-high);
+	box-shadow: 0 0 0 3px var(--accent-glow);
+	opacity: 1;
+}
+
 .liquid-color-btn:hover {
 	transform: scale(1.15);
 }
@@ -2029,6 +2058,17 @@ body.liquid-login {
 	background-image: url(img/MontereyLight.jpg);
 }
 
+/* Bing 每日壁纸（仅锁屏界面）：壁纸可用（data-liquid-bing-ok="1"，由
+   ucode 模板按当日缓存是否就绪输出）时覆盖亮/暗两种模式的默认壁纸。
+   无互联网（ok=0）或按钮关闭时规则不匹配，回退默认 Monterey 壁纸
+   （亮色 MontereyLight / 暗色 MontereyDark） */
+body.liquid-login[data-liquid-bing-ok="1"] {
+	background-image: var(--liquid-bing) !important;
+	background-size: cover;
+	background-position: center;
+	background-attachment: fixed;
+}
+
 body.liquid-login .skiplink {
 	display: none;
 }
@@ -2376,6 +2416,29 @@ button + .btn,
 	backdrop-filter: blur(var(--glass-blur));
 	border: 1px solid var(--glass-border);
 	box-shadow: var(--glass-shadow-soft), inset 0 1px 0 var(--glass-inset);
+}
+
+/* 未加入任何防火墙区域的接口：luci 渲染的 head 色条内联为浅灰/白色
+   （#eeeeee / #ffffff），且不同 luci 版本输出不同：
+   - '--zone-color-rgb:238, 238, 238'（冒号后有无空格两种）
+   - 或直接 'background-color: rgb(238, 238, 238)'
+   统一覆盖变量与直接色值，按模式改为中性灰：
+   亮色浅灰（黑字可读），暗色近黑（白字清晰） */
+.ifacebox-head[style*="--zone-color-rgb:238, 238, 238"],
+.ifacebox-head[style*="--zone-color-rgb: 238, 238, 238"],
+.ifacebox-head[style*="--zone-color-rgb:255, 255, 255"],
+.ifacebox-head[style*="--zone-color-rgb: 255, 255, 255"] {
+	--zone-color-rgb: 125, 125, 125;
+	background-color: rgb(125, 125, 125) !important;
+}
+
+:root[data-darkmode="true"] .ifacebox-head[style*="--zone-color-rgb:238, 238, 238"],
+:root[data-darkmode="true"] .ifacebox-head[style*="--zone-color-rgb: 238, 238, 238"],
+:root[data-darkmode="true"] .ifacebox-head[style*="--zone-color-rgb:255, 255, 255"],
+:root[data-darkmode="true"] .ifacebox-head[style*="--zone-color-rgb: 255, 255, 255"] {
+	/* 暗色下：比黑色浅一点点（近黑），白色接口名清晰可读 */
+	--zone-color-rgb: 24, 26, 30;
+	background-color: rgb(24, 26, 30) !important;
 }
 
 .ifacebox-head {
