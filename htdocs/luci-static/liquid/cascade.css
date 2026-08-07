@@ -2456,6 +2456,24 @@ pre {
 
 @media screen and (max-width: 854px) {
 
+	/* 移动端：多层嵌套卡片（network/dns/主机名记录等会套 2-4 层）压缩
+	   各层左右缩进到 2px，避免嵌套层数多了最内层内容被挤出视口 */
+	.cbi-map {
+		padding: 10px 2px 12px;
+	}
+
+	.cbi-section {
+		padding: 10px 2px 12px;
+	}
+
+	.cbi-section-node {
+		padding: 2px 0;
+	}
+
+	.cbi-section-node > .cbi-section {
+		margin-top: 2px;
+	}
+
 	#menubar .navigation {
 		display: flex;
 	}
