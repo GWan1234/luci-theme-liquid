@@ -2418,6 +2418,14 @@ button + .btn,
 	box-shadow: var(--glass-shadow-soft), inset 0 1px 0 var(--glass-inset);
 }
 
+/* 未加入任何防火墙区域的接口：luci 渲染的 head 色条内联为白色
+   （--zone-color-rgb:255,255,255 或浅灰 238,238,238），暗色模式下
+   与白色接口名冲突看不清。统一改为中性灰，黑白模式都有可读性 */
+.ifacebox-head[style*="--zone-color-rgb:255, 255, 255"],
+.ifacebox-head[style*="--zone-color-rgb:238, 238, 238"] {
+	--zone-color-rgb: 125, 125, 125;
+}
+
 .ifacebox-head {
 	display: flex;
 	align-items: center;
