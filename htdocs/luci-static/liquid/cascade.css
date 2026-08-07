@@ -2491,6 +2491,22 @@ div[style*="grid-template-columns:repeat(auto-fit, minmax(70px, 1fr))"] .ifacebo
 	opacity: 1;
 }
 
+/* 悬浮内容框被 portal 到 body 顶层后，原 .ifacebox .cbi-tooltip 的
+   背景规则因元素移出卡片而失效（会变成透明、文字看不清），
+   这里补上磨砂玻璃底色 */
+.liquid-tip-ported {
+	background: var(--glass-bg-strong) !important;
+	-webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat)) !important;
+	backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat)) !important;
+	border: 1px solid var(--glass-border) !important;
+	border-radius: 10px !important;
+	box-shadow: 0 10px 28px rgba(0, 0, 0, 0.2) !important;
+	padding: 8px 12px !important;
+	white-space: normal !important;
+	line-height: 1.55 !important;
+	color: var(--text-color-high) !important;
+}
+
 /* 接口总览表格：列宽自适应 */
 .cbi-section-table {
 	table-layout: auto;

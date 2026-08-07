@@ -304,11 +304,13 @@
 				tip.style.zIndex = '99999';
 				tip.style.opacity = '1';
 				tip.style.pointerEvents = 'none';
+				tip.classList.add('liquid-tip-ported');
 				document.body.appendChild(tip);
 			});
 			c.addEventListener('mouseleave', function () {
 				if (tip.parentNode !== origParent)
 					origParent.appendChild(tip);
+				tip.classList.remove('liquid-tip-ported');
 				tip.style.position = '';
 				tip.style.left = '';
 				tip.style.top = '';
