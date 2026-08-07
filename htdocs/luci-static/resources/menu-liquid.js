@@ -30,6 +30,42 @@ return baseclass.extend({
 
 		document.querySelector('#menubar > .navigation')
 			.addEventListener('click', ui.createHandlerFn(this, 'handleSidebarToggle'));
+
+		this.initMenuIndicator();
+	},
+
+	/* hover 追踪：一个玻璃滑块平滑跟随鼠标在一级菜单项间移动 */
+	initMenuIndicator() {
+		const menu = document.querySelector('#mainmenu');
+
+		if (!menu)
+			return;
+
+		const indicator = E('div', { 'class': 'liquid-menu-indicator' });
+		menu.appendChild(indicator);
+
+		const items = menu.querySelectorAll('ul.mainmenu.l1 > li');
+
+		menu.addEventListener('mouseleave', function () {
+			menu.classList.remove('liquid-menu-hovering');
+		});
+
+		menu.addEventListener('scroll', function () {
+			menu.classList.remove('liquid-menu-hovering');
+		});
+
+		items.forEach(function (li) {
+			li.addEventListener('mouseenter', function () {
+				const a = li.querySelector(':scope > a');
+				const menuRect = menu.getBoundingClientRect();
+				const aRect = a.getBoundingClientRect();
+
+				indicator.style.transform =
+					'translateY(%dpx)'.format(aRect.top - menuRect.top + menu.scrollTop);
+				indicator.style.height = '%dpx'.format(aRect.height);
+				menu.classList.add('liquid-menu-hovering');
+			});
+		});
 	},
 
 	handleMenuExpand(ev) {

@@ -512,16 +512,17 @@ header [data-indicator][data-style="inactive"],
 	            box-shadow .16s ease, color .16s ease;
 }
 
-/* menu item hover — liquid glass highlight */
+/* 悬停视觉由 .liquid-menu-indicator 滑块负责；这里仅文字变色 */
 #mainmenu ul.mainmenu.l1 > li > a:hover {
-	background: var(--glass-bg-hover);
-	border-color: var(--glass-border);
-	box-shadow: var(--glass-shadow-soft), inset 0 1px 0 var(--glass-inset);
+	background: transparent;
+	border-color: transparent;
+	box-shadow: none;
 	color: var(--text-color-highest);
 }
 
-/* menu item selected — liquid glass accent */
-#mainmenu ul.mainmenu.l1 > li.selected > a {
+/* menu item selected — liquid glass accent（不被 hover 覆盖） */
+#mainmenu ul.mainmenu.l1 > li.selected > a,
+#mainmenu ul.mainmenu.l1 > li.selected > a:hover {
 	background: var(--accent-grad);
 	border-color: rgba(255, 255, 255, 0.35);
 	color: var(--on-primary-color);
@@ -589,7 +590,8 @@ header [data-indicator][data-style="inactive"],
 	color: var(--text-color-high);
 }
 
-#mainmenu ul.mainmenu.l2 > li.selected > a {
+#mainmenu ul.mainmenu.l2 > li.selected > a,
+#mainmenu ul.mainmenu.l2 > li.selected > a:hover {
 	background: var(--glass-bg);
 	color: var(--primary-color-high);
 	font-weight: 600;
@@ -598,6 +600,31 @@ header [data-indicator][data-style="inactive"],
 
 #mainmenu:empty {
 	display: none;
+}
+
+/* hover 追踪滑块 */
+.liquid-menu-indicator {
+	position: absolute;
+	left: 10px;
+	right: 10px;
+	top: 0;
+	height: 40px;
+	border-radius: 13px;
+	background: var(--glass-bg-hover);
+	border: 1px solid var(--glass-border);
+	box-shadow: var(--glass-shadow-soft), inset 0 1px 0 var(--glass-inset);
+	-webkit-backdrop-filter: blur(10px) saturate(var(--glass-sat));
+	backdrop-filter: blur(10px) saturate(var(--glass-sat));
+	opacity: 0;
+	pointer-events: none;
+	z-index: 2;
+	transition: transform .28s cubic-bezier(.22, .8, .3, 1),
+	            height .28s cubic-bezier(.22, .8, .3, 1),
+	            opacity .18s ease;
+}
+
+#mainmenu.liquid-menu-hovering .liquid-menu-indicator {
+	opacity: 1;
 }
 
 /* ==========================================================================
