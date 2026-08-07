@@ -2472,6 +2472,17 @@ div[style*="grid-template-columns:repeat(auto-fit, minmax(70px, 1fr))"] .ifacebo
 /* 统计 tooltip：默认隐藏，悬停 📊/统计区域时在下方悬浮显示（DHCPv6/端口统计） */
 .cbi-tooltip {
 	z-index: 9999 !important;
+	/* 通用隐藏：防非 .ifacebox 容器（设备页等）里的 tooltip
+	   （含 ifacebadge 大图标）泄漏显示，导致一个接口出现两个图标 */
+	left: -10000px;
+	opacity: 0;
+	visibility: hidden;
+}
+
+.cbi-tooltip-container:hover .cbi-tooltip {
+	left: 0;
+	opacity: 1;
+	visibility: visible;
 }
 
 /* hover 时提升卡片本身的层叠顺序：
