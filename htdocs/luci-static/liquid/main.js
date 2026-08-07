@@ -104,9 +104,8 @@
 		var menubar = document.querySelector('#mainmenu');
 
 		if (menubar) {
-			/* 插在模式开关之后（菜单栏顶部） */
-			var ref = menubar.querySelector('.liquid-mode-switch');
-			menubar.insertBefore(wrap, ref ? ref.nextSibling : menubar.firstChild);
+			/* 菜单栏顶部（水平居中） */
+			menubar.insertBefore(wrap, menubar.firstChild);
 		}
 		else {
 			/* lock screen / pages without a menubar */
@@ -143,11 +142,11 @@
 			wrap.appendChild(btn);
 		});
 
-		var menubar = document.querySelector('#mainmenu');
+		var indicators = document.getElementById('indicators');
 
-		if (menubar) {
-			/* 菜单栏顶部（桌面/移动端都安全） */
-			menubar.insertBefore(wrap, menubar.firstChild);
+		if (indicators && indicators.parentNode) {
+			/* 顶栏原位置（刷新指示区左侧） */
+			indicators.parentNode.insertBefore(wrap, indicators);
 		}
 		else {
 			/* lock screen / pages without a menubar */

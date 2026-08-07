@@ -537,17 +537,20 @@ header [data-indicator][data-style="inactive"],
 	margin: 0;
 }
 
-/* 菜单栏顶部胶囊（桌面/移动端） */
-#mainmenu > .liquid-mode-switch {
-	margin: 2px 0 12px 4px;
+/* 顶栏模式开关（刷新指示区左侧） */
+#menubar > .liquid-mode-switch {
+	margin: 0 12px 0 0;
+	flex-shrink: 0;
 }
 
+/* 菜单栏顶部颜色胶囊（水平居中） */
 #mainmenu > .liquid-color-switch {
-	margin: 0 0 12px 2px;
-}
-
-#mainmenu > .liquid-mode-switch,
-#mainmenu > .liquid-color-switch {
+	display: flex;
+	justify-content: center;
+	box-sizing: border-box;
+	width: 100%;
+	margin: 10px 0 12px;
+	padding: 4px 7px;
 	flex-shrink: 0;
 }
 
