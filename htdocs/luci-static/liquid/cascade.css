@@ -2165,6 +2165,10 @@ div[style*="grid-template-columns:repeat(auto-fit, minmax(70px, 1fr))"] .ifacebo
 }
 
 /* 统计 tooltip：默认隐藏，悬停 📊/统计区域时在下方悬浮显示（DHCPv6/端口统计） */
+.cbi-tooltip {
+	z-index: 9999 !important;
+}
+
 .ifacebox .cbi-tooltip-container {
 	position: relative;
 }
