@@ -1570,7 +1570,7 @@ input[type="radio"] {
 	display: inline-flex;
 	align-items: center;
 	position: relative;
-	min-width: 300px;
+	min-width: 140px;
 	padding: 8px 34px 8px 12px;
 	font-size: 13px;
 	/* 闭合按钮：参照"保存并应用"（ComboButton）的一体化设计——
@@ -1688,7 +1688,7 @@ input[type="radio"] {
 	position: relative;
 	display: inline-flex;
 	align-items: center;
-	min-width: 300px;
+	min-width: 140px;
 	padding: 8px 34px 8px 12px;
 	/* 与 cbi-dropdown 统一的渐变按钮风格 */
 	background: var(--accent-grad);
