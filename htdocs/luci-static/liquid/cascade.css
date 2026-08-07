@@ -1491,7 +1491,7 @@ input[type="radio"] {
 	display: inline-flex;
 	align-items: center;
 	position: relative;
-	min-width: 190px;
+	min-width: 300px;
 	padding: 8px 34px 8px 12px;
 	font-size: 13px;
 	color: var(--text-color-high);
