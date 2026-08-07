@@ -18,6 +18,8 @@
 [release-badge]: https://img.shields.io/github/v/release/xylz0928/luci-theme-liquid?style=flat-square
 [download]: https://github.com/xylz0928/luci-theme-liquid/releases
 [download-badge]: https://img.shields.io/github/downloads/xylz0928/luci-theme-liquid/total?style=flat-square
+[en-us-link]: /README_EN.md
+[zh-cn-link]: /README.md
 [official]: https://github.com/openwrt/openwrt
 [immortalwrt]: https://github.com/immortalwrt/immortalwrt
 [luci-mod]: https://github.com/xylz0928/luci-mod
@@ -36,6 +38,8 @@
 [![issues][issues-badge]][issues]
 [![release][release-badge]][release]
 [![download][download-badge]][download]
+
+**简体中文** | [English][en-us-link]
 
 [特性](#特性) •
 [更新日志](#更新日志) •
