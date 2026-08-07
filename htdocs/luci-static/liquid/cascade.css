@@ -903,8 +903,11 @@ ul.mainmenu.l2.liquid-sub-hovering .liquid-sub-indicator {
    8. Tab menu
    ========================================================================== */
 
-/* 通用 tab 按钮组（页面级 #tabmenu 与 cbi 表单内 tab 共用样式） */
+/* 通用 tab 按钮组（页面级 #tabmenu 与 cbi 表单内 tab 共用样式）。
+   胶囊形状保留；未选中项透明交给追踪滑块，选中项用菜单区
+   selected 同款 accent 渐变高亮。 */
 ul.cbi-tabmenu {
+	position: relative;
 	display: flex;
 	flex-wrap: wrap;
 	gap: 8px;
@@ -914,6 +917,8 @@ ul.cbi-tabmenu {
 
 ul.cbi-tabmenu > li {
 	display: inline-block;
+	position: relative;
+	z-index: 1;
 	margin: 0;
 }
 
@@ -924,31 +929,44 @@ ul.cbi-tabmenu > li > a {
 	font-weight: 600;
 	font-size: 12.5px;
 	color: var(--text-color-medium);
-	background: var(--glass-bg);
-	border: 1px solid var(--glass-border);
+	background: transparent;
+	border: 1px solid transparent;
 	text-decoration: none;
-	-webkit-backdrop-filter: blur(10px);
-	backdrop-filter: blur(10px);
-	box-shadow: var(--glass-shadow-soft);
-	transition: background .16s ease, color .16s ease,
-	            border-color .16s ease, box-shadow .16s ease;
+	transition: color .16s ease, box-shadow .16s ease;
 }
 
 ul.cbi-tabmenu > li > a:hover {
-	background: var(--glass-bg-hover);
 	color: var(--text-color-high);
 }
 
 ul.cbi-tabmenu > li.cbi-tab > a {
 	color: var(--on-primary-color);
 	background: var(--accent-grad);
-	border-color: transparent;
-	box-shadow: 0 6px 18px var(--accent-glow),
-	            inset 0 1px 0 rgba(255, 255, 255, 0.35);
+	border-color: rgba(255, 255, 255, 0.35);
+	box-shadow: 0 8px 22px var(--accent-glow),
+	            inset 0 1px 0 rgba(255, 255, 255, 0.4);
 }
 
 ul.cbi-tabmenu > li.cbi-tab-disabled > a {
 	opacity: .75;
+}
+
+/* tab hover 追踪滑块（main.js 驱动，跟随鼠标/选中项滑动） */
+.liquid-tab-indicator {
+	position: absolute;
+	left: 0;
+	top: 0;
+	bottom: 0;
+	border-radius: 999px;
+	background: var(--indicator-bg);
+	border: 1px solid var(--indicator-border);
+	box-shadow: var(--indicator-shadow);
+	opacity: 0;
+	pointer-events: none;
+	z-index: 0;
+	transition: transform .26s cubic-bezier(.22, .8, .3, 1),
+	            width .26s cubic-bezier(.22, .8, .3, 1),
+	            opacity .18s ease;
 }
 
 /* cbi tab pane 显示控制（ui.tabs 通过 data-tab-active 切换） */

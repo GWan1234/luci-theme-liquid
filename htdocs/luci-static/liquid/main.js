@@ -182,6 +182,50 @@
 		};
 	}
 
+	/* 内容区 tab 菜单追踪滑块（跟随 hover/选中项平滑滑动） */
+	function initTabSliders() {
+		document.querySelectorAll('ul.cbi-tabmenu').forEach(function (ul) {
+			if (ul.classList.contains('liquid-tab-slider-init'))
+				return;
+
+			ul.classList.add('liquid-tab-slider-init');
+
+			var ind = document.createElement('span');
+			ind.className = 'liquid-tab-indicator';
+			ul.appendChild(ind);
+
+			function moveTo(el) {
+				if (!el || !ul.contains(el)) {
+					ind.style.opacity = '0';
+					return;
+				}
+				var r = el.getBoundingClientRect();
+				var ur = ul.getBoundingClientRect();
+				ind.style.width = r.width + 'px';
+				ind.style.transform = 'translateX(' + (r.left - ur.left) + 'px)';
+				ind.style.opacity = '1';
+			}
+
+			moveTo(ul.querySelector('li.cbi-tab'));
+
+			ul.addEventListener('mouseover', function (e) {
+				var li = e.target.closest ? e.target.closest('li') : null;
+				if (li && ul.contains(li))
+					moveTo(li);
+			});
+			ul.addEventListener('mouseleave', function () {
+				moveTo(ul.querySelector('li.cbi-tab'));
+			});
+
+			if (window.MutationObserver) {
+				var mo = new MutationObserver(function () {
+					moveTo(ul.querySelector('li.cbi-tab'));
+				});
+				mo.observe(ul, { attributes: true, subtree: true, attributeFilter: ['class'] });
+			}
+		});
+	}
+
 	/* 移动端菜单 top 跟随顶栏实际高度（防顶栏被撑高后菜单盖住它） */
 	function syncMenuTop() {
 		var bar = document.getElementById('menubar');
@@ -207,13 +251,27 @@
 			initSwitch();
 			initColorSwitch();
 			syncMenuTop();
+			initTabSliders();
 			setTimeout(syncMenuTop, 300);
+			setTimeout(initTabSliders, 300);
 		});
 	else {
 		initSwitch();
 		initColorSwitch();
 		syncMenuTop();
+		initTabSliders();
 		setTimeout(syncMenuTop, 300);
+		setTimeout(initTabSliders, 300);
+	}
+
+	/* 页面内容动态变化（view 切换、cbi 渲染等）时初始化新出现的 tab 菜单 */
+	if (window.MutationObserver) {
+		var tabObserver = new MutationObserver(function () {
+			initTabSliders();
+		});
+		document.addEventListener('DOMContentLoaded', function () {
+			tabObserver.observe(document.body, { childList: true, subtree: true });
+		});
 	}
 
 	document.addEventListener('click', function (e) {
