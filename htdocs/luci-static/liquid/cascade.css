@@ -980,13 +980,20 @@ ul.cbi-tabmenu > li.cbi-tab-disabled > a {
 	            opacity .18s ease;
 }
 
-/* cbi tab pane 显示控制（ui.tabs 通过 data-tab-active 切换） */
-[data-tab] {
-	display: none;
+/* cbi tab pane 显示控制（ui.tabs 通过 data-tab-title / data-tab-active 控制）
+   注意：tabmenu 的 li 也带 data-tab 属性，不能按 [data-tab] 全局隐藏，
+   必须用 [data-tab-title]（仅 pane 内容容器带）折叠内容区——与官方
+   bootstrap 的机制一致（height/opacity 折叠而非 display:none）。 */
+[data-tab-title] {
+	height: 0;
+	opacity: 0;
+	overflow: hidden;
 }
 
 [data-tab-active="true"] {
-	display: block;
+	height: auto;
+	opacity: 1;
+	overflow: visible;
 	animation: liquid-fade-in .22s ease;
 }
 
