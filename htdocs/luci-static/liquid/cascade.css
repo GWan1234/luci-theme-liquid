@@ -2717,6 +2717,12 @@ pre {
 		white-space: normal;
 	}
 
+	/* 移动端接口图标统一 18px（覆盖桌面 32px，测试尺寸） */
+	img[src*="icons/"][src$=".svg"] {
+		width: 18px !important;
+		height: 18px !important;
+	}
+
 	#menubar .navigation {
 		display: flex;
 	}
