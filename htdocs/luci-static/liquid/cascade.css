@@ -1443,24 +1443,6 @@ input[type="radio"] {
    ========================================================================== */
 
 .table,
-/* 全局表格行内单元格等高（分割线对齐）：
-   - 原生 <table>（.cbi-section-table）天然同高，无需处理；
-   - luci 用 div 模拟的 .table（div.table > div.tr > div.td）
-     强制 table 布局，行内单元格同高，分割线不断裂 */
-.table,
-.cbi-section-table {
-	display: table;
-}
-
-.table > .tr > .td,
-.table > .tr > .th,
-.cbi-section-table > .tr > .td,
-.cbi-section-table > .tr > .th {
-	display: table-cell;
-	vertical-align: middle;
-	height: 100%;
-}
-
 .cbi-section-table {
 	width: 100%;
 	border-collapse: separate;
