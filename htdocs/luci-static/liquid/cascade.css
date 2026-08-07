@@ -533,7 +533,7 @@ header [data-indicator][data-style="inactive"],
 	position: fixed;
 	top: 16px;
 	right: 16px;
-	z-index: 2000;
+	z-index: 2001;
 	margin: 0;
 }
 
@@ -593,7 +593,7 @@ header [data-indicator][data-style="inactive"],
 	position: fixed;
 	top: 16px;
 	right: 64px;
-	z-index: 2000;
+	z-index: 2001;
 	margin: 0;
 }
 
@@ -1767,6 +1767,7 @@ body.liquid-login p.luci {
 	left: 0;
 	width: 100%;
 	margin: 0;
+	z-index: 2001;
 	color: rgba(255, 255, 255, 0.6);
 	text-shadow: 0 1px 8px rgba(0, 0, 0, 0.55);
 }
