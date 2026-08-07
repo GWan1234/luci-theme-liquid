@@ -299,6 +299,55 @@
 		});
 	}
 
+	/* 下拉宽度自适应：取选项中最长文本宽度 + 余量，总宽上限 240px
+	   （"保存并应用"组合按钮除外，保持 auto）。原生 select 同步。 */
+	function fitDropdownWidths() {
+		document.querySelectorAll('.cbi-dropdown:not(.cbi-button-apply)').forEach(function (dd) {
+			if (dd.classList.contains('liquid-dd-fit'))
+				return;
+			dd.classList.add('liquid-dd-fit');
+			var ul = dd.querySelector('ul');
+			if (!ul)
+				return;
+			var maxW = 0;
+			[].forEach.call(ul.querySelectorAll('li'), function (li) {
+				if (li.classList.contains('hide-close') || li.classList.contains('hide-open'))
+					return;
+				var st = li.style;
+				st.display = 'block';
+				st.position = 'absolute';
+				st.visibility = 'hidden';
+				st.whiteSpace = 'nowrap';
+				var w = li.scrollWidth || 0;
+				st.display = '';
+				st.position = '';
+				st.visibility = '';
+				st.whiteSpace = '';
+				if (w > maxW)
+					maxW = w;
+			});
+			if (maxW > 0)
+				dd.style.width = Math.min(Math.max(maxW + 40, 60), 240) + 'px';
+		});
+
+		document.querySelectorAll('.cbi-select').forEach(function (sel) {
+			if (sel.classList.contains('liquid-dd-fit'))
+				return;
+			sel.classList.add('liquid-dd-fit');
+			var s = sel.querySelector('select');
+			if (!s)
+				return;
+			var maxW = 0;
+			[].forEach.call(s.options, function (o) {
+				var w = (o.text || '').length * 7.5;
+				if (w > maxW)
+					maxW = w;
+			});
+			if (maxW > 0)
+				sel.style.width = Math.min(Math.max(maxW + 60, 60), 240) + 'px';
+		});
+	}
+
 	/* 下拉框自动避让：按钮靠近视口底部（或被页脚遮挡）时向上弹出，
 	   下方空间足够则照常向下 */
 	function adjustDropdownDirection() {
@@ -489,6 +538,7 @@
 			syncMenuTop();
 			initTabSliders();
 			syncDropdownValues();
+			fitDropdownWidths();
 			portalTooltips();
 			injectLoginLogo();
 			setTimeout(syncMenuTop, 300);
@@ -501,6 +551,7 @@
 		syncMenuTop();
 		initTabSliders();
 		syncDropdownValues();
+		fitDropdownWidths();
 		portalTooltips();
 		injectLoginLogo();
 		setTimeout(syncMenuTop, 300);
@@ -524,6 +575,7 @@
 		var tabObserver = new MutationObserver(function () {
 			initTabSliders();
 			syncDropdownValues();
+			fitDropdownWidths();
 			portalTooltips();
 			injectLoginLogo();
 		});
