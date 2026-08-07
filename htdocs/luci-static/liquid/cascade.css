@@ -2105,11 +2105,12 @@ div[style*="grid-template-columns:repeat(auto-fit, minmax(70px, 1fr))"] .ifacebo
 
 /* 网络卡片（30_network）：内容左对齐、上游标题居中、接口名行居中 */
 .network-status-table .ifacebox {
-	text-align: left;
+	text-align: left !important;
 }
 
-.network-status-table .ifacebox-body.left {
-	text-align: left;
+.network-status-table .ifacebox-body.left,
+.network-status-table .ifacebox-body .nowrap {
+	text-align: left !important;
 }
 
 .network-status-table .ifacebox-head.center {
@@ -2161,10 +2162,6 @@ div[style*="grid-template-columns:repeat(auto-fit, minmax(70px, 1fr))"] .ifacebo
 .ifacebox .cbi-tooltip-container:hover .cbi-tooltip {
 	left: 0;
 	opacity: 1;
-}
-
-.ifacebox:hover {
-	z-index: 1001;
 }
 
 /* 接口总览表格：列宽自适应 */
