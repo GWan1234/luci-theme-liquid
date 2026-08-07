@@ -36,21 +36,28 @@ luci-theme-liquid/
 
 ## 编译安装
 
-作为 luci feed 主题（推荐，放到 `feeds/luci/themes/`）：
+本包使用 LuCI feed 的 `luci.mk` 打包规则（`include $(TOPDIR)/feeds/luci/luci.mk`），因此编译环境需先 `./scripts/feeds update -a && ./scripts/feeds install -a`（含 luci feed）。
+
+把本目录放入 OpenWrt 源码树的 `package/luci-theme-liquid/`（或 `feeds/luci/themes/luci-theme-liquid/`），在 `.config` 中启用该包后编译：
 
 ```sh
-./scripts/feeds update -a
-./scripts/feeds install luci-theme-liquid
-make package/feeds/luci/luci-theme-liquid/compile
+# 在 .config 中启用（任选其一）
+make menuconfig          # LuCI → Themes → luci-theme-liquid
+# 或
+echo 'CONFIG_PACKAGE_luci-theme-liquid=y' >> .config && make defconfig
+
+make package/luci-theme-liquid/compile -j4 V=s
 ```
 
-或作为独立包放入 OpenWrt 源码 `package/` 目录后：
+> 注意：`make package/<name>/compile` 只对已在 `.config` 中启用（`=y`/`=m`）的包真正执行构建，未启用时 make 会空转（`Entering/Leaving` 无任何动作），不要误判为成功。
+
+生成的 `bin/packages/<arch>/base/luci-theme-liquid-1.0-r1.apk` 可通过 `opkg`/`apk` 安装：
 
 ```sh
-make package/luci-theme-liquid/compile
+apk add --allow-untrusted luci-theme-liquid-1.0-r1.apk
 ```
 
-生成的 `luci-theme-liquid_*.ipk` 可通过 `opkg install` 安装到路由器；首次安装会自动注册主题，可在 **System → Advanced → Theme** 中选择 **Liquid**（若 `luci.main.mediaurlbase` 未配置过，安装时自动设为该主题）。
+首次安装会自动注册主题（`luci.themes.Liquid=/luci-static/liquid`）；若 `luci.main.mediaurlbase` 尚未配置则自动设为该主题，否则请在 **System → Advanced → Theme** 中手动选择 **Liquid**。
 
 ## 模式切换
 
