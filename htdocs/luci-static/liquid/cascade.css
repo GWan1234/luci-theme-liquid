@@ -2064,7 +2064,8 @@ pre {
 		width: 264px;
 		transform: translateX(-102%);
 		z-index: 800;
-		height: auto;
+		overflow-y: auto;
+		overscroll-behavior: contain;
 		box-shadow: none;
 	}
 
