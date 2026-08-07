@@ -2059,7 +2059,7 @@ pre {
 	#mainmenu {
 		position: fixed;
 		left: 0;
-		top: 56px;
+		top: 64px;
 		bottom: 0;
 		width: 264px;
 		transform: translateX(-102%);

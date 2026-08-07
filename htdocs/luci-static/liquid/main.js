@@ -180,9 +180,15 @@
 			return;
 
 		if (window.matchMedia && window.matchMedia('(max-width: 854px)').matches)
-			menu.style.top = bar.offsetHeight + 'px';
+			menu.style.top = (bar.offsetHeight + 1) + 'px';
 		else
 			menu.style.top = '';
+	}
+
+	/* #indicators 由 ui.js 动态渲染，顶栏高度在 DOMContentLoaded 时可能未定型：
+	   延迟二次校准 + 汉堡点击时校准 */
+	function scheduleMenuTop() {
+		setTimeout(syncMenuTop, 0);
 	}
 
 	if (document.readyState == 'loading')
@@ -190,12 +196,20 @@
 			initSwitch();
 			initColorSwitch();
 			syncMenuTop();
+			setTimeout(syncMenuTop, 300);
 		});
 	else {
 		initSwitch();
 		initColorSwitch();
 		syncMenuTop();
+		setTimeout(syncMenuTop, 300);
 	}
+
+	document.addEventListener('click', function (e) {
+		var nav = document.querySelector('#menubar .navigation');
+		if (nav && nav.contains(e.target))
+			scheduleMenuTop();
+	});
 
 	window.addEventListener('resize', syncMenuTop);
 })();
