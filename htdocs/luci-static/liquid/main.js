@@ -202,7 +202,8 @@
 				var r = el.getBoundingClientRect();
 				var ur = ul.getBoundingClientRect();
 				ind.style.width = r.width + 'px';
-				ind.style.transform = 'translateX(' + (r.left - ur.left) + 'px)';
+				ind.style.height = r.height + 'px';
+				ind.style.transform = 'translate(' + (r.left - ur.left) + 'px, ' + (r.top - ur.top) + 'px)';
 				ind.style.opacity = '1';
 			}
 
