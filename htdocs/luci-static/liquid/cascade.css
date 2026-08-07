@@ -2869,6 +2869,15 @@ pre {
 		height: auto !important;
 	}
 
+	/* 移动端接口页表格（含接口图标列的 GridSection）：锁定视口宽，
+	   覆盖上面的 max-content（行不再按内容撑宽、按钮不再溢出到屏幕
+	   右侧），所有内容在视口内换行显示 */
+	.cbi-section-table:has(td[data-name="_ifacebox"]) {
+		width: 100% !important;
+		min-width: 100% !important;
+		max-width: 100% !important;
+	}
+
 	/* 移动端接口页：每接口两行 —— 第一行 = 接口图标 + 详细信息，
 	   第二行 = 重启/停止/编辑/删除四个操作按钮（整行，右对齐） */
 	.cbi-section-table-row {
@@ -2879,7 +2888,7 @@ pre {
 	}
 
 	.cbi-section-table-row > td {
-		flex: 1 1 auto;
+		flex: 0 1 auto;
 		min-width: 0;
 	}
 
