@@ -322,15 +322,28 @@
 					}
 				});
 				var r = c.getBoundingClientRect();
+				document.body.appendChild(tip);
 				tip.style.position = 'fixed';
-				tip.style.left = r.left + 'px';
-				tip.style.top = (r.bottom + 6) + 'px';
+				tip.style.opacity = '0';
+				tip.style.visibility = 'visible';
+				tip.style.pointerEvents = 'none';
+				/* 自动避让：量出悬浮框尺寸，超出屏幕时翻转/收进视口，
+				   保证完整显示（同一帧内完成，无闪烁） */
+				var tw = tip.offsetWidth, th = tip.offsetHeight;
+				var vw = window.innerWidth, vh = window.innerHeight;
+				var left = r.left, top = r.bottom + 6;
+				if (left + tw > vw - 8)
+					left = Math.max(8, vw - tw - 8);
+				if (top + th > vh - 8)
+					top = r.top - th - 6;
+				if (top < 8) top = 8;
+				if (left < 8) left = 8;
+				tip.style.left = left + 'px';
+				tip.style.top = top + 'px';
 				tip.style.zIndex = '99999';
 				tip.style.opacity = '1';
 				tip.style.visibility = 'visible';
-				tip.style.pointerEvents = 'none';
 				tip.classList.add('liquid-tip-ported');
-				document.body.appendChild(tip);
 			}
 
 			c.addEventListener('mouseenter', show);
