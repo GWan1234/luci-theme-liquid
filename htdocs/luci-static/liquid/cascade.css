@@ -2390,10 +2390,6 @@ button + .btn,
 	vertical-align: middle;
 }
 
-/* 接口组（bridge）子接口图标行：图标多时允许换行，不溢出卡片 */
-.ifacebox-body > span {
-	white-space: normal;
-}
 
 /* 端口状态页：接口卡片宽度自适应内容、整体居中、间距 */
 div[style*="grid-template-columns:repeat(auto-fit, minmax(70px, 1fr))"] {
