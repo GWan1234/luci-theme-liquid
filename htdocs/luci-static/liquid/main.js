@@ -171,6 +171,17 @@
 		});
 	}
 
+	/* 修复 zh-cn 复数翻译缺失：多个网络时 "Part of networks:" 显示英文原文，
+	   统一成中文 */
+	if (typeof N_ == 'function') {
+		var origN = N_;
+		N_ = function (count, one, other) {
+			if (one == 'Part of network:' && other == 'Part of networks:')
+				return '网络的一部分：';
+			return origN(count, one, other);
+		};
+	}
+
 	/* 移动端菜单 top 跟随顶栏实际高度（防顶栏被撑高后菜单盖住它） */
 	function syncMenuTop() {
 		var bar = document.getElementById('menubar');

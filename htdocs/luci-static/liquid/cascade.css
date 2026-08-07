@@ -2076,6 +2076,44 @@ body.modal-overlay-active #modal_overlay {
 	white-space: nowrap;
 }
 
+/* 端口状态页：接口卡片宽度自适应内容、整体居中、间距 */
+div[style*="grid-template-columns:repeat(auto-fit, minmax(70px, 1fr))"] {
+	display: flex !important;
+	flex-wrap: wrap;
+	justify-content: center;
+	align-items: flex-start;
+	gap: 14px;
+}
+
+div[style*="grid-template-columns:repeat(auto-fit, minmax(70px, 1fr))"] .ifacebox,
+.network-status-table .ifacebox {
+	width: auto !important;
+	max-width: none !important;
+	min-width: 70px;
+	margin: 0 !important;
+}
+
+/* 网络卡片（30_network）整体居中、子卡片留空隙 */
+.network-status-table {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	align-items: flex-start;
+	gap: 14px;
+	margin-bottom: 14px;
+}
+
+/* 端口流量统计：tooltip 内容在 ▼ 下方换行显示 */
+.ifacebox .cbi-tooltip {
+	position: static !important;
+	left: auto !important;
+	opacity: 1 !important;
+	display: block;
+	margin: 6px 0 0;
+	white-space: normal;
+	line-height: 1.55;
+}
+
 /* 接口总览表格：列宽自适应 */
 .cbi-section-table {
 	table-layout: auto;
