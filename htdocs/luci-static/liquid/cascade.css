@@ -1442,9 +1442,9 @@ input[type="radio"] {
 }
 
 .table td[width="33%"] {
-	width: 40ch;
-	max-width: 40ch;
-	min-width: 40ch;
+	width: 16ch;
+	max-width: 16ch;
+	min-width: 16ch;
 	white-space: normal;
 	overflow-wrap: break-word;
 	word-break: break-word;
@@ -2230,8 +2230,8 @@ pre {
 
 	.cbi-section-table tr > td[width="33%"],
 	.table tr > td[width="33%"] {
-		flex: 0 0 40ch;
-		max-width: 40ch;
+		flex: 0 0 16ch;
+		max-width: 16ch;
 		white-space: normal;
 		overflow-wrap: break-word;
 		word-break: break-word;
