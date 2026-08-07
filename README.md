@@ -147,11 +147,16 @@ luci-theme-liquid/
 
 ## 界面展示
 
-<!-- 截图占位：桌面端（待上传） -->
-<!-- ![desktop](/Screenshots/screenshot_pc.jpg) -->
+- 桌面端
+[桌面端-锁屏-暗黑模式](https://github.com/zzsj0928/ReadmeContents/blob/master/liquid/luci-theme-liquid_pc-lock-dark.png)
+[桌面端-主界面-暗黑模式](https://github.com/zzsj0928/ReadmeContents/blob/master/liquid/luci-theme-liquid_pc-mainpage-dark.png)
+[桌面端-锁屏-明亮模式](https://github.com/zzsj0928/ReadmeContents/blob/master/liquid/luci-theme-liquid_pc-lock-light.png)
+[桌面端-主界面-明亮模式](https://github.com/zzsj0928/ReadmeContents/blob/master/liquid/luci-theme-liquid_pc-mainpage-light.png)
 
-<!-- 截图占位：移动端（待上传） -->
-<!-- ![mobile](/Screenshots/screenshot_phone.jpg) -->
+
+- 移动端
+[移动端-暗黑模式](https://github.com/zzsj0928/ReadmeContents/blob/master/liquid/luci-theme-liquid_mobile-dark.jpg)
+[移动端-明亮模式](https://github.com/zzsj0928/ReadmeContents/blob/master/liquid/luci-theme-liquid_mobile-light.jpg)
 
 ## 致谢
 
