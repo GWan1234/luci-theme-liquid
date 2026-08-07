@@ -24,4 +24,7 @@ if [ ! -f /etc/config/liquid ]; then
 	uci commit liquid
 fi
 
+# 清除 LuCI 路由缓存，使主题新增的 save_config 端点（menu.d/controller）立即可用
+rm -f /tmp/luci-indexcache /tmp/luci-indexcache.* 2>/dev/null
+
 exit 0
