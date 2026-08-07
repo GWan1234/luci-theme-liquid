@@ -2728,10 +2728,19 @@ pre {
 		margin: 2px;
 	}
 
-	/* 移动端：操作按钮列左对齐（贴近接口信息，不贴最右）；允许换行 */
+	/* 移动端：接口表格按内容宽度排布（列不压缩，按钮紧贴信息：
+	   不重叠、也不贴最右留空）；超出视口时外层横向滚动 */
+	.cbi-section-table {
+		width: max-content;
+		min-width: 100%;
+	}
+
+	.cbi-section-node {
+		overflow-x: auto;
+	}
+
 	.cbi-section-table td.cbi-section-actions {
-		text-align: left;
-		white-space: normal;
+		white-space: nowrap;
 	}
 
 	/* 移动端接口图标：宽度固定 24px，高度等比缩放（不强制高度） */
