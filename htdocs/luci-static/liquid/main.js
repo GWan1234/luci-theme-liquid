@@ -226,6 +226,34 @@
 		});
 	}
 
+	/* cbi-dropdown：选择后确保 li[display] 跟随选中项（当前值显示兜底） */
+	function syncDropdownValues() {
+		document.querySelectorAll('.cbi-dropdown').forEach(function (dd) {
+			if (dd.classList.contains('liquid-dd-init'))
+				return;
+			dd.classList.add('liquid-dd-init');
+
+			function sync() {
+				var ul = dd.querySelector('ul');
+				if (!ul)
+					return;
+				var sel = ul.querySelector('li[selected]');
+				var cur = ul.querySelector('li[display]');
+				if (sel && cur !== sel) {
+					if (cur)
+						cur.removeAttribute('display');
+					sel.setAttribute('display', '0');
+				}
+			}
+
+			sync();
+			if (window.MutationObserver) {
+				var mo = new MutationObserver(sync);
+				mo.observe(dd, { attributes: true, subtree: true, attributeFilter: ['class', 'display'] });
+			}
+		});
+	}
+
 	/* 移动端菜单 top 跟随顶栏实际高度（防顶栏被撑高后菜单盖住它） */
 	function syncMenuTop() {
 		var bar = document.getElementById('menubar');
@@ -252,22 +280,27 @@
 			initColorSwitch();
 			syncMenuTop();
 			initTabSliders();
+			syncDropdownValues();
 			setTimeout(syncMenuTop, 300);
 			setTimeout(initTabSliders, 300);
+			setTimeout(syncDropdownValues, 300);
 		});
 	else {
 		initSwitch();
 		initColorSwitch();
 		syncMenuTop();
 		initTabSliders();
+		syncDropdownValues();
 		setTimeout(syncMenuTop, 300);
 		setTimeout(initTabSliders, 300);
+		setTimeout(syncDropdownValues, 300);
 	}
 
 	/* 页面内容动态变化（view 切换、cbi 渲染等）时初始化新出现的 tab 菜单 */
 	if (window.MutationObserver) {
 		var tabObserver = new MutationObserver(function () {
 			initTabSliders();
+			syncDropdownValues();
 		});
 		document.addEventListener('DOMContentLoaded', function () {
 			tabObserver.observe(document.body, { childList: true, subtree: true });

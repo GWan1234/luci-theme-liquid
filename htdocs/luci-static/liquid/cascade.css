@@ -1516,8 +1516,7 @@ input[type="radio"] {
 	display: none;
 }
 
-.cbi-dropdown > ul > li[display],
-.cbi-dropdown > ul > li[selected] {
+.cbi-dropdown:not([open]) > ul > li[display] {
 	display: flex;
 	align-items: center;
 	flex: 1;
