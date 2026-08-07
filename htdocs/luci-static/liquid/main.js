@@ -408,15 +408,14 @@
 		setTimeout(syncDropdownValues, 300);
 	}
 
-	/* 禁用 luci 的"hover 删除按钮使整行半透"残留：该逻辑 hover 时把
-	   整个 section 设 opacity:0.5，mouseout 偶尔不恢复会残留，让
-	   已连接接口的图标/文字呈半透、被误判为未连接。定时清除。 */
+	/* 定时清除所有内联 opacity:0.5（luci 的离线/hover 样式会残留在
+	   接口徽章图标/文字、删除按钮、'取消配置'按钮等元素上，让已连接
+	   内容呈半透、被误判为未连接）。统一压回不透明。 */
 	setInterval(function () {
-		document.querySelectorAll('.cbi-section-remove > input[name^="cbi.rts"]').forEach(function (i) {
-			var bits = i.name.split(/\./),
-			    section = document.getElementById('cbi-' + bits[2] + '-' + bits[3]);
-			if (section && section.style.opacity)
-				section.style.opacity = '';
+		document.querySelectorAll('[style*="opacity"]').forEach(function (el) {
+			var o = el.style.opacity;
+			if (o === '0.5' || o === '.5')
+				el.style.opacity = '';
 		});
 	}, 600);
 

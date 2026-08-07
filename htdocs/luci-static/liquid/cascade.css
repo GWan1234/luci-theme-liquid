@@ -2409,6 +2409,11 @@ button + .btn,
 	vertical-align: middle;
 }
 
+/* GridSection（接口页网格卡片）的操作区同样不换行 */
+.cbi-section-actions {
+	white-space: nowrap;
+}
+
 
 /* 端口状态页：接口卡片宽度自适应内容、整体居中、间距 */
 div[style*="grid-template-columns:repeat(auto-fit, minmax(70px, 1fr))"] {
@@ -2752,12 +2757,28 @@ pre {
 		min-width: 100%;
 	}
 
-	.cbi-section-node {
+	/* 移动端所有表格按内容宽度排布（列不压缩，MAC/MTU 等不重叠），
+	   超出视口时允许横向滚动 */
+	.cbi-section-node,
+	#maincontent {
 		overflow-x: auto;
+	}
+
+	.cbi-section-table {
+		width: max-content !important;
+		min-width: 100%;
 	}
 
 	.cbi-section-table td.cbi-section-actions {
 		white-space: nowrap;
+	}
+
+	/* 接口页 GridSection（网格卡片，带操作按钮的行）：按内容宽度排布，
+	   重启/停止/编辑/删除按钮不挤压重叠文字，超出视口横向滚动 */
+	div[style*="grid-template-columns:repeat(auto-fit, minmax(70px, 1fr))"]:has(.cbi-section-actions) {
+		width: max-content;
+		min-width: 100%;
+		overflow-x: auto;
 	}
 
 	/* 移动端接口图标：宽度固定 24px，高度等比缩放（不强制高度） */
