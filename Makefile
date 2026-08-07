@@ -2,7 +2,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=luci-theme-liquid
 PKG_VERSION:=0.1
-PKG_RELEASE:=28
+PKG_RELEASE:=29
 
 PKG_MAINTAINER:=然后七年 <69092025+zzsj0928@users.noreply.github.com>
 PKG_LICENSE:=Apache-2.0
