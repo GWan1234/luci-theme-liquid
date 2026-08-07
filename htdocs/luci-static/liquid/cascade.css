@@ -67,7 +67,7 @@
 	--glass-bg: rgba(255, 255, 255, 0.42);
 	--glass-bg-strong: rgba(255, 255, 255, 0.66);
 	/* 亮色 hover 背景用浅主题色 tint（纯白 hover 会发白、看不清字） */
-	--glass-bg-hover: color-mix(in srgb, var(--primary-color-high) 25%, #ffffff);
+	--glass-bg-hover: color-mix(in srgb, var(--primary-color-high) 30%, #ffffff);
 	--glass-border: rgba(255, 255, 255, 0.8);
 	--glass-border-dark: rgba(23, 34, 52, 0.09);
 	--glass-inset: rgba(255, 255, 255, 0.95);
