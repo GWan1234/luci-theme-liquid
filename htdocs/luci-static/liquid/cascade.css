@@ -2533,7 +2533,18 @@ div[style*="grid-template-columns:repeat(auto-fit, minmax(70px, 1fr))"] .ifacebo
 	line-height: 1;
 }
 
+/* 接口图标（render_iface 的 img.middle 等）：不同 svg viewBox
+   会导致显示大小不一，统一 16px */
+.ifacebox img.middle,
+.ifacebox .cbi-tooltip-container > img {
+	width: 16px;
+	height: 16px;
+	vertical-align: middle;
+}
+
 .ifacebadge img {
+	width: 32px;
+	height: 32px;
 	vertical-align: middle;
 }
 
