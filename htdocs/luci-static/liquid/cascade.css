@@ -527,16 +527,16 @@ header [data-indicator][data-style="inactive"],
 	color: var(--text-color-highest);
 }
 
-/* menu item selected — 深蓝玻璃胶囊（沿用追踪滑块质感、颜色加深；不被 hover 覆盖） */
+/* menu item selected — 与追踪滑块同款的透明蓝玻璃，蓝色略深（不被 hover 覆盖） */
 #mainmenu ul.mainmenu.l1 > li.selected > a,
 #mainmenu ul.mainmenu.l1 > li.selected.active > a,
 #mainmenu ul.mainmenu.l1 > li.selected > a:hover,
 #mainmenu ul.mainmenu.l1 > li.selected.active > a:hover {
-	background: linear-gradient(135deg, rgba(74, 148, 245, 0.55), rgba(35, 108, 205, 0.48));
-	border-color: rgba(47, 127, 224, 0.65);
-	color: #ffffff;
-	box-shadow: 0 4px 18px rgba(47, 127, 224, 0.38),
-	            inset 0 1px 0 rgba(255, 255, 255, 0.4);
+	background: linear-gradient(135deg, rgba(90, 168, 247, 0.32), rgba(255, 255, 255, 0.62));
+	border-color: rgba(47, 127, 224, 0.5);
+	color: var(--primary-color-low);
+	box-shadow: 0 4px 16px rgba(47, 127, 224, 0.24),
+	            inset 0 1px 0 rgba(255, 255, 255, 0.9);
 	-webkit-backdrop-filter: blur(10px) saturate(var(--glass-sat));
 	backdrop-filter: blur(10px) saturate(var(--glass-sat));
 }
@@ -545,11 +545,11 @@ header [data-indicator][data-style="inactive"],
 :root[data-darkmode="true"] #mainmenu ul.mainmenu.l1 > li.selected.active > a,
 :root[data-darkmode="true"] #mainmenu ul.mainmenu.l1 > li.selected > a:hover,
 :root[data-darkmode="true"] #mainmenu ul.mainmenu.l1 > li.selected.active > a:hover {
-	background: linear-gradient(135deg, rgba(102, 173, 250, 0.5), rgba(52, 122, 210, 0.42));
-	border-color: rgba(140, 190, 255, 0.55);
-	color: #ffffff;
-	box-shadow: 0 4px 18px rgba(93, 163, 240, 0.42),
-	            inset 0 1px 0 rgba(255, 255, 255, 0.16);
+	background: linear-gradient(135deg, rgba(93, 163, 240, 0.30), rgba(46, 58, 84, 0.5));
+	border-color: rgba(140, 190, 255, 0.4);
+	color: #dcecff;
+	box-shadow: 0 4px 18px rgba(93, 163, 240, 0.35),
+	            inset 0 1px 0 rgba(255, 255, 255, 0.14);
 }
 
 /* 展开态（点击展开的其他一级菜单）— 次级高亮 */
