@@ -1435,14 +1435,24 @@ input[type="radio"] {
 	background: var(--glass-bg-hover);
 }
 
-/* 用量表格（内存/存储等）：标题列自适应不换行，用量条列占剩余宽度 */
+/* 用量表格（内存/存储等）：左侧标题列固定约 8 字符宽并截断，
+   右侧值列占剩余宽度，标题与值保持同一行 */
+.table:has(td[width="33%"]) {
+	table-layout: fixed;
+}
+
 .table td[width="33%"] {
-	width: auto;
+	width: 8ch;
+	max-width: 8ch;
+	min-width: 8ch;
 	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
 
 .table tr > td[width="33%"] + td {
 	width: 100%;
+	white-space: nowrap;
 }
 
 /* ==========================================================================
@@ -2220,7 +2230,11 @@ pre {
 
 	.cbi-section-table tr > td[width="33%"],
 	.table tr > td[width="33%"] {
-		flex: 0 0 auto;
+		flex: 0 0 8ch;
+		max-width: 8ch;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
 	}
 
 	.Dashboard .section-content {
