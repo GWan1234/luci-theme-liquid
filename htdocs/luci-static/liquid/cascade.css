@@ -1590,6 +1590,14 @@ input[type="radio"] {
 	box-shadow: var(--glass-shadow);
 }
 
+/* 暗黑模式下下拉选项列表更实一些（alpha 0.74 → 0.92 + 更强模糊），
+   避免透出下方内容导致选项文字看不清；仍保留玻璃质感 */
+:root[data-darkmode="true"] .cbi-dropdown[open] > ul.dropdown {
+	background: rgba(22, 29, 44, 0.92);
+	-webkit-backdrop-filter: blur(32px) saturate(var(--glass-sat));
+	backdrop-filter: blur(32px) saturate(var(--glass-sat));
+}
+
 /* 打开时：preview 克隆作为顶部当前值行（官方机制），
    原 ul 弹出后顶部仍有当前值显示 */
 .cbi-dropdown[open] > ul.preview {
