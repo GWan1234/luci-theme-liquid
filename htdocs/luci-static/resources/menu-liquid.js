@@ -83,6 +83,12 @@ return baseclass.extend({
 
 			ul.querySelectorAll(':scope > li').forEach(function (li) {
 				li.addEventListener('mouseenter', function () {
+					if (li.classList.contains('selected')) {
+						/* 当前选中项已有胶囊高亮，滑块不叠加 */
+						ul.classList.remove('liquid-sub-hovering');
+						return;
+					}
+
 					const a = li.querySelector(':scope > a');
 					const ulRect = ul.getBoundingClientRect();
 					const aRect = a.getBoundingClientRect();
