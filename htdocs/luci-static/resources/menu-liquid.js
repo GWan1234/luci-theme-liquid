@@ -64,12 +64,11 @@ return baseclass.extend({
 		if (children.length == 0 || l > 2)
 			return E([]);
 
-		children.forEach((child, index) => {
-			/* 当前所在一级菜单默认展开；无当前路径（如首页）时展开第一个一级菜单 */
-			const isActive = (L.env.dispatchpath[l] == child.name) ||
-			                 (l == 1 && !L.env.dispatchpath.length && index === 0);
+		children.forEach(child => {
+			/* 当前所在一级菜单仅高亮（selected），子菜单一律默认收起，点击才展开 */
+			const isActive = (L.env.dispatchpath[l] == child.name);
 			const activeClass = 'mainmenu-item-%s%s'.format(
-				child.name, isActive ? ' selected active' : '');
+				child.name, isActive ? ' selected' : '');
 
 			ul.appendChild(E('li', { 'class': activeClass }, [
 				E('a', {
