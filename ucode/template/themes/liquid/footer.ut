@@ -3,14 +3,27 @@
  Licensed to the public under the Apache License 2.0.
 -#}
 
+{%
+	const boardinfo = ubus.call('system', 'board') ?? {};
+%}
+
 {% if (!blank_page): %}
 	</div><!-- /#maincontent -->
 </div><!-- /#maincontainer -->
 {% endif %}
 
+{% if (blank_page): %}
+<p class="luci">
+	{{ version.distversion }} {{ version.distrevision }}<br>
+	Kernel: {{ boardinfo.kernel ?? '?' }}<br>
+	{{ version.luciname }} {{ version.luciversion }}
+</p>
+{% endif %}
+{% if (!blank_page): %}
 <p class="luci">
 	Powered by {{ version.luciname }} ({{ version.luciversion }})
 </p>
+{% endif %}
 
 {% if (!blank_page): %}
 <script>L.require('menu-liquid')</script>

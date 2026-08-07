@@ -66,7 +66,8 @@ return baseclass.extend({
 
 		children.forEach(child => {
 			const isActive = (L.env.dispatchpath[l] == child.name);
-			const activeClass = 'mainmenu-item-%s%s'.format(child.name, isActive ? ' selected' : '');
+			const activeClass = 'mainmenu-item-%s%s'.format(
+				child.name, isActive ? ' selected active' : '');
 
 			ul.appendChild(E('li', { 'class': activeClass }, [
 				E('a', {
