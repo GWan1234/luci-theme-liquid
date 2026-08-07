@@ -80,9 +80,9 @@
 	--accent-grad: linear-gradient(135deg, #5aa8f7 0%, #2f7fe0 48%, #1a63c4 100%);
 	--accent-glow: rgba(47, 127, 224, 0.38);
 	--lock-card-bg: rgba(255, 255, 255, 0.5);
-	--indicator-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.6));
-	--indicator-border: rgba(47, 127, 224, 0.35);
-	--indicator-shadow: 0 4px 16px rgba(47, 127, 224, 0.20), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+	--indicator-bg: linear-gradient(135deg, rgba(90, 168, 247, 0.26), rgba(255, 255, 255, 0.72));
+	--indicator-border: rgba(47, 127, 224, 0.45);
+	--indicator-shadow: 0 4px 16px rgba(47, 127, 224, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.9);
 	--body-grad:
 		radial-gradient(1100px 750px at 85% -10%, rgba(96, 165, 250, 0.38), transparent 60%),
 		radial-gradient(950px 700px at -10% 30%, rgba(167, 139, 250, 0.30), transparent 55%),
@@ -506,6 +506,7 @@ header [data-indicator][data-style="inactive"],
 	align-items: center;
 	gap: 10px;
 	position: relative;
+	z-index: 3;
 	padding: 10px 14px;
 	margin-bottom: 3px;
 	border-radius: 13px;
@@ -604,8 +605,8 @@ header [data-indicator][data-style="inactive"],
 }
 
 #mainmenu ul.mainmenu.l2 > li > a:hover {
-	background: var(--glass-bg-hover);
-	color: var(--text-color-high);
+	background: color-mix(in srgb, var(--primary-color-high) 12%, transparent);
+	color: var(--primary-color-high);
 }
 
 #mainmenu ul.mainmenu.l2 > li.selected > a,
@@ -635,7 +636,7 @@ header [data-indicator][data-style="inactive"],
 	backdrop-filter: blur(10px) saturate(var(--glass-sat));
 	opacity: 0;
 	pointer-events: none;
-	z-index: 2;
+	z-index: 0;
 	transition: transform .28s cubic-bezier(.22, .8, .3, 1),
 	            height .28s cubic-bezier(.22, .8, .3, 1),
 	            opacity .18s ease;
