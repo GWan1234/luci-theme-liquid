@@ -286,11 +286,10 @@
 
 	/* 悬浮内容框（.cbi-tooltip）：hover 时把 tooltip 临时移到 body 顶层
 	   （fixed 定位），彻底脱离卡片 backdrop-filter 的 stacking context，
-	   这样 tooltip 不会被相邻卡片遮挡。移出后放回原容器。 */
+	   这样 tooltip 不会被相邻卡片遮挡。移出后放回原容器。
+	   互斥保底：新的 hover 弹出时，先隐藏页面上所有其他 portal tooltip，
+	   避免 mouseleave 偶尔不触发导致的残留停留。 */
 	function portalTooltips() {
-		/* 所有 .cbi-tooltip 都 portal 到 body：既防相邻卡片遮挡，
-		   也避免被容器（如 .cbi-section-table overflow:hidden）边缘截断。
-		   显隐完全由 JS 控制（CSS hover 规则已移除，避免双重机制闪烁） */
 		document.querySelectorAll('.cbi-tooltip-container').forEach(function (c) {
 			if (c.classList.contains('liquid-tip-init'))
 				return;
@@ -299,7 +298,29 @@
 			if (!tip)
 				return;
 			var origParent = tip.parentNode;
-			c.addEventListener('mouseenter', function () {
+
+			function hide() {
+				if (tip.parentNode !== origParent)
+					origParent.appendChild(tip);
+				tip.classList.remove('liquid-tip-ported');
+				tip.style.position = '';
+				tip.style.left = '';
+				tip.style.top = '';
+				tip.style.zIndex = '';
+				tip.style.opacity = '0';
+				tip.style.visibility = 'hidden';
+				tip.style.pointerEvents = '';
+			}
+
+			function show() {
+				/* 互斥保底：先隐藏页面上所有其他已显示的 portal tooltip */
+				document.querySelectorAll('.liquid-tip-ported').forEach(function (other) {
+					if (other !== tip) {
+						other.style.opacity = '0';
+						other.style.visibility = 'hidden';
+						other.classList.remove('liquid-tip-ported');
+					}
+				});
 				var r = c.getBoundingClientRect();
 				tip.style.position = 'fixed';
 				tip.style.left = r.left + 'px';
@@ -310,21 +331,10 @@
 				tip.style.pointerEvents = 'none';
 				tip.classList.add('liquid-tip-ported');
 				document.body.appendChild(tip);
-			});
-			c.addEventListener('mouseleave', function () {
-				if (tip.parentNode !== origParent)
-					origParent.appendChild(tip);
-				tip.classList.remove('liquid-tip-ported');
-				tip.style.position = '';
-				tip.style.left = '';
-				tip.style.top = '';
-				tip.style.zIndex = '';
-				/* 强制隐藏：收回后原 .ifacebox .cbi-tooltip 隐藏规则可能
-				   因元素不在卡片内而不匹配，导致 tooltip 不收回 */
-				tip.style.opacity = '0';
-				tip.style.visibility = 'hidden';
-				tip.style.pointerEvents = '';
-			});
+			}
+
+			c.addEventListener('mouseenter', show);
+			c.addEventListener('mouseleave', hide);
 		});
 	}
 
