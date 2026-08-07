@@ -52,6 +52,9 @@ return baseclass.extend({
 
 		menu.addEventListener('scroll', function () {
 			menu.classList.remove('liquid-menu-hovering');
+			menu.querySelectorAll('ul.mainmenu.l2.liquid-sub-hovering').forEach(function (ul) {
+				ul.classList.remove('liquid-sub-hovering');
+			});
 		});
 
 		items.forEach(function (li) {
@@ -64,9 +67,31 @@ return baseclass.extend({
 					'translateY(%dpx)'.format(aRect.top - menuRect.top + menu.scrollTop);
 				indicator.style.height = '%dpx'.format(aRect.height);
 
-				/* 当前菜单(selected)有 accent 渐变背景，滑块需浮到其上保持可见 */
+				/* 当前菜单(selected)有 accent 渐变背景，滑块浮到其上但保持极淡，不挡字 */
 				indicator.classList.toggle('over-selected', li.classList.contains('selected'));
 				menu.classList.add('liquid-menu-hovering');
+			});
+		});
+
+		/* 二级菜单追踪滑块：每个展开的 ul.l2 一个 */
+		menu.querySelectorAll('ul.mainmenu.l2').forEach(function (ul) {
+			const sub = E('div', { 'class': 'liquid-sub-indicator' });
+			ul.appendChild(sub);
+
+			ul.querySelectorAll(':scope > li').forEach(function (li) {
+				li.addEventListener('mouseenter', function () {
+					const a = li.querySelector(':scope > a');
+					const ulRect = ul.getBoundingClientRect();
+					const aRect = a.getBoundingClientRect();
+
+					sub.style.transform = 'translateY(%dpx)'.format(aRect.top - ulRect.top);
+					sub.style.height = '%dpx'.format(aRect.height);
+					ul.classList.add('liquid-sub-hovering');
+				});
+			});
+
+			ul.addEventListener('mouseleave', function () {
+				ul.classList.remove('liquid-sub-hovering');
 			});
 		});
 	},

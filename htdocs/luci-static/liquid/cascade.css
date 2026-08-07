@@ -592,8 +592,37 @@ header [data-indicator][data-style="inactive"],
 	animation: liquid-fade-in .22s ease;
 }
 
+/* 二级菜单 hover 追踪滑块 */
+ul.mainmenu.l2 {
+	position: relative;
+}
+
+.liquid-sub-indicator {
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 0;
+	height: 32px;
+	border-radius: 10px;
+	background: var(--indicator-bg);
+	border: 1px solid var(--indicator-border);
+	box-shadow: var(--indicator-shadow);
+	opacity: 0;
+	pointer-events: none;
+	z-index: 0;
+	transition: transform .25s cubic-bezier(.22, .8, .3, 1),
+	            height .25s cubic-bezier(.22, .8, .3, 1),
+	            opacity .18s ease;
+}
+
+ul.mainmenu.l2.liquid-sub-hovering .liquid-sub-indicator {
+	opacity: 1;
+}
+
 #mainmenu ul.mainmenu.l2 > li > a {
 	display: block;
+	position: relative;
+	z-index: 3;
 	padding: 8px 12px;
 	margin: 1px 0;
 	border-radius: 10px;
@@ -605,7 +634,7 @@ header [data-indicator][data-style="inactive"],
 }
 
 #mainmenu ul.mainmenu.l2 > li > a:hover {
-	background: color-mix(in srgb, var(--primary-color-high) 12%, transparent);
+	background: transparent;
 	color: var(--primary-color-high);
 }
 
@@ -646,16 +675,18 @@ header [data-indicator][data-style="inactive"],
 	opacity: 1;
 }
 
-/* hover 到当前菜单（accent 渐变背景）时，滑块浮到其上保持追踪可见 */
+/* hover 到当前菜单（accent 渐变背景）时：滑块浮到其上但极淡，不遮挡文字 */
 .liquid-menu-indicator.over-selected {
 	z-index: 4;
-	background: color-mix(in srgb, var(--primary-color-high) 26%, rgba(255, 255, 255, 0.32));
-	border-color: rgba(255, 255, 255, 0.45);
+	background: rgba(255, 255, 255, 0.1);
+	border-color: rgba(255, 255, 255, 0.6);
+	box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.5);
 }
 
 :root[data-darkmode="true"] .liquid-menu-indicator.over-selected {
-	background: rgba(93, 163, 240, 0.34);
-	border-color: rgba(255, 255, 255, 0.3);
+	background: rgba(93, 163, 240, 0.14);
+	border-color: rgba(255, 255, 255, 0.4);
+	box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.12);
 }
 
 /* ==========================================================================
