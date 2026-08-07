@@ -561,7 +561,7 @@ header [data-indicator][data-style="inactive"],
 	align-items: center;
 	gap: 5px;
 	margin-left: 6px;
-	padding: 4px 7px;
+	padding: 6px 7px;
 	border-radius: 999px;
 	background: var(--glass-bg);
 	border: 1px solid var(--glass-border);
