@@ -2110,6 +2110,11 @@ body.liquid-login #modal_overlay > .modal.login button.important {
 	padding: 12px;
 	font-size: 14px;
 	border-radius: 12px;
+	/* 实色主题底：accent-grad 是半透明渐变，在明亮卡片上
+	   左边缘会透出深色（看起来像黑边） */
+	background: var(--primary-color-high);
+	border: 1px solid transparent;
+	box-shadow: 0 6px 16px var(--accent-glow), inset 0 1px 0 rgba(255, 255, 255, 0.35);
 }
 
 body.liquid-login #modal_overlay > .modal.login hr {
