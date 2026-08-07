@@ -283,6 +283,41 @@
 		});
 	}
 
+	/* 悬浮内容框（.cbi-tooltip）：hover 时把 tooltip 临时移到 body 顶层
+	   （fixed 定位），彻底脱离卡片 backdrop-filter 的 stacking context，
+	   这样 tooltip 不会被相邻卡片遮挡。移出后放回原容器。 */
+	function portalTooltips() {
+		document.querySelectorAll('.cbi-tooltip-container').forEach(function (c) {
+			if (c.classList.contains('liquid-tip-init'))
+				return;
+			c.classList.add('liquid-tip-init');
+			var tip = c.querySelector('.cbi-tooltip');
+			if (!tip)
+				return;
+			var origParent = tip.parentNode;
+			c.addEventListener('mouseenter', function () {
+				var r = c.getBoundingClientRect();
+				tip.style.position = 'fixed';
+				tip.style.left = r.left + 'px';
+				tip.style.top = (r.bottom + 6) + 'px';
+				tip.style.zIndex = '99999';
+				tip.style.opacity = '1';
+				tip.style.pointerEvents = 'none';
+				document.body.appendChild(tip);
+			});
+			c.addEventListener('mouseleave', function () {
+				if (tip.parentNode !== origParent)
+					origParent.appendChild(tip);
+				tip.style.position = '';
+				tip.style.left = '';
+				tip.style.top = '';
+				tip.style.zIndex = '';
+				tip.style.opacity = '';
+				tip.style.pointerEvents = '';
+			});
+		});
+	}
+
 	/* 移动端菜单 top 跟随顶栏实际高度（防顶栏被撑高后菜单盖住它） */
 	function syncMenuTop() {
 		var bar = document.getElementById('menubar');
@@ -310,6 +345,7 @@
 			syncMenuTop();
 			initTabSliders();
 			syncDropdownValues();
+			portalTooltips();
 			setTimeout(syncMenuTop, 300);
 			setTimeout(initTabSliders, 300);
 			setTimeout(syncDropdownValues, 300);
@@ -320,6 +356,7 @@
 		syncMenuTop();
 		initTabSliders();
 		syncDropdownValues();
+		portalTooltips();
 		setTimeout(syncMenuTop, 300);
 		setTimeout(initTabSliders, 300);
 		setTimeout(syncDropdownValues, 300);
@@ -330,6 +367,7 @@
 		var tabObserver = new MutationObserver(function () {
 			initTabSliders();
 			syncDropdownValues();
+			portalTooltips();
 		});
 		document.addEventListener('DOMContentLoaded', function () {
 			tabObserver.observe(document.body, { childList: true, subtree: true });

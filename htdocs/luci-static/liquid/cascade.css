@@ -2280,6 +2280,19 @@ div[style*="grid-template-columns:repeat(auto-fit, minmax(70px, 1fr))"] .ifacebo
 	z-index: 1001;
 }
 
+/* 悬浮内容框（tooltip）hover 时，提升其所在卡片本身的层叠顺序。
+   卡片的 backdrop-filter 会创建 stacking context 把 tooltip 的
+   z-index 锁在卡片内部，卡片之间的遮挡由 DOM 顺序决定，因此必须
+   整体提升卡片（而非只调 tooltip 的 z-index）。:has 覆盖 tooltip
+   可能挂载的各种卡片容器。 */
+.ifacebox:has(.cbi-tooltip-container:hover),
+.zonebadge:has(.cbi-tooltip-container:hover),
+.cbi-section-node:has(.cbi-tooltip-container:hover),
+.cbi-map:has(.cbi-tooltip-container:hover),
+.network-status-table:has(.cbi-tooltip-container:hover) {
+	z-index: 99999 !important;
+}
+
 .ifacebox .cbi-tooltip-container {
 	position: relative;
 }
