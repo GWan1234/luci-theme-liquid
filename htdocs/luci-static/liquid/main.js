@@ -110,8 +110,11 @@
 	function setBing(on) {
 		var v = on ? '1' : '0';
 		try { localStorage.setItem('liquid-bing', v); } catch (e) {}
-		if (document.body)
+		if (document.body) {
 			document.body.setAttribute('data-liquid-bing', v);
+			/* 页面渲染时模板已确保当日壁纸缓存就绪，打开即视为可用，即时生效 */
+			document.body.setAttribute('data-liquid-bing-ok', v);
+		}
 		updateColorSwitch();
 		saveConfig('bing', v);
 	}

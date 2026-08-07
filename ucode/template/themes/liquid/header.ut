@@ -34,6 +34,7 @@
 	   system() 只透传 stdout（返回退出码），因此用"写临时文件 +
 	   fs.readfile"获取 wget 输出 ---- */
 	let bing_style = '';
+	let bing_ok = '0';
 	if (cfg_bing == '1') {
 		system('mkdir -p /tmp/liquid && ln -sfn /tmp/liquid /www/liquid-cache && date +%Y%m%d > /tmp/liquid-date.txt');
 		let today = trim(fs.readfile('/tmp/liquid-date.txt') ?? '');
@@ -41,6 +42,7 @@
 			let bing_file = sprintf('/tmp/liquid/bing-%s.jpg', today);
 			if (fs.stat(bing_file)) {
 				bing_style = sprintf(":root{--liquid-bing:url('/liquid-cache/bing-%s.jpg');}", today);
+				bing_ok = '1';
 			} else {
 				system('wget -qO /tmp/liquid-bing-api.json -T 8 "https://www.bing.com/HPImageArchive.aspx?format=js&idx=0&n=1&mkt=zh-CN"');
 				let api = fs.readfile('/tmp/liquid-bing-api.json') ?? '';
@@ -49,8 +51,10 @@
 					if (j && j.images && j.images[0] && j.images[0].urlbase) {
 						let u = sprintf('https://www.bing.com%s_1920x1080.jpg', j.images[0].urlbase);
 						system(sprintf('wget -qO "%s" -T 20 "%s"', bing_file, u));
-						if (fs.stat(bing_file))
+						if (fs.stat(bing_file)) {
 							bing_style = sprintf(":root{--liquid-bing:url('/liquid-cache/bing-%s.jpg');}", today);
+							bing_ok = '1';
+						}
 					}
 				}
 			}
@@ -88,7 +92,7 @@
 <style title="text/css">{{ css }}</style>
 {% endif %}
 </head>
-<body class="lang_{{ dispatcher.lang }}{% if (blank_page): %} liquid-login{% endif %}" data-page="{{ entityencode(join('-', ctx.request_path), true) }}" data-hostname="{{ striptags(boardinfo.hostname ?? '') }}" data-liquid-mode="{{ cfg_mode }}" data-liquid-accent="{{ cfg_accent }}" data-liquid-bing="{{ cfg_bing }}">
+<body class="lang_{{ dispatcher.lang }}{% if (blank_page): %} liquid-login{% endif %}" data-page="{{ entityencode(join('-', ctx.request_path), true) }}" data-hostname="{{ striptags(boardinfo.hostname ?? '') }}" data-liquid-mode="{{ cfg_mode }}" data-liquid-accent="{{ cfg_accent }}" data-liquid-bing="{{ cfg_bing }}" data-liquid-bing-ok="{{ bing_ok }}">
 
 <p class="skiplink">
 <span id="skiplink1"><a href="#navigation">{{ _('Skip to navigation') }}</a></span>

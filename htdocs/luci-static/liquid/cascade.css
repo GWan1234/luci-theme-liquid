@@ -2058,11 +2058,12 @@ body.liquid-login {
 	background-image: url(img/MontereyLight.jpg);
 }
 
-/* Bing 每日壁纸（仅锁屏界面）：启用且壁纸可用（--liquid-bing 由 ucode
-   模板输出）时使用 Bing 当日壁纸；无互联网（变量未定义）或按钮关闭时
-   var() fallback 回退到默认 Monterey 壁纸 */
-body.liquid-login[data-liquid-bing="1"] {
-	background-image: var(--liquid-bing, url(img/MontereyDark.jpg));
+/* Bing 每日壁纸（仅锁屏界面）：壁纸可用（data-liquid-bing-ok="1"，由
+   ucode 模板按当日缓存是否就绪输出）时覆盖亮/暗两种模式的默认壁纸。
+   无互联网（ok=0）或按钮关闭时规则不匹配，回退默认 Monterey 壁纸
+   （亮色 MontereyLight / 暗色 MontereyDark） */
+body.liquid-login[data-liquid-bing-ok="1"] {
+	background-image: var(--liquid-bing) !important;
 	background-size: cover;
 	background-position: center;
 	background-attachment: fixed;
