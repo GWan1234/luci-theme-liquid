@@ -67,7 +67,7 @@
 	--glass-bg: rgba(255, 255, 255, 0.42);
 	--glass-bg-strong: rgba(255, 255, 255, 0.66);
 	/* 亮色 hover 背景用浅主题色 tint（纯白 hover 会发白、看不清字） */
-	--glass-bg-hover: color-mix(in srgb, var(--primary-color-high) 10%, #ffffff);
+	--glass-bg-hover: color-mix(in srgb, var(--primary-color-high) 25%, #ffffff);
 	--glass-border: rgba(255, 255, 255, 0.8);
 	--glass-border-dark: rgba(23, 34, 52, 0.09);
 	--glass-inset: rgba(255, 255, 255, 0.95);
@@ -1352,13 +1352,6 @@ input[type="radio"] {
 .cbi-button:hover {
 	background: var(--glass-bg-hover);
 	text-decoration: none;
-}
-
-/* 明亮模式下玻璃按钮 hover 用浅主题色 tint，避免 --glass-bg-hover
-   （白色 70%）让按钮直接发白 */
-:root:not([data-darkmode="true"]) .btn:hover,
-:root:not([data-darkmode="true"]) .cbi-button:hover {
-	background: color-mix(in srgb, var(--primary-color-high) 8%, #ffffff);
 }
 
 /* 彩色（accent/负面）按钮 hover 保持自身色系并微亮，不发白 */
