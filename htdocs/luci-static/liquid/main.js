@@ -251,6 +251,35 @@
 				var mo = new MutationObserver(sync);
 				mo.observe(dd, { attributes: true, subtree: true, attributeFilter: ['class', 'display'] });
 			}
+
+			/* 兜底：点击选项后（ui.js toggleItem/closeDropdown 之后），
+			   若关闭流程因任何原因中断（如 preview 缺失使 closeDropdown 抛错、
+			   open 属性残留），强制把下拉重置为闭合态并让选中值显示在框里。 */
+			dd.addEventListener('click', function (e) {
+				var li = e.target.closest ? e.target.closest('li') : null;
+				if (!li || !li.parentNode || !li.parentNode.classList.contains('dropdown'))
+					return;
+				setTimeout(function () {
+					var ul = dd.querySelector('ul.dropdown');
+					if (!ul)
+						return;  /* ui.js 已正常关闭 */
+					var pv = dd.querySelector('ul.preview');
+					if (pv && pv.parentNode === dd)
+						dd.removeChild(pv);
+					ul.classList.remove('dropdown');
+					ul.style.top = ul.style.bottom = ul.style.maxHeight = '';
+					dd.removeAttribute('open');
+					var sel = ul.querySelector('li[selected]');
+					if (!sel)
+						return;  /* 点击未生效（toggleItem 没跑），不动现状 */
+					ul.querySelectorAll('li[display]').forEach(function (l) {
+						if (l !== sel)
+							l.removeAttribute('display');
+					});
+					if (!sel.hasAttribute('display'))
+						sel.setAttribute('display', '0');
+				}, 0);
+			});
 		});
 	}
 

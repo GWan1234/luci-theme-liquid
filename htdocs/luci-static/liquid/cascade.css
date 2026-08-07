@@ -1534,7 +1534,9 @@ input[type="radio"] {
 	display: none;
 }
 
-.cbi-dropdown:not([open]) > ul > li[display] {
+/* 当前值行：与官方 bootstrap 一致，无条件显示 li[display]
+   （不依赖 :not([open])，防止关闭流程中断时值不可见） */
+.cbi-dropdown > ul > li[display] {
 	display: flex;
 	align-items: center;
 	flex: 1;
