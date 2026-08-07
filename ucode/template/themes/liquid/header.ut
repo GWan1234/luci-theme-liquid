@@ -4,9 +4,11 @@
 -#}
 
 {%
+	import * as fs from 'fs';
 	import { getuid, getspnam } from 'luci.core';
 
 	const boardinfo = ubus.call('system', 'board') ?? {};
+	let theme_ver = trim(fs.readfile('/usr/share/ucode/luci/template/themes/liquid/VERSION') ?? '?', '"\n\r');
 
 	http.prepare_content('text/html; charset=UTF-8');
 
@@ -32,7 +34,7 @@
 		} catch (e) {}
 	})();
 </script>
-<link rel="stylesheet" type="text/css" media="screen" href="{{ media }}/cascade.css" />
+<link rel="stylesheet" type="text/css" media="screen" href="{% print(media); %}/cascade.css?v={% print(theme_ver); %}" />
 <link rel="icon" href="{{ media }}/logo.svg" type="image/svg+xml" />
 <link rel="apple-touch-icon" href="{{ media }}/logo.png" />
 <script type="text/javascript" src="{{ dispatcher.build_url('admin/translations', dispatcher.lang) }}"></script>

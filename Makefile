@@ -1,7 +1,7 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=luci-theme-liquid
-PKG_VERSION:=2.23
+PKG_VERSION:=0.1
 PKG_RELEASE:=1
 
 PKG_MAINTAINER:=然后七年 <69092025+zzsj0928@users.noreply.github.com>
@@ -29,6 +29,8 @@ define Package/$(PKG_NAME)/postrm
 exit 0
 endef
 
+# 版本迭代：改 PKG_RELEASE（r 值）时，同步更新
+# ucode/template/themes/liquid/VERSION（模板用它做 foot 显示与 ?v= 缓存破坏）。
 include $(TOPDIR)/feeds/luci/luci.mk
 
 # call BuildPackage - OpenWrt buildroot signature

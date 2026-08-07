@@ -12,6 +12,9 @@
 %}
 
 {%
+	/* 主题版本（0.1-rN），由构建期 VERSION 文件提供 */
+	let theme_ver = trim(fs.readfile('/usr/share/ucode/luci/template/themes/liquid/VERSION') ?? '?', '"\n\r');
+
 	/* 固件信息：优先读 /etc/os-release 的 FIRMWARE_URL（固件 release 链接）
 	   与 OPENWRT_RELEASE（固件版本文本），读不到时回退动态构造。
 	   锁屏与登录后 foot 横幅共用。 */
@@ -55,7 +58,7 @@
 
 {% if (blank_page): %}
 <p class="luci">
-	<a href="https://github.com/zzsj0928/luci-theme-liquid" target="_blank" rel="noopener">Liquid Theme {# PKG_VERSION #}</a><br>
+	<a href="https://github.com/zzsj0928/luci-theme-liquid" target="_blank" rel="noopener">Liquid Theme {{ theme_ver }}</a><br>
 	<a href="{{ fw_release }}" target="_blank" rel="noopener">{{ fw_text }}</a><br>
 	Kernel: {{ boardinfo.kernel ?? '?' }}<br>
 	<a href="{{ luci_release }}" target="_blank" rel="noopener">{{ version.luciname }} {{ version.luciversion }}</a>
@@ -63,7 +66,7 @@
 {% endif %}
 {% if (!blank_page): %}
 <p class="luci luci-foot">
-	<a href="https://github.com/zzsj0928/luci-theme-liquid" target="_blank" rel="noopener">Liquid Theme {# PKG_VERSION #}</a>
+	<a href="https://github.com/zzsj0928/luci-theme-liquid" target="_blank" rel="noopener">Liquid Theme {{ theme_ver }}</a>
 	<span class="luci-sep">·</span>
 	<a class="luci-fw" href="{{ fw_release }}" target="_blank" rel="noopener">{{ fw_text }}</a>
 	<span class="luci-sep">·</span>
@@ -76,7 +79,7 @@
 {% if (!blank_page): %}
 <script>L.require('menu-liquid')</script>
 {% endif %}
-<script type="text/javascript" src="{{ media }}/main.js"></script>
+<script type="text/javascript" src="{% print(media); %}/main.js?v={% print(theme_ver); %}"></script>
 
 </body>
 </html>
