@@ -11,8 +11,13 @@ return view.extend({
 		var form = document.querySelector('form'),
 		    btn = document.querySelector('button');
 
+		var hostname = (document.body && document.body.getAttribute('data-hostname')) || '';
+		var title = hostname
+			? (hostname + ' · ' + _('Authorization Required'))
+			: _('Authorization Required');
+
 		var dlg = ui.showModal(
-			_('Authorization Required'),
+			title,
 			[].slice.call(document.querySelectorAll('section > *')),
 			'login'
 		);

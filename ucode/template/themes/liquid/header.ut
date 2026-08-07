@@ -44,7 +44,7 @@
 <style title="text/css">{{ css }}</style>
 {% endif %}
 </head>
-<body class="lang_{{ dispatcher.lang }}{% if (blank_page): %} liquid-login{% endif %}" data-page="{{ entityencode(join('-', ctx.request_path), true) }}">
+<body class="lang_{{ dispatcher.lang }}{% if (blank_page): %} liquid-login{% endif %}" data-page="{{ entityencode(join('-', ctx.request_path), true) }}" data-hostname="{{ striptags(boardinfo.hostname ?? '') }}">
 
 <p class="skiplink">
 <span id="skiplink1"><a href="#navigation">{{ _('Skip to navigation') }}</a></span>
