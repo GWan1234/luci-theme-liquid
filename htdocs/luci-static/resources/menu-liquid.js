@@ -64,8 +64,10 @@ return baseclass.extend({
 		if (children.length == 0 || l > 2)
 			return E([]);
 
-		children.forEach(child => {
-			const isActive = (L.env.dispatchpath[l] == child.name);
+		children.forEach((child, index) => {
+			/* 当前所在一级菜单默认展开；无当前路径（如首页）时展开第一个一级菜单 */
+			const isActive = (L.env.dispatchpath[l] == child.name) ||
+			                 (l == 1 && !L.env.dispatchpath.length && index === 0);
 			const activeClass = 'mainmenu-item-%s%s'.format(
 				child.name, isActive ? ' selected active' : '');
 
