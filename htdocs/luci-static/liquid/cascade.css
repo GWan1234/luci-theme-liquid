@@ -2092,12 +2092,33 @@ div[style*="grid-template-columns:repeat(auto-fit, minmax(70px, 1fr))"] .ifacebo
 	max-width: none !important;
 	min-width: 70px;
 	margin: 0 !important;
-	text-align: center;
 }
 
 /* 端口状态卡片：接口名/图标/连接状态水平居中 */
+div[style*="grid-template-columns:repeat(auto-fit, minmax(70px, 1fr))"] .ifacebox {
+	text-align: center;
+}
+
 div[style*="grid-template-columns:repeat(auto-fit, minmax(70px, 1fr))"] .ifacebox-head {
 	justify-content: center;
+}
+
+/* 网络卡片（30_network）：内容左对齐、上游标题居中、接口名行居中 */
+.network-status-table .ifacebox {
+	text-align: left;
+}
+
+.network-status-table .ifacebox-body.left {
+	text-align: left;
+}
+
+.network-status-table .ifacebox-head.center {
+	justify-content: center;
+	text-align: center;
+}
+
+.network-status-table .ifacebox > div:last-child {
+	text-align: center;
 }
 
 /* 网络卡片（30_network）整体居中、子卡片留空隙 */
@@ -2130,7 +2151,7 @@ div[style*="grid-template-columns:repeat(auto-fit, minmax(70px, 1fr))"] .ifacebo
 	backdrop-filter: blur(12px);
 	border: 1px solid var(--glass-border);
 	box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
-	z-index: 1000;
+	z-index: 9999;
 	white-space: normal;
 	line-height: 1.55;
 	pointer-events: none;
