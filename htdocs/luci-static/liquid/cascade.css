@@ -1435,12 +1435,26 @@ input[type="radio"] {
 	background: var(--glass-bg-hover);
 }
 
-/* 用量表格（内存/存储等）：左侧标题列约 40 字符宽（超出换行），
-   右侧值列占剩余宽度，标题与值保持同一行（桌面/移动端一致） */
-.table:has(td[width="33%"]) {
-	table-layout: fixed;
+/* 表格显式保持行布局（防 td 被块级化堆叠） */
+.table,
+.cbi-section-table {
+	display: table;
 }
 
+.table tr,
+.cbi-section-table tr {
+	display: table-row;
+}
+
+.table td,
+.table th,
+.cbi-section-table td,
+.cbi-section-table th {
+	display: table-cell;
+}
+
+/* 用量表格（内存/存储等）：左侧标题列约 16 字符宽（允许内部换行），
+   右侧值列占剩余宽度，标题与值始终同一行 */
 .table td[width="33%"] {
 	width: 16ch;
 	max-width: 16ch;
@@ -2208,10 +2222,10 @@ pre {
 		overflow-x: auto;
 	}
 
-	/* 行内单元格同行排列，标题列紧凑、值列占剩余宽度 */
+	/* 行内单元格同行排列（!important 防覆盖），标题列紧凑、值列占剩余宽度 */
 	.cbi-section-table tr,
 	.table tr {
-		display: flex;
+		display: flex !important;
 		align-items: center;
 		white-space: nowrap;
 	}
