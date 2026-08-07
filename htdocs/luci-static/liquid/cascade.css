@@ -1353,6 +1353,31 @@ input[type="radio"] {
 	text-decoration: none;
 }
 
+/* 明亮模式下玻璃按钮 hover 用浅主题色 tint，避免 --glass-bg-hover
+   （白色 70%）让按钮直接发白 */
+:root:not([data-darkmode="true"]) .btn:hover,
+:root:not([data-darkmode="true"]) .cbi-button:hover {
+	background: color-mix(in srgb, var(--primary-color-high) 8%, #ffffff);
+}
+
+/* 彩色（accent/负面）按钮 hover 保持自身色系并微亮，不发白 */
+.cbi-button-action:hover,
+.cbi-button-apply:hover,
+.cbi-button-reload:hover,
+.cbi-button-edit:hover,
+.cbi-button-positive:hover,
+.cbi-button-save:hover {
+	background: var(--accent-grad);
+	filter: brightness(1.1);
+}
+
+.cbi-button-negative:hover,
+.cbi-button-reset:hover,
+.cbi-button-remove:hover {
+	background: linear-gradient(135deg, #f06767, var(--error-color-high));
+	filter: brightness(1.08);
+}
+
 .btn:active,
 .cbi-button:active {
 	transform: translateY(1px);
