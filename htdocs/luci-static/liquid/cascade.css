@@ -68,6 +68,9 @@
 	--glass-bg-strong: rgba(255, 255, 255, 0.66);
 	/* 亮色 hover 背景用浅主题色 tint（纯白 hover 会发白、看不清字） */
 	--glass-bg-hover: color-mix(in srgb, var(--primary-color-high) 30%, #ffffff);
+	/* 表格隔行：不透明浅色（半透明玻璃隔行会让图标文字显得半透，
+	   误以为接口未连接） */
+	--table-stripe: #f4f6f9;
 	--glass-border: rgba(255, 255, 255, 0.8);
 	--glass-border-dark: rgba(23, 34, 52, 0.09);
 	--glass-inset: rgba(255, 255, 255, 0.95);
@@ -137,6 +140,7 @@
 	--glass-bg: rgba(24, 32, 48, 0.4);
 	--glass-bg-strong: rgba(22, 29, 44, 0.74);
 	--glass-bg-hover: rgba(42, 54, 78, 0.55);
+	--table-stripe: #1b2330;
 	--glass-border: rgba(255, 255, 255, 0.16);
 	--glass-border-dark: rgba(0, 0, 0, 0.42);
 	--glass-inset: rgba(255, 255, 255, 0.10);
@@ -1483,7 +1487,7 @@ input[type="radio"] {
 .cbi-section-table tr.cbi-rowstyle-2,
 .table tr:nth-child(even),
 .cbi-section-table tr:nth-child(even) {
-	background: var(--glass-bg);
+	background: var(--table-stripe);
 }
 
 .table tr:hover,
