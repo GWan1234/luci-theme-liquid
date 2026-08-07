@@ -2478,6 +2478,18 @@ div[style*="grid-template-columns:repeat(auto-fit, minmax(70px, 1fr))"] .ifacebo
 	left: -10000px;
 	opacity: 0;
 	visibility: hidden;
+	/* 磨砂玻璃底（与概况页悬浮框一致，否则透明看不见文字） */
+	background: var(--glass-bg-strong);
+	-webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
+	backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
+	border: 1px solid var(--glass-border);
+	border-radius: 10px;
+	box-shadow: 0 10px 28px rgba(0, 0, 0, 0.2);
+	padding: 8px 12px;
+	white-space: normal;
+	line-height: 1.55;
+	color: var(--text-color-high);
+	pointer-events: none;
 }
 
 .cbi-tooltip-container {
@@ -2485,7 +2497,7 @@ div[style*="grid-template-columns:repeat(auto-fit, minmax(70px, 1fr))"] .ifacebo
 }
 
 .cbi-tooltip-container:hover .cbi-tooltip {
-	left: 0;
+	left: calc(100% + 8px);
 	opacity: 1;
 	visibility: visible;
 }
