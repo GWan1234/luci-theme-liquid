@@ -55,7 +55,7 @@
 <div id="menubar">
 	<h2 class="navigation"><a id="navigation" name="navigation">{{ _('Navigation') }}</a></h2>
 
-	<span class="hostname"><a href="/">{{ striptags(boardinfo.hostname ?? '?') }}</a></span>
+	<span class="hostname"><a href="/"><svg class="liquid-logo" viewBox="0 0 64 68" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs><linearGradient id="liquid-lg-top" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--primary-color-high)" stop-opacity="0.85"/><stop offset="0.5" stop-color="var(--primary-color-high)" stop-opacity="0.4"/><stop offset="1" stop-color="var(--primary-color-low)" stop-opacity="0.92"/></linearGradient></defs><path d="M32 3 C46 20 57 30 57 42 a25 25 0 0 1 -50 0 C7 30 18 20 32 3 Z" fill="url(#liquid-lg-top)" stroke="rgba(255,255,255,0.7)" stroke-width="1.5"/><ellipse cx="23" cy="39" rx="9.5" ry="6" fill="#ffffff" opacity="0.6"/></svg>{{ striptags(boardinfo.hostname ?? '?') }}</a></span>
 	<span class="distversion">{{ version.distversion }} {{ version.distrevision }}</span>
 	<span id="indicators"></span>
 </div>

@@ -428,13 +428,14 @@ img {
 	text-decoration: none;
 }
 
-#menubar .hostname a::before {
-	content: "";
+/* 顶栏 logo（内联 SVG，跟随主题色 + 玻璃水滴感） */
+#menubar .hostname a .liquid-logo {
 	display: inline-block;
 	width: 22px;
 	height: 22px;
 	margin: 0 8px -5px 0;
-	background: url(logo.svg) center / contain no-repeat;
+	vertical-align: baseline;
+	filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.18));
 }
 
 #menubar .distversion {
@@ -2022,13 +2023,13 @@ body.liquid-login #modal_overlay > .modal.login {
 	            inset 0 1px 0 var(--glass-inset);
 }
 
-body.liquid-login #modal_overlay > .modal.login::before {
-	content: "";
+/* 登录页 logo（main.js 注入内联 SVG，跟随主题色 + 玻璃水滴感） */
+body.liquid-login #modal_overlay > .modal.login .liquid-logo {
 	display: block;
 	width: 78px;
 	height: 78px;
 	margin: 0 auto 14px;
-	background: url(logo.svg) center / contain no-repeat;
+	filter: drop-shadow(0 6px 18px rgba(31, 45, 70, 0.35));
 }
 
 body.liquid-login #modal_overlay > .modal.login h4 {

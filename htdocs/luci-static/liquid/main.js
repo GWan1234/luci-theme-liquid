@@ -319,6 +319,17 @@
 		});
 	}
 
+	/* 登录页 logo：luci 的 modal.login 是 JS 渲染的，注入内联 SVG
+	   （跟随主题色 + 玻璃水滴感），替换原 CSS 背景图 */
+	function injectLoginLogo() {
+		var m = document.querySelector('body.liquid-login #modal_overlay > .modal.login');
+		if (!m || m.querySelector('.liquid-logo'))
+			return;
+		var w = document.createElement('div');
+		w.innerHTML = '<svg class="liquid-logo" viewBox="0 0 64 68" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs><linearGradient id="liquid-lg-login" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--primary-color-high)" stop-opacity="0.85"/><stop offset="0.5" stop-color="var(--primary-color-high)" stop-opacity="0.4"/><stop offset="1" stop-color="var(--primary-color-low)" stop-opacity="0.92"/></linearGradient></defs><path d="M32 3 C46 20 57 30 57 42 a25 25 0 0 1 -50 0 C7 30 18 20 32 3 Z" fill="url(#liquid-lg-login)" stroke="rgba(255,255,255,0.7)" stroke-width="1.5"/><ellipse cx="23" cy="39" rx="9.5" ry="6" fill="#ffffff" opacity="0.6"/></svg>';
+		m.insertBefore(w.firstChild, m.firstChild);
+	}
+
 	/* 移动端菜单 top 跟随顶栏实际高度（防顶栏被撑高后菜单盖住它） */
 	function syncMenuTop() {
 		var bar = document.getElementById('menubar');
@@ -347,6 +358,7 @@
 			initTabSliders();
 			syncDropdownValues();
 			portalTooltips();
+			injectLoginLogo();
 			setTimeout(syncMenuTop, 300);
 			setTimeout(initTabSliders, 300);
 			setTimeout(syncDropdownValues, 300);
@@ -358,6 +370,7 @@
 		initTabSliders();
 		syncDropdownValues();
 		portalTooltips();
+		injectLoginLogo();
 		setTimeout(syncMenuTop, 300);
 		setTimeout(initTabSliders, 300);
 		setTimeout(syncDropdownValues, 300);
@@ -369,6 +382,7 @@
 			initTabSliders();
 			syncDropdownValues();
 			portalTooltips();
+			injectLoginLogo();
 		});
 		document.addEventListener('DOMContentLoaded', function () {
 			tabObserver.observe(document.body, { childList: true, subtree: true });
