@@ -1490,6 +1490,13 @@ input[type="radio"] {
 	background: var(--table-stripe);
 }
 
+/* 接口/设备表格行：强制不透明。luci 的"hover 删除按钮"或渲染逻辑
+   会给行加内联 style="opacity:0.5"，让已连接接口的图标/文字呈半透、
+   被误判为未连接；统一压回 1（连接状态由图标本身区分） */
+.cbi-section-table tr {
+	opacity: 1 !important;
+}
+
 .table tr:hover,
 .cbi-section-table tr:hover {
 	background: var(--glass-bg-hover);
