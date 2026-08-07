@@ -1544,7 +1544,11 @@ input[type="radio"] {
 	text-overflow: ellipsis;
 }
 
-.cbi-dropdown[open] > ul {
+/* 打开时：选项列表（ul.dropdown）弹出为玻璃下拉。
+   注意：ui.js 打开时会把原 ul 克隆为 ul.preview（顶部当前值行），
+   弹出规则必须只作用于 ul.dropdown，否则 preview 也会被弹成
+   第二个列表，出现“两套下拉菜单”。 */
+.cbi-dropdown[open] > ul.dropdown {
 	display: block;
 	position: absolute;
 	left: 0;
@@ -1562,7 +1566,27 @@ input[type="radio"] {
 	box-shadow: var(--glass-shadow);
 }
 
-.cbi-dropdown[open] > ul > li {
+/* 打开时：preview 克隆作为顶部当前值行（官方机制），
+   原 ul 弹出后顶部仍有当前值显示 */
+.cbi-dropdown[open] > ul.preview {
+	display: flex;
+	flex: 1;
+	min-width: 0;
+	align-items: center;
+	overflow: hidden;
+}
+
+.cbi-dropdown[open] > ul.preview > li[display] {
+	display: flex;
+	align-items: center;
+	flex: 1;
+	min-width: 0;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.cbi-dropdown[open] > ul.dropdown > li {
 	display: flex;
 	align-items: center;
 	padding: 7px 10px;
@@ -1570,6 +1594,17 @@ input[type="radio"] {
 	font-size: 13px;
 	color: var(--text-color-medium);
 	cursor: pointer;
+}
+
+/* 富选项（cbiRichListValue）：闭合显示标题，弹出列表内显示描述 */
+.cbi-dropdown > ul > li .hide-close,
+.cbi-dropdown[open] > ul.dropdown > li .hide-open {
+	display: none;
+}
+
+.cbi-dropdown > ul > li .hide-open,
+.cbi-dropdown[open] > ul.dropdown > li .hide-close {
+	display: initial;
 }
 
 .cbi-dropdown > ul > li {
