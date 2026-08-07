@@ -2906,6 +2906,8 @@ pre {
 		align-items: center;
 		gap: 4px;
 		padding: 2px 0 4px;
+		/* 四个按钮下方多 8px：让相邻两个接口之间稍微区分 */
+		margin-bottom: 8px;
 	}
 
 	#menubar .navigation {
