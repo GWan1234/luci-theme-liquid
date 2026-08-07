@@ -2433,6 +2433,18 @@ div[style*="grid-template-columns:repeat(auto-fit, minmax(70px, 1fr))"] .ifacebo
 	margin: 0 !important;
 }
 
+/* GridSection 行内单元格强制等高：接口卡/详情/操作按钮底边对齐，
+   单元格分割线在同一高度（内容高度不同时不再错位） */
+div[style*="grid-template-columns:repeat(auto-fit, minmax(70px, 1fr))"] > * {
+	align-self: stretch !important;
+	height: auto !important;
+}
+
+/* 接口页行：接口小块靠左（限定左侧），详情与按钮依次排开 */
+div[style*="grid-template-columns:repeat(auto-fit, minmax(70px, 1fr))"]:has(.cbi-section-actions) {
+	justify-content: flex-start;
+}
+
 /* 网络-接口页的接口卡片：宽度按内容（接口组 bridge 的多个图标）拓展，
    防止图标溢出卡片；max-width 不限制，让列随内容拉伸 */
 .cbi-section-table td[data-name="_ifacebox"] {
