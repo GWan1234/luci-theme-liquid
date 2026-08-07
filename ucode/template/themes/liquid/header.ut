@@ -21,13 +21,14 @@
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="darkreader-lock">
 <script>
-	/* Liquid theme: apply persisted light/dark/auto mode before CSS paints */
+	/* Liquid theme: apply persisted light/dark/auto mode + accent before CSS paints */
 	(function () {
 		try {
 			var m = localStorage.getItem('liquid-theme-mode');
 			var dark = (m == 'dark') || ((m != 'light') && window.matchMedia('(prefers-color-scheme: dark)').matches);
 			document.documentElement.setAttribute('data-darkmode', dark ? 'true' : 'false');
 			document.documentElement.setAttribute('data-liquid-mode', m || 'auto');
+			document.documentElement.setAttribute('data-accent', localStorage.getItem('liquid-accent') || 'blue');
 		} catch (e) {}
 	})();
 </script>

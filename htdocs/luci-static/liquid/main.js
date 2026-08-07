@@ -26,6 +26,14 @@
 		{ id: 'auto',  icon: 'auto.svg',      title: 'Follow system' }
 	];
 
+	var ACCENTS = [
+		{ id: 'blue',    color: '#2f7fe0', title: 'Blue'       },
+		{ id: 'magenta', color: '#d63384', title: 'Magenta'     },
+		{ id: 'amber',   color: '#e8940f', title: 'Amber'       },
+		{ id: 'purple',  color: '#8e44ad', title: 'Tulip purple' },
+		{ id: 'lime',    color: '#7fb52a', title: 'Yellow-green' }
+	];
+
 	function getMode() {
 		try { return localStorage.getItem(MODE_KEY) || 'auto'; } catch (e) { return 'auto'; }
 	}
@@ -51,6 +59,60 @@
 		[].forEach.call(document.querySelectorAll('.liquid-mode-btn'), function (b) {
 			b.classList.toggle('active', b.getAttribute('data-mode') == mode);
 		});
+	}
+
+	/* ---- accent color switch ---- */
+
+	function getAccent() {
+		try { return localStorage.getItem('liquid-accent') || 'blue'; } catch (e) { return 'blue'; }
+	}
+
+	function setAccent(id) {
+		try { localStorage.setItem('liquid-accent', id); } catch (e) {}
+		document.documentElement.setAttribute('data-accent', id);
+		updateColorSwitch();
+	}
+
+	function updateColorSwitch() {
+		var accent = getAccent();
+		[].forEach.call(document.querySelectorAll('.liquid-color-btn'), function (b) {
+			b.classList.toggle('active', b.getAttribute('data-accent') == accent);
+		});
+	}
+
+	function initColorSwitch() {
+		if (document.getElementById('liquid-color-switch'))
+			return;
+
+		var wrap = document.createElement('span');
+		wrap.id = 'liquid-color-switch';
+		wrap.className = 'liquid-color-switch';
+		wrap.title = 'Accent color';
+
+		ACCENTS.forEach(function (c) {
+			var btn = document.createElement('button');
+			btn.type = 'button';
+			btn.className = 'liquid-color-btn liquid-accent-' + c.id;
+			btn.title = c.title;
+			btn.setAttribute('data-accent', c.id);
+			btn.setAttribute('aria-label', c.title);
+			btn.style.background = c.color;
+			btn.addEventListener('click', function () { setAccent(c.id); });
+			wrap.appendChild(btn);
+		});
+
+		var indicators = document.getElementById('indicators');
+
+		if (indicators && indicators.parentNode) {
+			indicators.parentNode.insertBefore(wrap, indicators);
+		}
+		else {
+			/* lock screen / pages without a menubar */
+			wrap.classList.add('liquid-color-switch-fixed');
+			document.body.appendChild(wrap);
+		}
+
+		updateColorSwitch();
 	}
 
 	function initSwitch() {
@@ -108,7 +170,12 @@
 	}
 
 	if (document.readyState == 'loading')
-		document.addEventListener('DOMContentLoaded', initSwitch);
-	else
+		document.addEventListener('DOMContentLoaded', function () {
+			initSwitch();
+			initColorSwitch();
+		});
+	else {
 		initSwitch();
+		initColorSwitch();
+	}
 })();
