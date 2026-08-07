@@ -1409,7 +1409,7 @@ input[type="radio"] {
 	font-size: 13px;
 	vertical-align: middle;
 	border-bottom: 1px solid var(--border-color-low);
-	background: var(--field-bg);
+	background: transparent;
 }
 
 .table tr:last-child td,
@@ -1417,16 +1417,27 @@ input[type="radio"] {
 	border-bottom: 0;
 }
 
-.table tr.cbi-rowstyle-2 td,
-.cbi-section-table tr.cbi-rowstyle-2 td,
-.table tr:nth-child(even) td,
-.cbi-section-table tr:nth-child(even) td {
+/* 双色交叉（斑马纹）与 hover 画在整行上，底色延伸到表格行头尾 */
+.table tr.cbi-rowstyle-2,
+.cbi-section-table tr.cbi-rowstyle-2,
+.table tr:nth-child(even),
+.cbi-section-table tr:nth-child(even) {
 	background: var(--glass-bg);
 }
 
-.table tr:hover td,
-.cbi-section-table tr:hover td {
+.table tr:hover,
+.cbi-section-table tr:hover {
 	background: var(--glass-bg-hover);
+}
+
+/* 用量表格（内存/存储等）：标题列自适应不换行，用量条占剩余宽度 */
+.table td[width="33%"] {
+	width: auto;
+	white-space: nowrap;
+}
+
+.table tr > td:last-child {
+	width: 100%;
 }
 
 /* ==========================================================================
