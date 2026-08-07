@@ -48,6 +48,7 @@
 %}
 
 {% if (!blank_page): %}
+	<div class="luci-foot-spacer"></div>
 	</div><!-- /#maincontent -->
 </div><!-- /#maincontainer -->
 {% endif %}

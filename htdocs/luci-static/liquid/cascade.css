@@ -1020,6 +1020,11 @@ p.luci {
 	color: var(--text-color-low);
 }
 
+/* 内容区底部 spacer：滚动到底时内容完整显示在 foot 之上 */
+.luci-foot-spacer {
+	height: 80px;
+}
+
 /* 登录后 foot 横幅：从菜单栏右外侧到窗口右边缘，顶栏式玻璃横幅 */
 body:not(.liquid-login) p.luci {
 	position: fixed;
@@ -2159,6 +2164,10 @@ pre {
 	/* 移动端 foot 横幅只保留固件版本 */
 	body:not(.liquid-login) p.luci > *:not(.luci-fw) {
 		display: none;
+	}
+
+	.luci-foot-spacer {
+		height: 70px;
 	}
 
 	#menubar .distversion {
