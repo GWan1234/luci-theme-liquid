@@ -1257,6 +1257,7 @@ textarea[disabled] {
 	cursor: not-allowed;
 }
 
+
 textarea {
 	min-height: 72px;
 	resize: vertical;

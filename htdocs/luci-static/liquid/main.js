@@ -408,13 +408,13 @@
 		setTimeout(syncDropdownValues, 300);
 	}
 
-	/* 定时清除所有内联 opacity:0.5（luci 的离线/hover 样式会残留在
-	   接口徽章图标/文字、删除按钮、'取消配置'按钮等元素上，让已连接
-	   内容呈半透、被误判为未连接）。统一压回不透明。 */
+	/* 定时清除所有内联 opacity（非 0/1 的残留值，luci 的离线/hover
+	   样式会残留在接口徽章图标/文字、删除按钮、'取消配置'按钮等元素上，
+	   让已连接内容呈半透、被误判为未连接）。统一压回不透明。 */
 	setInterval(function () {
 		document.querySelectorAll('[style*="opacity"]').forEach(function (el) {
 			var o = el.style.opacity;
-			if (o === '0.5' || o === '.5')
+			if (o && o !== '1' && o !== '0')
 				el.style.opacity = '';
 		});
 	}, 600);
