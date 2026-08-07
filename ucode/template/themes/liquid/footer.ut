@@ -4,6 +4,10 @@
 -#}
 
 {%
+	import * as fs from 'fs';
+%}
+
+{%
 	const boardinfo = ubus.call('system', 'board') ?? {};
 %}
 
@@ -14,12 +18,31 @@
 
 {% if (blank_page): %}
 {%
-	/* 固件 release 链接：从被安装固件的版本动态构造，
-	   解析不到标准 OpenWrt 版本号时回退官方 release 页 */
-	let fw_m = match(version.distversion ?? '', /OpenWrt[ \t]+([0-9]+\.[0-9]+(\.[0-9]+)?)/);
-	let fw_release = (fw_m !== null)
-		? sprintf('https://downloads.openwrt.org/releases/%s/', fw_m[1])
-		: 'https://github.com/openwrt/openwrt/releases';
+	/* 固件信息：优先读 /etc/os-release 的 FIRMWARE_URL（固件 release 链接）
+	   与 OPENWRT_RELEASE（固件版本文本），读不到时回退动态构造 */
+	let fw_url = '';
+	let fw_text = '';
+	let fw_release = '';
+	let osrel = fs.readfile('/etc/os-release') ?? '';
+	let lines = split(osrel, '\n');
+	for (let i = 0; i < length(lines); i++) {
+		let m1 = match(lines[i], /^FIRMWARE_URL=(.*)$/);
+		if (m1 !== null)
+			fw_url = trim(m1[1], "\"\n\r");
+		let m2 = match(lines[i], /^OPENWRT_RELEASE=(.*)$/);
+		if (m2 !== null)
+			fw_text = trim(m2[1], "\"\n\r");
+	}
+	if (fw_url != '')
+		fw_release = fw_url;
+	else {
+		let fw_m = match(version.distversion ?? '', /OpenWrt[ \t]+([0-9]+\.[0-9]+(\.[0-9]+)?)/);
+		fw_release = (fw_m !== null)
+			? sprintf('https://downloads.openwrt.org/releases/%s/', fw_m[1])
+			: 'https://github.com/openwrt/openwrt/releases';
+	}
+	if (fw_text == '')
+		fw_text = sprintf('%s %s', version.distversion ?? '', version.distrevision ?? '');
 
 	/* LuCI release 链接：luciversion 为纯版本号（如 23.05.3）时链接对应
 	   release tag，否则（git 快照版本）回退官方 release 页 */
@@ -30,7 +53,7 @@
 %}
 <p class="luci">
 	<a href="https://github.com/zzsj0928/luci-theme-liquid" target="_blank" rel="noopener">Liquid Theme {# PKG_VERSION #}</a><br>
-	<a href="{{ fw_release }}" target="_blank" rel="noopener">{{ version.distversion }} {{ version.distrevision }}</a><br>
+	<a href="{{ fw_release }}" target="_blank" rel="noopener">{{ fw_text }}</a><br>
 	Kernel: {{ boardinfo.kernel ?? '?' }}<br>
 	<a href="{{ luci_release }}" target="_blank" rel="noopener">{{ version.luciname }} {{ version.luciversion }}</a>
 </p>
