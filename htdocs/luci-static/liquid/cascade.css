@@ -2591,15 +2591,15 @@ img[src*="icons/"][src$=".svg"] {
 	vertical-align: middle;
 }
 
-/* interfaces.js 里 ifacebox-body 的设备图内联 16px，覆盖为 32px */
+/* interfaces.js 里 ifacebox-body 的设备图内联 16px，覆盖为 24px */
 .ifacebox-body > img {
-	width: 32px !important;
-	height: 32px !important;
+	width: 24px !important;
+	height: auto !important;
 }
 
 .ifacebadge img {
-	width: 32px;
-	height: 32px;
+	width: 24px;
+	height: auto;
 	vertical-align: middle;
 }
 
@@ -2696,10 +2696,10 @@ pre {
 		white-space: normal;
 	}
 
-	/* 移动端：接口图标强制统一 32px，防止被列宽挤压变形 */
+	/* 移动端：接口图标强制统一 24px，防止被列宽挤压变形 */
 	.cbi-section-table .ifacebox img {
-		width: 32px !important;
-		height: 32px !important;
+		width: 24px !important;
+		height: auto !important;
 		flex-shrink: 0;
 	}
 
