@@ -2567,12 +2567,11 @@ div[style*="grid-template-columns:repeat(auto-fit, minmax(70px, 1fr))"] .ifacebo
 	line-height: 1;
 }
 
-/* 接口图标（render_iface 的 img.middle 等）：不同 svg viewBox
-   会导致显示大小不一，统一 32px（2 倍于原 16px） */
-.ifacebox img.middle,
-.ifacebox .cbi-tooltip-container > img {
-	width: 32px;
-	height: 32px;
+/* 接口图标全局统一 32px：不同 svg viewBox / 不同容器会导致宽度不一，
+   统一强制 32×32（!important 防内联样式覆盖） */
+img[src*="icons/"][src$=".svg"] {
+	width: 32px !important;
+	height: 32px !important;
 	vertical-align: middle;
 }
 
@@ -2686,6 +2685,19 @@ pre {
 		width: 32px !important;
 		height: 32px !important;
 		flex-shrink: 0;
+	}
+
+	/* 移动端：接口图标（主图标+子接口图标）换行居中，多图标整齐排列 */
+	.ifacebox-body {
+		white-space: normal;
+	}
+
+	.ifacebox-body > .cbi-tooltip-container,
+	.ifacebox-body > span,
+	.ifacebox-body > span .cbi-tooltip-container {
+		display: inline-block;
+		vertical-align: middle;
+		margin: 2px;
 	}
 
 	/* 移动端：操作按钮列右对齐，避让接口信息文字；允许换行 */
