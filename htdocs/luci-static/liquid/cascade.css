@@ -2381,6 +2381,20 @@ button + .btn,
 	white-space: nowrap;
 }
 
+/* 接口列表操作列（重启/停止/编辑/删除）：不压缩、不换行，
+   卡片 fit-content 变宽后按钮列被挤压会与详细信息重叠 */
+.cbi-section-table td.cbi-section-actions {
+	width: 1%;
+	white-space: nowrap;
+	text-align: right;
+	vertical-align: middle;
+}
+
+/* 接口组（bridge）子接口图标行：图标多时允许换行，不溢出卡片 */
+.ifacebox-body > span {
+	white-space: normal;
+}
+
 /* 端口状态页：接口卡片宽度自适应内容、整体居中、间距 */
 div[style*="grid-template-columns:repeat(auto-fit, minmax(70px, 1fr))"] {
 	display: flex !important;
