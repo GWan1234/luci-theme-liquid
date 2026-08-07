@@ -17,4 +17,11 @@ if [ $changed = 1 ]; then
 	uci commit luci
 fi
 
+# 主题持久化配置（模式/主题色/Bing 壁纸开关）：首次安装时创建默认 section
+if [ ! -f /etc/config/liquid ]; then
+	touch /etc/config/liquid
+	uci set "liquid.theme=theme"
+	uci commit liquid
+fi
+
 exit 0
