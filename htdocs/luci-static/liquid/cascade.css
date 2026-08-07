@@ -2496,12 +2496,6 @@ div[style*="grid-template-columns:repeat(auto-fit, minmax(70px, 1fr))"] .ifacebo
 	position: relative;
 }
 
-.cbi-tooltip-container:hover .cbi-tooltip {
-	left: calc(100% + 8px);
-	opacity: 1;
-	visibility: visible;
-}
-
 /* 悬浮内容框内不再重复显示接口图标（行内主图标已表示连接状态）；
    只针对 render_iface 的 ifacebadge.large 内重复图标，避免误伤
    设备页等把主图标放在 tooltip 结构里的场景 */
@@ -2555,11 +2549,6 @@ div[style*="grid-template-columns:repeat(auto-fit, minmax(70px, 1fr))"] .ifacebo
 	line-height: 1.55;
 	pointer-events: none;
 	transition: opacity .15s ease;
-}
-
-.ifacebox .cbi-tooltip-container:hover .cbi-tooltip {
-	left: 0;
-	opacity: 1;
 }
 
 /* 悬浮内容框被 portal 到 body 顶层后，原 .ifacebox .cbi-tooltip 的

@@ -288,10 +288,10 @@
 	   （fixed 定位），彻底脱离卡片 backdrop-filter 的 stacking context，
 	   这样 tooltip 不会被相邻卡片遮挡。移出后放回原容器。 */
 	function portalTooltips() {
-		/* 只对会被相邻卡片遮挡的场景（ifacebox / zonebadge 卡片内）做 portal；
-		   设备页等行内 tooltip 走 CSS hover，避免 portal 与 CSS hover
-		   叠加造成悬停闪烁 */
-		document.querySelectorAll('.ifacebox .cbi-tooltip-container, .zonebadge .cbi-tooltip-container').forEach(function (c) {
+		/* 所有 .cbi-tooltip 都 portal 到 body：既防相邻卡片遮挡，
+		   也避免被容器（如 .cbi-section-table overflow:hidden）边缘截断。
+		   显隐完全由 JS 控制（CSS hover 规则已移除，避免双重机制闪烁） */
+		document.querySelectorAll('.cbi-tooltip-container').forEach(function (c) {
 			if (c.classList.contains('liquid-tip-init'))
 				return;
 			c.classList.add('liquid-tip-init');
