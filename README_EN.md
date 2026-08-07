@@ -9,15 +9,15 @@
 } -->
 
 [license]: /LICENSE
-[license-badge]: https://img.shields.io/github/license/xylz0928/luci-theme-liquid?style=flat-square&a=1
-[prs]: https://github.com/xylz0928/luci-theme-liquid/pulls
+[license-badge]: https://img.shields.io/github/license/zzsj0928/luci-theme-liquid?style=flat-square&a=1
+[prs]: https://github.com/zzsj0928/luci-theme-liquid/pulls
 [prs-badge]: https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square
-[issues]: https://github.com/xylz0928/luci-theme-liquid/issues/new
+[issues]: https://github.com/zzsj0928/luci-theme-liquid/issues/new
 [issues-badge]: https://img.shields.io/badge/Issues-welcome-brightgreen.svg?style=flat-square
-[release]: https://github.com/xylz0928/luci-theme-liquid/releases
-[release-badge]: https://img.shields.io/github/v/release/xylz0928/luci-theme-liquid?style=flat-square
-[download]: https://github.com/xylz0928/luci-theme-liquid/releases
-[download-badge]: https://img.shields.io/github/downloads/xylz0928/luci-theme-liquid/total?style=flat-square
+[release]: https://github.com/zzsj0928/luci-theme-liquid/releases
+[release-badge]: https://img.shields.io/github/v/release/zzsj0928/luci-theme-liquid?style=flat-square
+[download]: https://github.com/zzsj0928/luci-theme-liquid/releases
+[download-badge]: https://img.shields.io/github/downloads/zzsj0928/luci-theme-liquid/total?style=flat-square
 [en-us-link]: /README_EN.md
 [zh-cn-link]: /README.md
 [official]: https://github.com/openwrt/openwrt
@@ -48,9 +48,7 @@ Supports **light / dark / auto** modes, **5 accent colors** and adjustable blur 
 [Screenshots](#screenshots) •
 [Credits](#credits)
 
-<!-- Animation placeholder: theme demo GIF (to be uploaded later) -->
-<!-- <img src="https://raw.githubusercontent.com/xylz0928/ReadmeContents/master/Liquid/Liquid_Demo.gif"> -->
-
+<img src="https://raw.githubusercontent.com/zzsj0928/ReadmeContents/master/liquid/luci-theme-liquid_pc.gif">
 </div>
 
 ## Features
@@ -155,11 +153,18 @@ luci-theme-liquid/
 
 ## Screenshots
 
-<!-- Screenshot placeholder: desktop (to be uploaded later) -->
-<!-- ![desktop](/Screenshots/screenshot_pc.jpg) -->
+- 桌面端
 
-<!-- Screenshot placeholder: mobile (to be uploaded later) -->
-<!-- ![mobile](/Screenshots/screenshot_phone.jpg) -->
+![桌面端-锁屏-暗黑模式](https://raw.githubusercontent.com/zzsj0928/ReadmeContents/master/liquid/luci-theme-liquid_pc-lock-dark.png)
+![桌面端-主界面-暗黑模式](https://raw.githubusercontent.com/zzsj0928/ReadmeContents/master/liquid/luci-theme-liquid_pc-mainpage-dark.png)
+![桌面端-锁屏-明亮模式](https://raw.githubusercontent.com/zzsj0928/ReadmeContents/master/liquid/luci-theme-liquid_pc-lock-light.png)
+![桌面端-主界面-明亮模式](https://raw.githubusercontent.com/zzsj0928/ReadmeContents/master/liquid/luci-theme-liquid_pc-mainpage-light.png)
+
+
+- 移动端
+
+![移动端-暗黑模式](https://raw.githubusercontent.com/zzsj0928/ReadmeContents/master/liquid/luci-theme-liquid_mobile-dark.jpg)
+![移动端-明亮模式](https://raw.githubusercontent.com/zzsj0928/ReadmeContents/master/liquid/luci-theme-liquid_mobile-light.jpg)
 
 ## Credits
 
