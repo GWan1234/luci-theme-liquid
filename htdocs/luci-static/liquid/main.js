@@ -141,7 +141,7 @@
 		bingBtn.className = 'liquid-color-btn liquid-bing-btn';
 		bingBtn.title = 'Bing 每日壁纸';
 		bingBtn.setAttribute('aria-label', 'Bing daily wallpaper');
-		bingBtn.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><rect width="24" height="24" rx="5" fill="#008373"/><path d="M7 5.5v13h4.2V15.5c0-1.6 1.1-2.9 2.7-3.1l4.1-.5v-4l-4.6.6c-1.3.2-2.3.5-3 .9V5.5H7z" fill="#fff"/></svg>';
+		bingBtn.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><rect width="24" height="24" rx="5" fill="#008373"/><text x="12" y="17.5" font-family="Segoe UI, Arial, sans-serif" font-size="15" font-weight="700" fill="#ffffff" text-anchor="middle">b</text></svg>';
 		bingBtn.addEventListener('click', function () {
 			setBing(getBing() != '1');
 		});

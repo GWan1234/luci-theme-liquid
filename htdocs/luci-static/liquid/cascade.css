@@ -2045,15 +2045,6 @@ input[type="radio"] {
    15. Lock screen (sysauth login)
    ========================================================================== */
 
-/* Bing 每日壁纸：启用时覆盖默认背景（data-liquid-bing 与
-   --liquid-bing 由 ucode 模板输出，壁纸缓存于 /tmp/liquid/） */
-body[data-liquid-bing="1"] {
-	background-image: var(--liquid-bing, var(--body-grad));
-	background-size: cover;
-	background-position: center;
-	background-attachment: fixed;
-}
-
 body.liquid-login {
 	background-color: #0a0d13;
 	background-image: url(img/MontereyDark.jpg);
@@ -2067,6 +2058,9 @@ body.liquid-login {
 	background-image: url(img/MontereyLight.jpg);
 }
 
+/* Bing 每日壁纸（仅锁屏界面）：启用且壁纸可用（--liquid-bing 由 ucode
+   模板输出）时使用 Bing 当日壁纸；无互联网（变量未定义）或按钮关闭时
+   var() fallback 回退到默认 Monterey 壁纸 */
 body.liquid-login[data-liquid-bing="1"] {
 	background-image: var(--liquid-bing, url(img/MontereyDark.jpg));
 	background-size: cover;
