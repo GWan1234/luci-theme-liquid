@@ -385,6 +385,18 @@
 		setTimeout(syncDropdownValues, 300);
 	}
 
+	/* 禁用 luci 的"hover 删除按钮使整行半透"残留：该逻辑 hover 时把
+	   整个 section 设 opacity:0.5，mouseout 偶尔不恢复会残留，让
+	   已连接接口的图标/文字呈半透、被误判为未连接。定时清除。 */
+	setInterval(function () {
+		document.querySelectorAll('.cbi-section-remove > input[name^="cbi.rts"]').forEach(function (i) {
+			var bits = i.name.split(/\./),
+			    section = document.getElementById('cbi-' + bits[2] + '-' + bits[3]);
+			if (section && section.style.opacity)
+				section.style.opacity = '';
+		});
+	}, 600);
+
 	/* 页面内容动态变化（view 切换、cbi 渲染等）时初始化新出现的 tab 菜单 */
 	if (window.MutationObserver) {
 		var tabObserver = new MutationObserver(function () {
