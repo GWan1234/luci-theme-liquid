@@ -9,15 +9,15 @@
 } -->
 
 [license]: /LICENSE
-[license-badge]: https://img.shields.io/github/license/xylz0928/luci-theme-liquid?style=flat-square&a=1
-[prs]: https://github.com/xylz0928/luci-theme-liquid/pulls
+[license-badge]: https://img.shields.io/github/license/zzsj0928/luci-theme-liquid?style=flat-square&a=1
+[prs]: https://github.com/zzsj0928/luci-theme-liquid/pulls
 [prs-badge]: https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square
-[issues]: https://github.com/xylz0928/luci-theme-liquid/issues/new
+[issues]: https://github.com/zzsj0928/luci-theme-liquid/issues/new
 [issues-badge]: https://img.shields.io/badge/Issues-welcome-brightgreen.svg?style=flat-square
-[release]: https://github.com/xylz0928/luci-theme-liquid/releases
-[release-badge]: https://img.shields.io/github/v/release/xylz0928/luci-theme-liquid?style=flat-square
-[download]: https://github.com/xylz0928/luci-theme-liquid/releases
-[download-badge]: https://img.shields.io/github/downloads/xylz0928/luci-theme-liquid/total?style=flat-square
+[release]: https://github.com/zzsj0928/luci-theme-liquid/releases
+[release-badge]: https://img.shields.io/github/v/release/zzsj0928/luci-theme-liquid?style=flat-square
+[download]: https://github.com/zzsj0928/luci-theme-liquid/releases
+[download-badge]: https://img.shields.io/github/downloads/zzsj0928/luci-theme-liquid/total?style=flat-square
 [en-us-link]: /README_EN.md
 [zh-cn-link]: /README.md
 [official]: https://github.com/openwrt/openwrt
