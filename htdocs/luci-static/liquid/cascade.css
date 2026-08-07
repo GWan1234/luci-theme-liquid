@@ -1611,6 +1611,13 @@ input[type="radio"] {
 	color: var(--on-error-color);
 }
 
+/* ComboButton 闭合时：按钮本身已有渐变底色，内部当前值行
+   不再叠加 accent 底色（打开后的弹出列表里选中项仍保留高亮） */
+.cbi-dropdown.cbi-button-apply:not([open]) > ul > li[selected],
+.cbi-dropdown.cbi-button-negative:not([open]) > ul > li[selected] {
+	background: transparent;
+}
+
 /* 单选时多余的 “···”（多选超限指示）默认隐藏，与官方一致 */
 .cbi-dropdown > .more {
 	display: none;
