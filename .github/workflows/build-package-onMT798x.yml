@@ -27,6 +27,9 @@ on:
           - ubuntu-22.04
           - ubuntu-24.04
 
+permissions:
+  contents: write
+
 env:
   UPLOAD_PACKAGE: true
   UPLOAD_RELEASE: true
@@ -180,7 +183,7 @@ jobs:
           echo "status=success" >> $GITHUB_OUTPUT
 
       - name: Upload firmware to release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         if: steps.tag.outputs.status == 'success' && !cancelled()
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
