@@ -66,7 +66,8 @@
 	--glass-radius-lg: 24px;
 	--glass-bg: rgba(255, 255, 255, 0.42);
 	--glass-bg-strong: rgba(255, 255, 255, 0.66);
-	--glass-bg-hover: rgba(255, 255, 255, 0.7);
+	/* 亮色 hover 背景用浅主题色 tint（纯白 hover 会发白、看不清字） */
+	--glass-bg-hover: color-mix(in srgb, var(--primary-color-high) 10%, #ffffff);
 	--glass-border: rgba(255, 255, 255, 0.8);
 	--glass-border-dark: rgba(23, 34, 52, 0.09);
 	--glass-inset: rgba(255, 255, 255, 0.95);
