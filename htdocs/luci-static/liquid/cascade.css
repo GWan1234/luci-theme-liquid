@@ -591,8 +591,8 @@ header [data-indicator][data-style="inactive"],
 
 .liquid-color-switch-fixed {
 	position: fixed;
-	top: 16px;
-	right: 64px;
+	top: 60px;
+	right: 16px;
 	z-index: 2001;
 	margin: 0;
 }
