@@ -587,6 +587,35 @@ header [data-indicator][data-style="inactive"],
 	transition: transform .15s ease, box-shadow .15s ease;
 }
 
+/* Bing 壁纸按钮（五色之前）：点亮 = 启用 Bing 每日壁纸 */
+.liquid-bing-btn {
+	position: relative;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 20px;
+	height: 20px;
+	padding: 0;
+	border-radius: 50%;
+	border: 2px solid transparent;
+	background: transparent;
+	cursor: pointer;
+	transition: transform .15s ease, box-shadow .15s ease, opacity .15s ease;
+	opacity: .55;
+}
+
+.liquid-bing-btn:hover {
+	transform: scale(1.15);
+	opacity: 1;
+}
+
+.liquid-bing-btn.active {
+	transform: scale(1.15);
+	border-color: var(--primary-color-high);
+	box-shadow: 0 0 0 3px var(--accent-glow);
+	opacity: 1;
+}
+
 .liquid-color-btn:hover {
 	transform: scale(1.15);
 }
@@ -2016,6 +2045,15 @@ input[type="radio"] {
    15. Lock screen (sysauth login)
    ========================================================================== */
 
+/* Bing 每日壁纸：启用时覆盖默认背景（data-liquid-bing 与
+   --liquid-bing 由 ucode 模板输出，壁纸缓存于 /tmp/liquid/） */
+body[data-liquid-bing="1"] {
+	background-image: var(--liquid-bing, var(--body-grad));
+	background-size: cover;
+	background-position: center;
+	background-attachment: fixed;
+}
+
 body.liquid-login {
 	background-color: #0a0d13;
 	background-image: url(img/MontereyDark.jpg);
@@ -2027,6 +2065,13 @@ body.liquid-login {
 
 :root[data-darkmode="false"] body.liquid-login {
 	background-image: url(img/MontereyLight.jpg);
+}
+
+body.liquid-login[data-liquid-bing="1"] {
+	background-image: var(--liquid-bing, url(img/MontereyDark.jpg));
+	background-size: cover;
+	background-position: center;
+	background-attachment: fixed;
 }
 
 body.liquid-login .skiplink {

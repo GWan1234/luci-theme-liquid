@@ -23,7 +23,7 @@
 [luci-mod]: https://github.com/xylz0928/luci-mod
 
 <div align="center">
-<img src="logo.svg">
+<p align="center"><img src="logo.svg" width="300"></p>
 
 # 💧 luci-theme-liquid
 
@@ -106,10 +106,10 @@ make package/luci-theme-liquid/compile -j4 V=s
 
 > 注意：`make package/<name>/compile` 只对已在 `.config` 中启用（`=y`/`=m`）的包真正执行构建，未启用时 make 会空转（`Entering/Leaving` 无任何动作），不要误判为成功。
 
-生成的 `bin/packages/<arch>/base/luci-theme-liquid-0.1-r<rel>.apk`（或 `.ipk`）可通过 `apk` / `opkg` 安装：
+生成的 `bin/packages/<arch>/base/luci-theme-liquid-0.2-r<rel>.apk`（或 `.ipk`）可通过 `apk` / `opkg` 安装：
 
 ```sh
-apk add --allow-untrusted luci-theme-liquid-0.1-r94.apk
+apk add --allow-untrusted luci-theme-liquid-0.2-r1.apk
 ```
 
 首次安装会自动注册主题（`luci.themes.Liquid=/luci-static/liquid`）；若 `luci.main.mediaurlbase` 尚未配置则自动设为该主题，否则请在 **System → Advanced → Theme** 中手动选择 **Liquid**。

@@ -16,6 +16,21 @@
 		return;
 
 	var MODE_KEY = 'liquid-theme-mode';
+
+	/* 写 uci /etc/config/liquid（theme 配置），换客户端（浏览器/设备）仍保留。
+	   localStorage 仅作即时/降级用；服务端模板渲染时读 uci 输出到 body data 属性。 */
+	function saveConfig(opt, val) {
+		try {
+			if (window.L && L.require) {
+				L.require('uci').then(function (uci) {
+					uci.load('liquid').then(function () {
+						uci.set('liquid', 'theme', opt, val);
+						return uci.save('liquid');
+					}).catch(function () {});
+				});
+			}
+		} catch (e) {}
+	}
 	var mql = (typeof window.matchMedia == 'function')
 		? window.matchMedia('(prefers-color-scheme: dark)')
 		: null;
@@ -35,13 +50,19 @@
 	];
 
 	function getMode() {
+		var d = document.body ? document.body.getAttribute('data-liquid-mode') : null;
+		if (d)
+			return d;
 		try { return localStorage.getItem(MODE_KEY) || 'auto'; } catch (e) { return 'auto'; }
 	}
 
 	function setMode(mode) {
 		try { localStorage.setItem(MODE_KEY, mode); } catch (e) {}
+		if (document.body)
+			document.body.setAttribute('data-liquid-mode', mode);
 		applyMode(mode);
 		updateSwitch();
+		saveConfig('mode', mode);
 	}
 
 	function isDark(mode) {
@@ -64,19 +85,44 @@
 	/* ---- accent color switch ---- */
 
 	function getAccent() {
+		var d = document.body ? document.body.getAttribute('data-liquid-accent') : null;
+		if (d)
+			return d;
 		try { return localStorage.getItem('liquid-accent') || 'blue'; } catch (e) { return 'blue'; }
 	}
 
 	function setAccent(id) {
 		try { localStorage.setItem('liquid-accent', id); } catch (e) {}
+		if (document.body)
+			document.body.setAttribute('data-liquid-accent', id);
 		document.documentElement.setAttribute('data-accent', id);
 		updateColorSwitch();
+		saveConfig('accent', id);
+	}
+
+	function getBing() {
+		var d = document.body ? document.body.getAttribute('data-liquid-bing') : null;
+		if (d)
+			return d;
+		try { return localStorage.getItem('liquid-bing') || '0'; } catch (e) { return '0'; }
+	}
+
+	function setBing(on) {
+		var v = on ? '1' : '0';
+		try { localStorage.setItem('liquid-bing', v); } catch (e) {}
+		if (document.body)
+			document.body.setAttribute('data-liquid-bing', v);
+		updateColorSwitch();
+		saveConfig('bing', v);
 	}
 
 	function updateColorSwitch() {
 		var accent = getAccent();
 		[].forEach.call(document.querySelectorAll('.liquid-color-btn'), function (b) {
 			b.classList.toggle('active', b.getAttribute('data-accent') == accent);
+		});
+		[].forEach.call(document.querySelectorAll('.liquid-bing-btn'), function (b) {
+			b.classList.toggle('active', getBing() == '1');
 		});
 	}
 
@@ -88,6 +134,18 @@
 		wrap.id = 'liquid-color-switch';
 		wrap.className = 'liquid-color-switch';
 		wrap.title = 'Accent color';
+
+		/* Bing 每日壁纸开关（五色之前）：点亮启用在线壁纸 */
+		var bingBtn = document.createElement('button');
+		bingBtn.type = 'button';
+		bingBtn.className = 'liquid-color-btn liquid-bing-btn';
+		bingBtn.title = 'Bing 每日壁纸';
+		bingBtn.setAttribute('aria-label', 'Bing daily wallpaper');
+		bingBtn.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><rect width="24" height="24" rx="5" fill="#008373"/><path d="M7 5.5v13h4.2V15.5c0-1.6 1.1-2.9 2.7-3.1l4.1-.5v-4l-4.6.6c-1.3.2-2.3.5-3 .9V5.5H7z" fill="#fff"/></svg>';
+		bingBtn.addEventListener('click', function () {
+			setBing(getBing() != '1');
+		});
+		wrap.appendChild(bingBtn);
 
 		ACCENTS.forEach(function (c) {
 			var btn = document.createElement('button');
