@@ -1,0 +1,11 @@
+{
+	"admin/system/liquid/save_config": {
+		"title": "Liquid Config",
+		"order": 100,
+		"action": {
+			"type": "function",
+			"module": "luci.controller.liquid",
+			"function": "act_save_config"
+		}
+	}
+}

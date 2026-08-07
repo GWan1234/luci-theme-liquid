@@ -25,16 +25,21 @@
 	   - 锁屏（登录页，未认证）不允许修改配置：只做本地预览
 	     （localStorage），登录后刷新才真正持久化 */
 	function saveConfig(opt, val) {
-		if (!window.L || !document.body ||
+		if (!document.body ||
 		    document.body.classList.contains('liquid-login'))
 			return;
+		/* 用主题自己的 ucode controller 保存（仿 luci-app-pushbot）：
+		   XHR POST 到 /cgi-bin/luci/admin/system/liquid/save_config，
+		   后端直接写 /etc/config/liquid，绕开跨版本不可靠的 uci rpc */
 		try {
-			L.require('uci').then(function (uci) {
-				uci.load('liquid').then(function () {
-					uci.set('liquid', 'theme', opt, val);
-					return uci.save('liquid');
-				}).catch(function () {});
-			});
+			var base = (window.L && L.env && L.env.admin_path)
+				? L.env.admin_path : '/cgi-bin/luci/admin/';
+			var data = {};
+			data[opt] = val;
+			var xhr = new XMLHttpRequest();
+			xhr.open('POST', base + 'system/liquid/save_config');
+			xhr.setRequestHeader('Content-Type', 'application/json');
+			xhr.send(JSON.stringify(data));
 		} catch (e) {}
 	}
 	var mql = (typeof window.matchMedia == 'function')
