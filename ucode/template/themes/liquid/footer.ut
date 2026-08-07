@@ -14,9 +14,10 @@
 
 {% if (blank_page): %}
 <p class="luci">
-	{{ version.distversion }} {{ version.distrevision }}<br>
+	<a href="https://github.com/zzsj0928/luci-theme-liquid" target="_blank" rel="noopener">Liquid Theme {# PKG_VERSION #}</a><br>
+	<a href="https://github.com/openwrt/openwrt/releases" target="_blank" rel="noopener">{{ version.distversion }} {{ version.distrevision }}</a><br>
 	Kernel: {{ boardinfo.kernel ?? '?' }}<br>
-	{{ version.luciname }} {{ version.luciversion }}
+	<a href="https://github.com/openwrt/luci/releases" target="_blank" rel="noopener">{{ version.luciname }} {{ version.luciversion }}</a>
 </p>
 {% endif %}
 {% if (!blank_page): %}

@@ -1772,6 +1772,18 @@ body.liquid-login p.luci {
 	text-shadow: 0 1px 8px rgba(0, 0, 0, 0.55);
 }
 
+body.liquid-login p.luci a {
+	color: rgba(255, 255, 255, 0.88);
+	text-decoration: none;
+	border-bottom: 1px solid rgba(255, 255, 255, 0.35);
+	transition: color .15s ease, border-bottom-color .15s ease;
+}
+
+body.liquid-login p.luci a:hover {
+	color: #fff;
+	border-bottom-color: rgba(255, 255, 255, 0.9);
+}
+
 /* ==========================================================================
    16. Modal dialogs
    ========================================================================== */
