@@ -646,6 +646,18 @@ header [data-indicator][data-style="inactive"],
 	opacity: 1;
 }
 
+/* hover 到当前菜单（accent 渐变背景）时，滑块浮到其上保持追踪可见 */
+.liquid-menu-indicator.over-selected {
+	z-index: 4;
+	background: color-mix(in srgb, var(--primary-color-high) 26%, rgba(255, 255, 255, 0.32));
+	border-color: rgba(255, 255, 255, 0.45);
+}
+
+:root[data-darkmode="true"] .liquid-menu-indicator.over-selected {
+	background: rgba(93, 163, 240, 0.34);
+	border-color: rgba(255, 255, 255, 0.3);
+}
+
 /* ==========================================================================
    7. Mode menu (mobile breadcrumb)
    ========================================================================== */

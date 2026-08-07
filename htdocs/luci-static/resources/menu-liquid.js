@@ -63,6 +63,9 @@ return baseclass.extend({
 				indicator.style.transform =
 					'translateY(%dpx)'.format(aRect.top - menuRect.top + menu.scrollTop);
 				indicator.style.height = '%dpx'.format(aRect.height);
+
+				/* 当前菜单(selected)有 accent 渐变背景，滑块需浮到其上保持可见 */
+				indicator.classList.toggle('over-selected', li.classList.contains('selected'));
 				menu.classList.add('liquid-menu-hovering');
 			});
 		});
