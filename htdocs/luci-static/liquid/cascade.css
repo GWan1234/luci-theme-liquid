@@ -2379,6 +2379,14 @@ button + .btn,
 
 .ifacebox-body {
 	white-space: nowrap;
+	text-align: center;
+}
+
+.ifacebox-body > img,
+.ifacebox-body > .cbi-tooltip-container,
+.ifacebox-body > span {
+	display: inline-block;
+	vertical-align: middle;
 }
 
 /* 接口列表操作列（重启/停止/编辑/删除）：不压缩、不换行；
