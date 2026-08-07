@@ -1,0 +1,9 @@
+.research/
+.reasonix/
+*.ipk
+*.apk
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride

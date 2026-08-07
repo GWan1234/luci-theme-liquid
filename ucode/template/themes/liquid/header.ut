@@ -1,0 +1,90 @@
+{#
+ Copyright 2026 然后七年 <69092025+zzsj0928@users.noreply.github.com>
+ Licensed to the public under the Apache License 2.0.
+-#}
+
+{%
+	import * as fs from 'fs';
+	import { getuid, getspnam } from 'luci.core';
+
+	const boardinfo = ubus.call('system', 'board') ?? {};
+	let theme_ver = trim(fs.readfile('/usr/share/ucode/luci/template/themes/liquid/VERSION') ?? '?', '"\n\r');
+
+	http.prepare_content('text/html; charset=UTF-8');
+
+	let ptitle = (node ?? dispatched)?.title;
+-%}
+
+<!DOCTYPE html>
+<html lang="{{ dispatcher.lang }}">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="darkreader-lock">
+<script>
+	/* Liquid theme: apply persisted light/dark/auto mode + accent before CSS paints */
+	(function () {
+		try {
+			var m = localStorage.getItem('liquid-theme-mode');
+			var dark = (m == 'dark') || ((m != 'light') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+			document.documentElement.setAttribute('data-darkmode', dark ? 'true' : 'false');
+			document.documentElement.setAttribute('data-liquid-mode', m || 'auto');
+			document.documentElement.setAttribute('data-accent', localStorage.getItem('liquid-accent') || 'blue');
+		} catch (e) {}
+	})();
+</script>
+<link rel="stylesheet" type="text/css" media="screen" href="{% print(media); %}/cascade.css?v={% print(theme_ver); %}" />
+<link rel="icon" href="{{ media }}/logo.svg" type="image/svg+xml" />
+<link rel="apple-touch-icon" href="{{ media }}/logo.png" />
+<script type="text/javascript" src="{{ dispatcher.build_url('admin/translations', dispatcher.lang) }}"></script>
+<script type="text/javascript" src="{{ resource }}/cbi.js"></script>
+<title>{{ striptags(`${boardinfo.hostname ?? '?'}${ptitle ? ` | ${_(ptitle)}` : ''}`) }}</title>
+{% if (css): %}
+<style title="text/css">{{ css }}</style>
+{% endif %}
+</head>
+<body class="lang_{{ dispatcher.lang }}{% if (blank_page): %} liquid-login{% endif %}" data-page="{{ entityencode(join('-', ctx.request_path), true) }}" data-hostname="{{ striptags(boardinfo.hostname ?? '') }}">
+
+<p class="skiplink">
+<span id="skiplink1"><a href="#navigation">{{ _('Skip to navigation') }}</a></span>
+<span id="skiplink2"><a href="#content">{{ _('Skip to content') }}</a></span>
+</p>
+
+{% if (!blank_page): %}
+<div id="menubar">
+	<h2 class="navigation"><a id="navigation" name="navigation">{{ _('Navigation') }}</a></h2>
+
+	<span class="hostname"><a href="/"><svg class="liquid-logo" viewBox="0 0 64 68" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs><linearGradient id="liquid-lg-top" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--primary-color-high)" stop-opacity="0.85"/><stop offset="0.5" stop-color="var(--primary-color-high)" stop-opacity="0.4"/><stop offset="1" stop-color="var(--primary-color-low)" stop-opacity="0.92"/></linearGradient></defs><path d="M32 3 C46 20 57 30 57 42 a25 25 0 0 1 -50 0 C7 30 18 20 32 3 Z" fill="url(#liquid-lg-top)" stroke="rgba(255,255,255,0.7)" stroke-width="1.5"/><ellipse cx="23" cy="39" rx="9.5" ry="6" fill="#ffffff" opacity="0.6"/></svg>{{ striptags(boardinfo.hostname ?? '?') }}</a></span>
+	<span class="distversion">{{ version.distversion }} {{ version.distrevision }}</span>
+	<span id="indicators"></span>
+</div>
+
+<div id="modemenu" style="display:none"></div>
+
+<div id="maincontainer">
+	<div id="mainmenu"></div>
+
+	<div id="maincontent">
+		{% if (getuid() == 0 && getspnam('root')?.pwdp === '' && join('-', ctx.request_path) != 'admin-system-admin'): %}
+		<div class="alert-message warning">
+			<h4>{{ _('No password set!') }}</h4>
+			<p>{{ _('There is no password set on this router. Please configure a root password to protect the web interface.') }}</p>
+			{% if (dispatcher.lookup("admin/system/admin")): %}
+				<div class="right"><a class="btn" href="{{ dispatcher.build_url("admin/system/admin") }}">{{ _('Go to password configuration...') }}</a></div>
+			{% endif %}
+		</div>
+		{% endif %}
+
+		{% if (boardinfo.rootfs_type == "initramfs"): %}
+		<div class="alert-message warning">
+			<h4>{{ _('System running in recovery (initramfs) mode.') }}</h4>
+			<p>{{ _('No changes to settings will be stored and are lost after rebooting. This mode should only be used to install a firmware upgrade') }}</p>
+			{% if (dispatcher.lookup("admin/system/flash")): %}
+			  <div class="right"><a class="btn" href="{{ dispatcher.build_url("admin/system/flash") }}">{{ _('Go to firmware upgrade...') }}</a></div>
+			{% endif %}
+		</div>
+		{% endif %}
+
+		<div id="tabmenu" style="display:none"></div>
+{% endif %}
