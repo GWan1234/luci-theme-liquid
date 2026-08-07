@@ -127,6 +127,10 @@ jobs:
         run: |
           cd openwrt
           echo -e "$(nproc) thread compile"
+          # package/xxx/compile 会递归依赖 toolchain（ld-musl 等），
+          # 必须先构建 host 工具与工具链，否则 libs/toolchain 编译失败
+          make tools/install -j$(nproc)
+          make toolchain/install -j$(nproc)
           make package/${{ matrix.plugin.name }}/compile -j$(nproc) V=s || make package/${{ matrix.plugin.name }}/compile -j1 V=s
           echo "status=success" >> $GITHUB_OUTPUT
           echo "FILE_DATE=_$(date +"%Y%m%d%H%M")" >> $GITHUB_ENV
