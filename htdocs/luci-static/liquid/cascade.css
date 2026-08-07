@@ -2485,6 +2485,11 @@ div[style*="grid-template-columns:repeat(auto-fit, minmax(70px, 1fr))"] .ifacebo
 	visibility: visible;
 }
 
+/* 悬浮内容框内不再重复显示接口图标（行内主图标已表示连接状态） */
+.cbi-tooltip img {
+	display: none;
+}
+
 /* hover 时提升卡片本身的层叠顺序：
    .ifacebox 的 backdrop-filter 会创建 stacking context，把 tooltip 的
    z-index:9999 锁在卡片内部，卡片之间的遮挡由 DOM 顺序决定——后一张
@@ -2578,11 +2583,11 @@ div[style*="grid-template-columns:repeat(auto-fit, minmax(70px, 1fr))"] .ifacebo
 	line-height: 1;
 }
 
-/* 接口图标全局统一 32px：不同 svg viewBox / 不同容器会导致宽度不一，
-   统一强制 32×32（!important 防内联样式覆盖） */
+/* 接口图标全局统一 24px：不同 svg viewBox / 不同容器会导致宽度不一，
+   统一强制宽度 24px（!important 防内联样式覆盖），占位紧凑 */
 img[src*="icons/"][src$=".svg"] {
-	width: 32px !important;
-	height: 32px !important;
+	width: 24px !important;
+	height: auto !important;
 	vertical-align: middle;
 }
 
