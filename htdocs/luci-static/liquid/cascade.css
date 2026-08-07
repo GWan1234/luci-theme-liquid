@@ -1765,6 +1765,82 @@ input[type="radio"] {
 	backdrop-filter: blur(32px) saturate(var(--glass-sat));
 }
 
+/* 下拉弹出浮层（portal 到 body）：突破所在卡片的 overflow 裁剪，
+   始终浮于上层；配合 JS 文档坐标定位（含屏幕边缘避让，滚动自然跟随） */
+ul.liquid-dd-portal {
+	display: none;
+	position: absolute;
+	z-index: 9999;
+	max-height: 260px;
+	overflow-y: auto;
+	padding: 5px;
+	background: var(--glass-bg-strong);
+	-webkit-backdrop-filter: blur(var(--glass-blur));
+	backdrop-filter: blur(var(--glass-blur));
+	border: 1px solid var(--glass-border);
+	border-radius: 12px;
+	box-shadow: var(--glass-shadow);
+	margin: 0;
+}
+
+ul.liquid-dd-portal.liquid-dd-open {
+	display: block;
+}
+
+:root[data-darkmode="true"] ul.liquid-dd-portal {
+	background: rgba(22, 29, 44, 0.92);
+	-webkit-backdrop-filter: blur(32px) saturate(var(--glass-sat));
+	backdrop-filter: blur(32px) saturate(var(--glass-sat));
+}
+
+/* 当前值行（顶部，与官方机制一致） */
+ul.liquid-dd-portal > li[display] {
+	display: flex;
+	align-items: center;
+	flex: 1;
+	min-width: 0;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+ul.liquid-dd-portal > li {
+	display: flex;
+	align-items: center;
+	padding: 7px 10px;
+	border-radius: 8px;
+	font-size: 13px;
+	color: var(--text-color-medium);
+	cursor: pointer;
+	white-space: normal;
+	overflow-wrap: break-word;
+}
+
+ul.liquid-dd-portal > li:hover {
+	background: color-mix(in srgb, var(--primary-color-high) 16%, #ffffff);
+	color: var(--text-color-highest);
+}
+
+:root[data-darkmode="true"] ul.liquid-dd-portal > li:hover {
+	background: rgba(74, 92, 128, 0.95);
+	color: #ffffff;
+}
+
+ul.liquid-dd-portal > li[selected] {
+	color: var(--on-primary-color);
+	background: var(--accent-grad);
+}
+
+/* 富选项：打开状态显示 hide-open 子元素 */
+ul.liquid-dd-portal > li .hide-close,
+ul.liquid-dd-portal > li .hide-open {
+	display: none;
+}
+
+ul.liquid-dd-portal > li[display] .hide-open {
+	display: initial;
+}
+
 /* 打开时：preview 克隆作为顶部当前值行（官方机制），
    原 ul 弹出后顶部仍有当前值显示 */
 .cbi-dropdown[open] > ul.preview {

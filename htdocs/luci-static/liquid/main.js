@@ -306,7 +306,7 @@
 			if (dd.classList.contains('liquid-dd-fit'))
 				return;
 			dd.classList.add('liquid-dd-fit');
-			var ul = dd.querySelector('ul');
+			var ul = dd.querySelector('ul') || dd._liquidUl;
 			if (!ul)
 				return;
 			var maxW = 0;
@@ -348,22 +348,43 @@
 		});
 	}
 
-	/* 下拉框自动避让：按钮靠近视口底部（或被页脚遮挡）时向上弹出，
-	   下方空间足够则照常向下 */
+	/* 下拉框自动避让 + 浮层：按钮靠近视口底部（或被页脚遮挡）时向上弹出；
+	   弹出列表 portal 到 <body>，突破所在卡片的 overflow 裁剪、始终浮于
+	   上层（z-index 9999）；用文档坐标（absolute）定位，滚动自然跟随 */
 	function adjustDropdownDirection() {
-		document.querySelectorAll('.cbi-dropdown[open] > ul.dropdown').forEach(function (ul) {
-			var dd = ul.closest('.cbi-dropdown');
-			if (!dd)
+		document.querySelectorAll('.cbi-dropdown').forEach(function (dd) {
+			var ul = dd.querySelector('ul.dropdown') || dd.querySelector('ul') || dd._liquidUl;
+			if (!ul)
 				return;
-			var r = dd.getBoundingClientRect();
-			var vh = window.innerHeight;
-			var listH = ul.offsetHeight || 220;
-			if (r.bottom + listH + 12 > vh) {
-				ul.style.top = 'auto';
-				ul.style.bottom = 'calc(100% + 4px)';
-			} else {
-				ul.style.top = 'calc(100% + 4px)';
+			var open = dd.classList.contains('open') || dd.hasAttribute('open');
+
+			if (open) {
+				if (ul.parentNode !== document.body) {
+					dd._liquidUl = ul;
+					document.body.appendChild(ul);
+					ul.classList.add('liquid-dd-portal');
+				}
+				ul.classList.add('liquid-dd-open');
+
+				var r = dd.getBoundingClientRect();
+				var vh = window.innerHeight;
+				var listH = ul.offsetHeight || 220;
+				var sx = window.scrollX || 0, sy = window.scrollY || 0;
+				ul.style.minWidth = Math.max(dd.offsetWidth - 2, 60) + 'px';
+				ul.style.left = (r.left + sx) + 'px';
 				ul.style.bottom = 'auto';
+				if (r.bottom + listH + 12 > vh) {
+					/* 下方空间不足：向上弹出（顶部贴边兜底） */
+					var topY = r.top - listH - 4 + sy;
+					if (topY < sy + 4)
+						topY = sy + 4;
+					ul.style.top = topY + 'px';
+				} else {
+					ul.style.top = (r.bottom + 4 + sy) + 'px';
+				}
+			}
+			else if (ul.classList.contains('liquid-dd-portal')) {
+				ul.classList.remove('liquid-dd-open');
 			}
 		});
 	}
@@ -376,7 +397,7 @@
 			dd.classList.add('liquid-dd-init');
 
 			function sync() {
-				var ul = dd.querySelector('ul');
+				var ul = dd.querySelector('ul') || dd._liquidUl;
 				if (!ul)
 					return;
 				var sel = ul.querySelector('li[selected]');
