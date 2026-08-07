@@ -101,10 +101,11 @@ return baseclass.extend({
 			return E([]);
 
 		children.forEach(child => {
-			/* 当前所在一级菜单仅高亮（selected），子菜单一律默认收起，点击才展开 */
+			/* 当前所在一级菜单：高亮(selected)并展开其二级菜单(active)；
+			   其余一级菜单保持收起，点击才展开 */
 			const isActive = (L.env.dispatchpath[l] == child.name);
 			const activeClass = 'mainmenu-item-%s%s'.format(
-				child.name, isActive ? ' selected' : '');
+				child.name, isActive ? ' selected active' : '');
 
 			ul.appendChild(E('li', { 'class': activeClass }, [
 				E('a', {
