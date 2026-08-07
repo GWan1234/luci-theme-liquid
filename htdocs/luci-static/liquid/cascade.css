@@ -2398,6 +2398,14 @@ div[style*="grid-template-columns:repeat(auto-fit, minmax(70px, 1fr))"] .ifacebo
 	margin: 0 !important;
 }
 
+/* 网络-接口页的接口卡片：宽度按内容（接口组 bridge 的多个图标）拓展，
+   防止图标溢出卡片 */
+.cbi-section-table .ifacebox {
+	width: fit-content;
+	min-width: 0;
+	max-width: 100%;
+}
+
 /* 端口状态卡片：接口名/图标/连接状态水平居中 */
 div[style*="grid-template-columns:repeat(auto-fit, minmax(70px, 1fr))"] .ifacebox {
 	text-align: center;
