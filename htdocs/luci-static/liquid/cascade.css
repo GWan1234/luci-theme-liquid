@@ -2630,6 +2630,8 @@ img[src*="icons/"][src$=".svg"] {
 	font-weight: 700;
 	background: var(--glass-bg);
 	border: 1px solid var(--glass-border);
+	/* 与上方内容（概况页的 ifacebox-body 等）留出空隙 */
+	margin-top: 8px;
 }
 
 /* code / pre blocks */
