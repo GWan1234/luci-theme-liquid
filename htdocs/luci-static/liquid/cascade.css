@@ -2428,7 +2428,8 @@ button + .btn,
 
 :root[data-darkmode="true"] .ifacebox-head[style*="--zone-color-rgb:255, 255, 255"],
 :root[data-darkmode="true"] .ifacebox-head[style*="--zone-color-rgb:238, 238, 238"] {
-	--zone-color-rgb: 60, 60, 60;
+	/* 暗色下：比黑色浅一点点（近黑），白色接口名清晰可读 */
+	--zone-color-rgb: 24, 26, 30;
 }
 
 .ifacebox-head {
