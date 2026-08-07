@@ -586,8 +586,18 @@
 
 	document.addEventListener('click', function (e) {
 		var nav = document.querySelector('#menubar .navigation');
-		if (nav && nav.contains(e.target))
+		if (nav && nav.contains(e.target)) {
 			scheduleMenuTop();
+			return;
+		}
+		/* 移动端：点击菜单（抽屉）外的任意区域 → 闭合侧边栏。
+		   菜单内点击（子菜单展开等）不干预，菜单按钮交给原生 toggle */
+		var menu = document.getElementById('mainmenu');
+		if (menu && menu.classList.contains('active') && !menu.contains(e.target)) {
+			menu.classList.remove('active');
+			if (nav)
+				nav.classList.remove('active');
+		}
 	});
 
 	window.addEventListener('resize', syncMenuTop);
