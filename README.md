@@ -44,8 +44,7 @@
 [界面展示](#界面展示) •
 [致谢](#致谢)
 
-<!-- 动图占位：主题演示动图（待上传） -->
-<!-- <img src="https://raw.githubusercontent.com/xylz0928/ReadmeContents/master/Liquid/Liquid_Demo.gif"> -->
+<img src="https://raw.githubusercontent.com/zzsj0928/ReadmeContents/master/liquid/luci-theme-liquid_pc.gif"
 
 </div>
 
