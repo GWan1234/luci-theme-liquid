@@ -2622,6 +2622,14 @@ img[src*="icons/"][src$=".svg"] {
 	vertical-align: middle;
 }
 
+/* luci 渲染会给接口徽章（ifacebadge）的图标/文字加内联
+   style="opacity:0.5"（离线样式），即使接口已连接也会残留，
+   造成半透明、被误判为未连接；统一压回不透明 */
+.ifacebadge img,
+.ifacebadge span {
+	opacity: 1 !important;
+}
+
 .zonebadge {
 	display: inline-block;
 	padding: 2px 8px;
