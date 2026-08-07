@@ -2477,3 +2477,10 @@ pre {
 	}
 }
 
+
+/* Bootstrap 工具类：插件常用 class="hidden" 隐藏元素（隐藏的保存按钮、
+   提示面板、折叠区块等）。主题只加载自己的 css，必须自行提供，
+   否则插件声明 hidden 的元素会全部显示出来。 */
+.hidden {
+	display: none;
+}
