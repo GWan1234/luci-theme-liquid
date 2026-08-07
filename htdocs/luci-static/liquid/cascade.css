@@ -1589,6 +1589,8 @@ input[type="radio"] {
 	border-color: transparent;
 	color: var(--on-primary-color);
 	box-shadow: 0 6px 16px var(--accent-glow), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+	/* 保存并应用：宽度只匹配文字，不继承普通下拉框的 min-width */
+	min-width: auto;
 }
 
 .cbi-dropdown.cbi-button-apply > .open {
@@ -1601,6 +1603,7 @@ input[type="radio"] {
 	border-color: transparent;
 	color: var(--on-error-color);
 	box-shadow: 0 6px 16px rgba(var(--error-color-high-rgb), 0.35);
+	min-width: auto;
 }
 
 .cbi-dropdown.cbi-button-negative > .open {
@@ -1692,9 +1695,16 @@ input[type="radio"] {
 	cursor: pointer;
 }
 
+/* 下拉选项 hover：更实的背景 + 高对比文字（原 --glass-bg-hover 偏淡，
+   暗黑模式下悬浮选项看不清） */
 .cbi-dropdown > ul > li:hover {
-	background: var(--glass-bg-hover);
-	color: var(--text-color-high);
+	background: rgba(255, 255, 255, 0.92);
+	color: var(--text-color-highest);
+}
+
+:root[data-darkmode="true"] .cbi-dropdown > ul > li:hover {
+	background: rgba(74, 92, 128, 0.95);
+	color: #ffffff;
 }
 
 .cbi-dropdown > ul > li[selected] {
