@@ -17,9 +17,11 @@
 
 	var MODE_KEY = 'liquid-theme-mode';
 
-	/* 主题配置直接写入 uci /etc/config/liquid（换客户端仍保留）：
-	   - 用 RPC（uci.set + uci.save）直写，绕过 luci uci 实例的 changes
-	     跟踪 → 不生成待应用项、不弹"保存更改"询问，改动立即生效
+	/* 主题配置写入 uci /etc/config/liquid（换客户端仍保留）：
+	   - 用 LuCI 官方 uci 实例（uci.load + uci.set + uci.save），
+	     跨 luci 版本最兼容（L.bind 手拼 RPC 在其他固件上不可靠）；
+	     uci.save 直接写盘，不经过 ui.changes → 无待应用项、
+	     不弹"保存更改"询问，改动立即生效
 	   - 锁屏（登录页，未认证）不允许修改配置：只做本地预览
 	     （localStorage），登录后刷新才真正持久化 */
 	function saveConfig(opt, val) {
@@ -27,14 +29,12 @@
 		    document.body.classList.contains('liquid-login'))
 			return;
 		try {
-			L.bind('uci', 'set', {
-				config: 'liquid',
-				section: 'theme',
-				option: opt,
-				value: val
-			}).then(function () {
-				return L.bind('uci', 'save', { config: 'liquid' });
-			}).catch(function () {});
+			L.require('uci').then(function (uci) {
+				uci.load('liquid').then(function () {
+					uci.set('liquid', 'theme', opt, val);
+					return uci.save('liquid');
+				}).catch(function () {});
+			});
 		} catch (e) {}
 	}
 	var mql = (typeof window.matchMedia == 'function')
