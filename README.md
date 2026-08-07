@@ -44,7 +44,7 @@
 [界面展示](#界面展示) •
 [致谢](#致谢)
 
-<img src="https://raw.githubusercontent.com/zzsj0928/ReadmeContents/master/liquid/luci-theme-liquid_pc.gif"
+<img src="https://raw.githubusercontent.com/zzsj0928/ReadmeContents/master/liquid/luci-theme-liquid_pc.gif">
 
 </div>
 
