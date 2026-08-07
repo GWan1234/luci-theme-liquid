@@ -303,6 +303,7 @@
 				tip.style.top = (r.bottom + 6) + 'px';
 				tip.style.zIndex = '99999';
 				tip.style.opacity = '1';
+				tip.style.visibility = 'visible';
 				tip.style.pointerEvents = 'none';
 				tip.classList.add('liquid-tip-ported');
 				document.body.appendChild(tip);
@@ -315,7 +316,10 @@
 				tip.style.left = '';
 				tip.style.top = '';
 				tip.style.zIndex = '';
-				tip.style.opacity = '';
+				/* 强制隐藏：收回后原 .ifacebox .cbi-tooltip 隐藏规则可能
+				   因元素不在卡片内而不匹配，导致 tooltip 不收回 */
+				tip.style.opacity = '0';
+				tip.style.visibility = 'hidden';
 				tip.style.pointerEvents = '';
 			});
 		});

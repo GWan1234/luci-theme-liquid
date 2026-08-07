@@ -2368,7 +2368,7 @@ button + .btn,
 	color: var(--text-color-highest);
 	/* 顶部防火墙分区色条：扩展到卡片边缘（抵消 ifacebox 的
 	   14px/18px padding），整行显示分区底色，与下方信息区分割 */
-	margin: -14px -18px 10px;
+	margin: -14px -18px 14px;
 	padding: 7px 18px;
 	border-radius: calc(var(--glass-radius) - 2px) calc(var(--glass-radius) - 2px) 0 0;
 	border-bottom: 1px solid var(--glass-border);
