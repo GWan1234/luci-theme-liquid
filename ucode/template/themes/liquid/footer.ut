@@ -1,0 +1,21 @@
+{#
+ Copyright 2026 然后七年 <69092025+zzsj0928@users.noreply.github.com>
+ Licensed to the public under the Apache License 2.0.
+-#}
+
+{% if (!blank_page): %}
+	</div><!-- /#maincontent -->
+</div><!-- /#maincontainer -->
+{% endif %}
+
+<p class="luci">
+	Powered by {{ version.luciname }} ({{ version.luciversion }})
+</p>
+
+{% if (!blank_page): %}
+<script>L.require('menu-liquid')</script>
+{% endif %}
+<script type="text/javascript" src="{{ media }}/main.js"></script>
+
+</body>
+</html>
