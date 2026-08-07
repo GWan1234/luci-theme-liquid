@@ -11,15 +11,10 @@
 	const boardinfo = ubus.call('system', 'board') ?? {};
 %}
 
-{% if (!blank_page): %}
-	</div><!-- /#maincontent -->
-</div><!-- /#maincontainer -->
-{% endif %}
-
-{% if (blank_page): %}
 {%
 	/* 固件信息：优先读 /etc/os-release 的 FIRMWARE_URL（固件 release 链接）
-	   与 OPENWRT_RELEASE（固件版本文本），读不到时回退动态构造 */
+	   与 OPENWRT_RELEASE（固件版本文本），读不到时回退动态构造。
+	   锁屏与登录后 foot 横幅共用。 */
 	let fw_url = '';
 	let fw_text = '';
 	let fw_release = '';
@@ -51,6 +46,13 @@
 		? sprintf('https://github.com/openwrt/luci/releases/tag/v%s', luci_m[1])
 		: 'https://github.com/openwrt/luci/releases';
 %}
+
+{% if (!blank_page): %}
+	</div><!-- /#maincontent -->
+</div><!-- /#maincontainer -->
+{% endif %}
+
+{% if (blank_page): %}
 <p class="luci">
 	<a href="https://github.com/zzsj0928/luci-theme-liquid" target="_blank" rel="noopener">Liquid Theme {# PKG_VERSION #}</a><br>
 	<a href="{{ fw_release }}" target="_blank" rel="noopener">{{ fw_text }}</a><br>
@@ -59,8 +61,14 @@
 </p>
 {% endif %}
 {% if (!blank_page): %}
-<p class="luci">
-	Powered by {{ version.luciname }} ({{ version.luciversion }})
+<p class="luci luci-foot">
+	<a href="https://github.com/zzsj0928/luci-theme-liquid" target="_blank" rel="noopener">Liquid Theme {# PKG_VERSION #}</a>
+	<span class="luci-sep">·</span>
+	<a href="{{ fw_release }}" target="_blank" rel="noopener">{{ fw_text }}</a>
+	<span class="luci-sep">·</span>
+	<span>Kernel: {{ boardinfo.kernel ?? '?' }}</span>
+	<span class="luci-sep">·</span>
+	<a href="{{ luci_release }}" target="_blank" rel="noopener">{{ version.luciname }} {{ version.luciversion }}</a>
 </p>
 {% endif %}
 
