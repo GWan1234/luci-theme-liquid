@@ -2063,7 +2063,7 @@ pre {
 		bottom: 0;
 		width: 264px;
 		transform: translateX(-102%);
-		z-index: 950;
+		z-index: 800;
 		height: auto;
 		box-shadow: none;
 	}

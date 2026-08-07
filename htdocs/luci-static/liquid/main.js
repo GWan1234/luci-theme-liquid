@@ -171,13 +171,31 @@
 		});
 	}
 
+	/* 移动端菜单 top 跟随顶栏实际高度（防顶栏被撑高后菜单盖住它） */
+	function syncMenuTop() {
+		var bar = document.getElementById('menubar');
+		var menu = document.getElementById('mainmenu');
+
+		if (!bar || !menu)
+			return;
+
+		if (window.matchMedia && window.matchMedia('(max-width: 854px)').matches)
+			menu.style.top = bar.offsetHeight + 'px';
+		else
+			menu.style.top = '';
+	}
+
 	if (document.readyState == 'loading')
 		document.addEventListener('DOMContentLoaded', function () {
 			initSwitch();
 			initColorSwitch();
+			syncMenuTop();
 		});
 	else {
 		initSwitch();
 		initColorSwitch();
+		syncMenuTop();
 	}
+
+	window.addEventListener('resize', syncMenuTop);
 })();
