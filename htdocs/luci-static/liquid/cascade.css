@@ -1719,6 +1719,14 @@ input[type="radio"] {
 	background: var(--accent-grad);
 }
 
+/* 下拉弹出列表里的当前选中项：压深一档的主题色实底 + 白字。
+   accent-grad 是半透明渐变，在浅色玻璃列表上看不清白字；且当
+   鼠标悬浮其他项时，当前项必须保持醒目。 */
+.cbi-dropdown[open] > ul.dropdown > li[selected] {
+	background: color-mix(in srgb, var(--primary-color-high) 72%, #000);
+	color: #ffffff;
+}
+
 .cbi-dropdown > .placeholder,
 .cbi-dropdown[open] > .placeholder {
 	color: var(--text-color-low);
