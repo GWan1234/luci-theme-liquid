@@ -59,6 +59,12 @@ return baseclass.extend({
 
 		items.forEach(function (li) {
 			li.addEventListener('mouseenter', function () {
+				if (li.classList.contains('selected')) {
+					/* 当前菜单已有自身高亮，滑块滑到它时不叠加，避免遮挡 */
+					menu.classList.remove('liquid-menu-hovering');
+					return;
+				}
+
 				const a = li.querySelector(':scope > a');
 				const menuRect = menu.getBoundingClientRect();
 				const aRect = a.getBoundingClientRect();
@@ -66,9 +72,6 @@ return baseclass.extend({
 				indicator.style.transform =
 					'translateY(%dpx)'.format(aRect.top - menuRect.top + menu.scrollTop);
 				indicator.style.height = '%dpx'.format(aRect.height);
-
-				/* 当前菜单(selected)有 accent 渐变背景，滑块浮到其上但保持极淡，不挡字 */
-				indicator.classList.toggle('over-selected', li.classList.contains('selected'));
 				menu.classList.add('liquid-menu-hovering');
 			});
 		});

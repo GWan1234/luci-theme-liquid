@@ -688,19 +688,6 @@ ul.mainmenu.l2.liquid-sub-hovering .liquid-sub-indicator {
 	opacity: 1;
 }
 
-/* hover 到当前菜单（accent 渐变背景）时：滑块浮到其上但极淡，不遮挡文字 */
-.liquid-menu-indicator.over-selected {
-	z-index: 4;
-	background: rgba(255, 255, 255, 0.1);
-	border-color: rgba(255, 255, 255, 0.6);
-	box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.5);
-}
-
-:root[data-darkmode="true"] .liquid-menu-indicator.over-selected {
-	background: rgba(93, 163, 240, 0.14);
-	border-color: rgba(255, 255, 255, 0.4);
-	box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.12);
-}
 
 /* ==========================================================================
    7. Mode menu (mobile breadcrumb)
