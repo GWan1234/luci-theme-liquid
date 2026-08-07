@@ -23,7 +23,7 @@
 [luci-mod]: https://github.com/xylz0928/luci-mod
 
 <div align="center">
-<p align="center"><img src="logo.svg" width="300"></p>
+<p align="center"><img src="logo.svg" width="500"></p>
 
 # 💧 luci-theme-liquid
 
