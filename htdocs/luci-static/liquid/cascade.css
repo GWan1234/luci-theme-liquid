@@ -1753,6 +1753,9 @@ input[type="radio"] {
 	font-size: 13px;
 	color: var(--text-color-medium);
 	cursor: pointer;
+	/* 长文本选项（如 wechatpush 推送模式带描述）允许换行显示全 */
+	white-space: normal;
+	overflow-wrap: break-word;
 }
 
 /* 富选项（cbiRichListValue）：闭合显示标题，弹出列表内显示描述 */
