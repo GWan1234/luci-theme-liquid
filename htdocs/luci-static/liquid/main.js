@@ -313,6 +313,15 @@
 			[].forEach.call(ul.querySelectorAll('li'), function (li) {
 				if (li.classList.contains('hide-close') || li.classList.contains('hide-open'))
 					return;
+				/* 隐藏 li 无法直接测宽：临时 absolute+hidden 测量。
+				   图标（img）未加载时宽度为 0 会漏算：临时给 24px 估算 */
+				var imgs = li.querySelectorAll('img');
+				var saved = [];
+				[].forEach.call(imgs, function (img, i) {
+					saved[i] = img.style.width;
+					img.style.width = '24px';
+					img.style.flexShrink = '0';
+				});
 				var st = li.style;
 				st.display = 'block';
 				st.position = 'absolute';
@@ -323,6 +332,10 @@
 				st.position = '';
 				st.visibility = '';
 				st.whiteSpace = '';
+				[].forEach.call(imgs, function (img, i) {
+					img.style.width = saved[i];
+					img.style.flexShrink = '';
+				});
 				if (w > maxW)
 					maxW = w;
 			});
@@ -453,6 +466,18 @@
 			}
 
 			sync();
+			/* luci 每次选值/取消都会派发 cbi-dropdown-change：同步勾选框与
+			   selected 状态（点击即生效，不依赖 observer 时序） */
+			dd.addEventListener('cbi-dropdown-change', function () {
+				var u = dd.querySelector('ul') || dd._liquidUl;
+				if (!u)
+					return;
+				u.querySelectorAll('li').forEach(function (li) {
+					var cb = li.querySelector('input[type="checkbox"]');
+					if (cb)
+						cb.checked = li.hasAttribute('selected');
+				});
+			});
 			if (window.MutationObserver) {
 				var mo = new MutationObserver(function () {
 					sync();
@@ -668,4 +693,13 @@
 	});
 
 	window.addEventListener('resize', syncMenuTop);
+
+	/* 页面资源加载完成（图标 naturalWidth 就绪）后重测下拉宽度，
+	   修正带图标选项的宽度估算 */
+	window.addEventListener('load', function () {
+		document.querySelectorAll('.cbi-dropdown.liquid-dd-fit').forEach(function (dd) {
+			dd.classList.remove('liquid-dd-fit');
+		});
+		fitDropdownWidths();
+	});
 })();
