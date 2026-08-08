@@ -66,6 +66,13 @@ Supports **light / dark / auto** modes, **5 accent colors** and adjustable blur 
 
 ## Changelog
 
+- **2026-08-08 · v0.3**: custom accent color + color-switch polish + mobile / dark-mode improvements
+  - **Custom accent color**: beyond the 5 presets — click the rainbow dot to drop a hex input (`#RRGGBB`); leaving the field saves and applies instantly; invalid values fall back to default blue (custom mode stays enabled); persisted via uci across clients
+  - **Color switch**: pill fixed at 35px; a selected custom dot shows its color inside with a rainbow ring for instant recognition; the Bing wallpaper button gets a square outline hugging its icon and a single white ring when active
+  - **Mobile**: no first-load menu flash (desktop entry animation disabled so the drawer starts closed and usable immediately); footer height trimmed
+  - **Dark mode**: mode-switch icons (external svg) inverted to light so they stay visible on dark backgrounds
+  - **Fixes**: custom-color persistence (controller whitelist accepts `accent=custom` / `accent_custom`), login-page color-switch position, pill height
+
 - **2026-08-08 · v0.2-r52**: mobile UX & dropdown improvements
   - **Mobile interfaces page**: ifacebox aligned 4px from its row card's left edge for a cleaner look
   - **Mobile nested-card insets**: modal at 95% width, each nested layer steps in 2px, giving a larger usable area
