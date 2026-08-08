@@ -637,10 +637,13 @@ header [data-indicator][data-style="inactive"],
 	opacity: 1;
 }
 
+/* 启用时只保留一层白色方形描边（border）。
+   不能有 box-shadow 白环：按钮同时带 .liquid-color-btn 类，
+   其 .active 的 2px 白环会叠成第二层圈，这里用 !important 压掉 */
 .liquid-bing-btn.active {
 	transform: scale(1.15);
 	border-color: rgba(255, 255, 255, 0.85);
-	box-shadow: 0 0 0 2px var(--text-color-high), 0 2px 6px rgba(0, 0, 0, 0.3);
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3) !important;
 	opacity: 1;
 }
 
