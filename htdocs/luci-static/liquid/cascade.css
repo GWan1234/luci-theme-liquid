@@ -621,8 +621,8 @@ header [data-indicator][data-style="inactive"],
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	width: 20px;
-	height: 20px;
+	width: 18px;
+	height: 18px;
 	padding: 0;
 	border-radius: 5px;
 	border: 2px solid transparent;
