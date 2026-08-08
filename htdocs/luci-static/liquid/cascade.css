@@ -1846,12 +1846,11 @@ input[type="radio"] {
 }
 
 :root[data-darkmode="true"] .cbi-dropdown li:hover {
-	/* 暗黑 hover：玻璃磨砂（半透明偏一点白 + 背景模糊），替代灰色实色、
-	   也覆盖选中项的原胶囊（accent）高亮 —— hover 时统一磨砂效果。
-	   选择器泛化：下拉列表、预览行、选中项的 li 全部生效 */
+	/* 暗黑 hover：半透明白磨砂高亮。
+	   注意不能加 backdrop-filter —— li 已位于带玻璃背景的 ul 内，
+	   再叠一层 blur 会把深色玻璃模糊加深，反而显得比胶囊更暗；
+	   半透明白叠在深色上即是"凸起的白玻璃"质感 */
 	background: rgba(255, 255, 255, 0.07) !important;
-	-webkit-backdrop-filter: blur(10px) saturate(140%);
-	backdrop-filter: blur(10px) saturate(140%);
 	color: #ffffff;
 }
 
