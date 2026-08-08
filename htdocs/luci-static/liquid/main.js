@@ -339,6 +339,32 @@
 				if (w > maxW)
 					maxW = w;
 			});
+
+			/* 初始加载（读 uci 已选中项）：当前值行 li[display] 是闭合时
+			   唯一可见的项，实测其渲染宽（含图标），保证胶囊不短于已选项 */
+			[].forEach.call(ul.querySelectorAll('li[display]'), function (li) {
+				var imgs = li.querySelectorAll('img');
+				var saved = [];
+				[].forEach.call(imgs, function (img, i) {
+					saved[i] = img.style.width;
+					img.style.width = '24px';
+					img.style.flexShrink = '0';
+				});
+				var st = li.style;
+				st.position = 'absolute';
+				st.visibility = 'hidden';
+				st.whiteSpace = 'nowrap';
+				var w = li.scrollWidth || 0;
+				st.position = '';
+				st.visibility = '';
+				st.whiteSpace = '';
+				[].forEach.call(imgs, function (img, i) {
+					img.style.width = saved[i];
+					img.style.flexShrink = '';
+				});
+				if (w > maxW)
+					maxW = w;
+			});
 			if (maxW > 0) {
 				var w = Math.min(Math.max(maxW + 40, 60), 240);
 				dd.style.width = w + 'px';

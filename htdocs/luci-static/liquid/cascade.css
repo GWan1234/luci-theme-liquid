@@ -1644,7 +1644,8 @@ input[type="radio"] {
 }
 
 .cbi-dropdown[multiple] > ul > li[display] {
-	flex: 0 1 auto;
+	/* 一个选项一行（竖向），不允许并行显示 */
+	flex: 0 0 100%;
 	white-space: normal;
 	overflow-wrap: break-word;
 }
