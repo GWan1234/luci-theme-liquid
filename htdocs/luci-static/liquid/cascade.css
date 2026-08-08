@@ -666,10 +666,14 @@ header [data-indicator][data-style="inactive"],
 	opacity: .85;
 }
 
+/* 选中时：内部显示自定义色，描边（2px 边框区）为彩虹渐变，
+   一眼识别"这是自定义颜色" */
 .liquid-custom-btn.active {
-	background: var(--accent-custom, #2f7fe0) !important;
-	border-color: var(--accent-custom, #2f7fe0);
-	box-shadow: 0 0 0 2px var(--accent-custom, #2f7fe0), 0 2px 6px rgba(0, 0, 0, 0.3);
+	background:
+		var(--accent-custom, #2f7fe0) padding-box,
+		conic-gradient(#f66, #fc3, #6c6, #3cf, #96f, #f66) border-box !important;
+	border: 2px solid transparent;
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
 	opacity: 1;
 }
 
