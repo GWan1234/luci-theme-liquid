@@ -31,7 +31,7 @@
 
 **macOS-style Liquid Glass OpenWrt LuCI theme**, for **LuCI ≥ 23** (OpenWrt 23.05 / 24.10 / master).
 
-Supports **light / dark / auto** modes, **5 accent colors** and adjustable blur & transparency; frosted glass design across the login page, sidebar, content cards, dropdowns and tooltips.
+Supports **light / dark / auto** modes, **5 accent colors + a custom color picker** and adjustable blur & transparency; frosted glass design across the login page, sidebar, content cards, dropdowns and tooltips.
 
 [![license][license-badge]][license]
 [![prs][prs-badge]][prs]
@@ -54,17 +54,25 @@ Supports **light / dark / auto** modes, **5 accent colors** and adjustable blur 
 ## Features
 
 - **Liquid glass design language**: sidebar, content cards, login card and footer share a frosted-glass look (blur + highlight + theme-colored glow); the dark mode glass is more solid for readable text.
-- **Three-way mode switch**: light / dark / auto (follow system), located at the top-right of the top bar (next to LuCI's native refresh/poll indicators), persisted via `localStorage`, applied before paint with no flash; the lock screen offers the same switch.
-- **Accent colors**: 5 themes (blue / magenta / amber / tulip purple / yellow-green) driving the selected menu, hover slider, buttons, tabs and logo in one linked system.
+- **Three-way mode switch**: light / dark / auto (follow system), located at the top-right of the top bar (next to LuCI's native refresh/poll indicators), persisted via uci (survives across browsers/devices) with `localStorage` as a fallback; applied before paint with no flash; the lock screen offers the same switch.
+- **Accent colors**: 5 themes (blue / magenta / amber / tulip purple / yellow-green) driving the selected menu, hover slider, buttons, tabs and logo in one linked system; plus a **custom accent color** — type a hex code (`#RRGGBB`) into the rainbow-dot picker and it saves on blur, invalid values fall back to default blue, also uci-persisted.
 - **Sidebar menu**: all top-level menus collapsed by default — click a level-1 menu to expand its own submenu; hover-tracking slider + selected glass capsule; the mobile slide-out menu avoids the top bar.
 - **Dropdown controls**: every dropdown setting renders as a "Save & Apply"-style gradient capsule (body + divider + arrow); the opened option list keeps the glass design; near the viewport bottom the list flips upward so it is never clipped by the footer.
 - **Tooltips**: frosted glass background, portaled to the page top-level (never hidden behind a neighbouring card), auto-avoid viewport edges, mutual exclusion against stale popups.
 - **Tables**: equal-height cells per row (dividers align); on mobile, tables lay out at content width with horizontal scrolling (long columns like MAC / MTU no longer overlap).
-- **Interfaces / Devices pages**: uniform 24px interface icons, forced opaque (link state is told by the icon file, not translucency); GridSection rows keep equal heights; action buttons never wrap.
-- **Lock screen (login)**: macOS-style frosted login card + Monterey wallpaper (light/dark) + inline SVG waterdrop logo (follows the accent color with a glass highlight).
+- **Interfaces / Devices pages**: uniform 24px interface icons, forced opaque (link state is told by the icon file, not translucency); GridSection rows keep equal heights; action buttons never wrap; interface boxes align 4px from their row card on mobile.
+- **Mobile adaptation**: modals at 95% width with nested cards stepping in per layer (larger usable area); the drawer menu closes on tapping outside and starts collapsed with no first-load flash; dropdowns flip upward near the viewport bottom so they are never clipped.
+- **Lock screen (login)**: macOS-style frosted login card + Monterey wallpaper (light/dark) + optional **Bing daily wallpaper** (auto-fetched and cached) + inline SVG waterdrop logo (follows the accent color with a glass highlight).
 - **SVG icons**: network / interface status icons taken from [xylz0928/luci-mod][luci-mod] `immortalwrt-24.10`; UI element icons (sun / moon / auto / refresh / lock / search / close / chevron) are built-in SVGs.
 
 ## Changelog
+
+- **2026-08-08 · v0.3**: custom accent color + color-switch polish + mobile / dark-mode improvements
+  - **Custom accent color**: beyond the 5 presets — click the rainbow dot to drop a hex input (`#RRGGBB`); leaving the field saves and applies instantly; invalid values fall back to default blue (custom mode stays enabled); persisted via uci across clients
+  - **Color switch**: pill fixed at 35px; a selected custom dot shows its color inside with a rainbow ring for instant recognition; the Bing wallpaper button gets a square outline hugging its icon and a single white ring when active
+  - **Mobile**: no first-load menu flash (desktop entry animation disabled so the drawer starts closed and usable immediately); footer height trimmed
+  - **Dark mode**: mode-switch icons (external svg) inverted to light so they stay visible on dark backgrounds
+  - **Fixes**: custom-color persistence (controller whitelist accepts `accent=custom` / `accent_custom`), login-page color-switch position, pill height
 
 - **2026-08-08 · v0.2-r52**: mobile UX & dropdown improvements
   - **Mobile interfaces page**: ifacebox aligned 4px from its row card's left edge for a cleaner look
@@ -124,10 +132,10 @@ make package/luci-theme-liquid/compile -j4 V=s
 
 > Note: `make package/<name>/compile` only really builds packages enabled (`=y`/`=m`) in `.config`; otherwise make no-ops (just prints `Entering/Leaving`), which is not a successful build.
 
-The produced `bin/packages/<arch>/base/luci-theme-liquid-0.2-r<rel>.apk` (or `.ipk`) can be installed with `apk` / `opkg`:
+The produced `bin/packages/<arch>/base/luci-theme-liquid-0.3-r<rel>.apk` (or `.ipk`) can be installed with `apk` / `opkg`:
 
 ```sh
-apk add --allow-untrusted luci-theme-liquid-0.2-r13.apk
+apk add --allow-untrusted luci-theme-liquid-0.3-r1.apk
 ```
 
 On first install the theme is registered automatically (`luci.themes.Liquid=/luci-static/liquid`); if `luci.main.mediaurlbase` is not set it is set to the theme, otherwise pick **Liquid** manually at **System → Advanced → Theme**.
@@ -153,7 +161,7 @@ luci-theme-liquid/
 ├── root/usr/share/luci/menu.d/       # dispatcher route registration
 │   └── liquid.json
 ├── ucode/template/themes/liquid/     # theme ucode templates
-│   ├── header.ut / footer.ut         # page skeleton (incl. anti-flash mode script)
+│   ├── header.ut / footer.ut         # page skeleton (uci config / anti-flash / Bing wallpaper cache)
 │   └── sysauth.ut                    # login template (blank_page + centered login box)
 └── root/etc/uci-defaults/            # registers luci.themes.Liquid on install
 ```

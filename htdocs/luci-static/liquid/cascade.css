@@ -251,6 +251,30 @@
 	--accent-glass-soft: linear-gradient(135deg, rgba(163, 208, 74, 0.22), rgba(46, 58, 84, 0.4));
 }
 
+/* 自定义主题色（data-accent="custom"）：主色来自 --accent-custom（JS 从
+   uci accent_custom / 输入框设置），派生色变量由 main.js 的
+   applyCustomAccent() 生成，此处给出默认蓝 fallback（JS 未跑时防闪烁） */
+:root[data-accent="custom"] {
+	--primary-color-high: var(--accent-custom, #2f7fe0);
+	--primary-color-medium: var(--accent-custom-medium, #286cbe);
+	--primary-color-low: var(--accent-custom-low, #205698);
+	--accent-grad: var(--accent-custom-grad, linear-gradient(135deg, #639fe8 0%, #2f7fe0 48%, #1c4c86 100%));
+	--accent-glow: var(--accent-custom-glow, rgba(47, 127, 224, 0.38));
+	--accent-glass: var(--accent-custom-glass, linear-gradient(135deg, rgba(47, 127, 224, 0.30), rgba(255, 255, 255, 0.62)));
+	--accent-glass-soft: var(--accent-custom-glass-soft, linear-gradient(135deg, rgba(47, 127, 224, 0.24), rgba(255, 255, 255, 0.72)));
+}
+
+:root[data-darkmode="true"][data-accent="custom"] {
+	--primary-color-high: var(--accent-custom-dark-high, #6da5e9);
+	--primary-color-medium: var(--accent-custom-dark-medium, #488ee4);
+	--primary-color-low: var(--accent-custom-dark-low, #2f7fe0);
+	--accent-grad: var(--accent-custom-dark-grad, linear-gradient(135deg, #9cc8f7 0%, #6da5e9 48%, #488ee4 100%));
+	--accent-glow: var(--accent-custom-dark-glow, rgba(109, 165, 233, 0.42));
+	--accent-glass: var(--accent-custom-dark-glass, linear-gradient(135deg, rgba(109, 165, 233, 0.28), rgba(46, 58, 84, 0.45)));
+	--accent-glass-soft: var(--accent-custom-dark-glass-soft, linear-gradient(135deg, rgba(109, 165, 233, 0.22), rgba(46, 58, 84, 0.40)));
+}
+
+
 /* ==========================================================================
    2. Reset & base
    ========================================================================== */
@@ -536,6 +560,12 @@ header [data-indicator][data-style="inactive"],
 	pointer-events: none;
 }
 
+/* 暗黑模式：模式开关图标（外链 svg 的 currentColor 在 <img> 里不继承
+   CSS color，解析为默认黑色）反色为浅色，避免深色背景下黑图标 */
+:root[data-darkmode="true"] .liquid-mode-btn img {
+	filter: invert(1);
+}
+
 .liquid-mode-switch-fixed {
 	position: fixed;
 	top: 16px;
@@ -563,11 +593,14 @@ header [data-indicator][data-style="inactive"],
 
 /* accent color switch */
 .liquid-color-switch {
+	position: relative;
+	height: 35px;
+	box-sizing: border-box;
 	display: inline-flex;
 	align-items: center;
 	gap: 5px;
 	margin-left: 6px;
-	padding: 8px 7px;
+	padding: 0 7px;
 	border-radius: 999px;
 	background: var(--glass-bg);
 	border: 1px solid var(--glass-border);
@@ -587,16 +620,17 @@ header [data-indicator][data-style="inactive"],
 	transition: transform .15s ease, box-shadow .15s ease;
 }
 
-/* Bing 壁纸按钮（五色之前）：点亮 = 启用 Bing 每日壁纸 */
+/* Bing 壁纸按钮（五色之前）：点亮 = 启用 Bing 每日壁纸。
+   方形外框（跟随 b logo 的圆角方形图标 rx=5），选中时白色描边也是方形 */
 .liquid-bing-btn {
 	position: relative;
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	width: 20px;
-	height: 20px;
+	width: 18px;
+	height: 18px;
 	padding: 0;
-	border-radius: 50%;
+	border-radius: 5px;
 	border: 2px solid transparent;
 	background: transparent;
 	cursor: pointer;
@@ -609,10 +643,13 @@ header [data-indicator][data-style="inactive"],
 	opacity: 1;
 }
 
+/* 启用时只保留一层白色方形描边（border）。
+   不能有 box-shadow 白环：按钮同时带 .liquid-color-btn 类，
+   其 .active 的 2px 白环会叠成第二层圈，这里用 !important 压掉 */
 .liquid-bing-btn.active {
 	transform: scale(1.15);
-	border-color: var(--primary-color-high);
-	box-shadow: 0 0 0 3px var(--accent-glow);
+	border-color: rgba(255, 255, 255, 0.85);
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3) !important;
 	opacity: 1;
 }
 
@@ -631,6 +668,74 @@ header [data-indicator][data-style="inactive"],
 	right: 16px;
 	z-index: 2001;
 	margin: 0;
+}
+
+/* 自定义主题色按钮（5 色之后）：彩虹圆点；激活时显示当前自定义色 */
+.liquid-custom-btn {
+	background: conic-gradient(#f66, #fc3, #6c6, #3cf, #96f, #f66);
+	opacity: .85;
+}
+
+/* 选中时：内部显示自定义色（第一层，clip 到 padding-box），
+   描边（2px 边框区）为彩虹渐变（第二层，clip 到 border-box），
+   一眼识别"这是自定义颜色"。不能用 background 简写（color 不能放
+   在非最后层的 box 关键字后，整条会被浏览器丢弃） */
+.liquid-custom-btn.active {
+	background-image:
+		linear-gradient(var(--accent-custom, #2f7fe0), var(--accent-custom, #2f7fe0)),
+		conic-gradient(#f66, #fc3, #6c6, #3cf, #96f, #f66);
+	background-clip: padding-box, border-box;
+	background-origin: padding-box, border-box;
+	border: 3px solid transparent;
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+	opacity: 1;
+}
+
+/* 自定义颜色输入面板（点击彩虹圆点下拉） */
+.liquid-custom-pop {
+	display: none;
+	position: absolute;
+	top: calc(100% + 8px);
+	right: 0;
+	z-index: 9999;
+	padding: 6px;
+	border-radius: 8px;
+	background: var(--glass-bg);
+	border: 1px solid var(--glass-border);
+	box-shadow: var(--glass-shadow-soft), inset 0 1px 0 var(--glass-inset);
+	-webkit-backdrop-filter: blur(var(--glass-blur));
+	backdrop-filter: blur(var(--glass-blur));
+	animation: liquid-pop-in .3s ease;
+	transform-origin: top right;
+}
+
+@keyframes liquid-pop-in {
+	from { opacity: 0; transform: translateY(-8px) scale(.95); }
+	to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.liquid-custom-input {
+	width: 112px;
+	padding: 4px 8px;
+	font-size: 12px;
+	font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+	color: var(--text-color);
+	background: var(--input-bg, rgba(255, 255, 255, 0.7));
+	border: 1px solid var(--glass-border);
+	border-radius: 6px;
+	outline: none;
+}
+
+.liquid-custom-input:focus {
+	border-color: var(--primary-color-high);
+	box-shadow: 0 0 0 2px var(--accent-glow);
+}
+
+/* 锁屏（无菜单栏，开关固定在右上角）：输入面板向上弹出 */
+.liquid-color-switch-fixed .liquid-custom-pop {
+	top: auto;
+	bottom: calc(100% + 8px);
+	transform-origin: bottom right;
 }
 
 /* ==========================================================================
@@ -3002,6 +3107,7 @@ pre {
 		bottom: 0;
 		width: 264px;
 		transform: translateX(-102%);
+		animation: none;
 		z-index: 800;
 		overflow-y: auto;
 		overscroll-behavior: contain;
@@ -3025,6 +3131,10 @@ pre {
 	/* 移动端 foot 横幅只保留固件版本 */
 	body:not(.liquid-login) p.luci > *:not(.luci-fw) {
 		display: none;
+	}
+
+	body:not(.liquid-login) p.luci {
+		padding: 6px 22px;
 	}
 
 	.luci-foot-spacer {

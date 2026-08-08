@@ -31,8 +31,10 @@ return {
 			let v = sprintf("%s", data[k]);
 			if (k == 'mode' && match(v, /^(light|dark|auto)$/))
 				writes['mode'] = v;
-			else if (k == 'accent' && match(v, /^(blue|magenta|amber|purple|lime)$/))
+			else if (k == 'accent' && match(v, /^(blue|magenta|amber|purple|lime|custom)$/))
 				writes['accent'] = v;
+			else if (k == 'accent_custom' && match(v, /^#[0-9a-fA-F]{6}$/))
+				writes['accent_custom'] = v;
 			else if (k == 'bing' && match(v, /^(0|1)$/))
 				writes['bing'] = v;
 		}
