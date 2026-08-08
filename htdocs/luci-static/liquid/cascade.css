@@ -614,7 +614,8 @@ header [data-indicator][data-style="inactive"],
 	transition: transform .15s ease, box-shadow .15s ease;
 }
 
-/* Bing 壁纸按钮（五色之前）：点亮 = 启用 Bing 每日壁纸 */
+/* Bing 壁纸按钮（五色之前）：点亮 = 启用 Bing 每日壁纸。
+   方形外框（跟随 b logo 的圆角方形图标 rx=5），选中时白色描边也是方形 */
 .liquid-bing-btn {
 	position: relative;
 	display: inline-flex;
@@ -623,7 +624,7 @@ header [data-indicator][data-style="inactive"],
 	width: 20px;
 	height: 20px;
 	padding: 0;
-	border-radius: 50%;
+	border-radius: 5px;
 	border: 2px solid transparent;
 	background: transparent;
 	cursor: pointer;
