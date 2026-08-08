@@ -588,11 +588,13 @@ header [data-indicator][data-style="inactive"],
 /* accent color switch */
 .liquid-color-switch {
 	position: relative;
+	height: 35px;
+	box-sizing: border-box;
 	display: inline-flex;
 	align-items: center;
 	gap: 5px;
 	margin-left: 6px;
-	padding: 8px 7px;
+	padding: 0 7px;
 	border-radius: 999px;
 	background: var(--glass-bg);
 	border: 1px solid var(--glass-border);
@@ -666,6 +668,8 @@ header [data-indicator][data-style="inactive"],
 
 .liquid-custom-btn.active {
 	background: var(--accent-custom, #2f7fe0) !important;
+	border-color: var(--accent-custom, #2f7fe0);
+	box-shadow: 0 0 0 2px var(--accent-custom, #2f7fe0), 0 2px 6px rgba(0, 0, 0, 0.3);
 	opacity: 1;
 }
 
@@ -683,6 +687,13 @@ header [data-indicator][data-style="inactive"],
 	box-shadow: var(--glass-shadow-soft), inset 0 1px 0 var(--glass-inset);
 	-webkit-backdrop-filter: blur(var(--glass-blur));
 	backdrop-filter: blur(var(--glass-blur));
+	animation: liquid-pop-in .3s ease;
+	transform-origin: top right;
+}
+
+@keyframes liquid-pop-in {
+	from { opacity: 0; transform: translateY(-8px) scale(.95); }
+	to   { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 .liquid-custom-input {
@@ -706,6 +717,7 @@ header [data-indicator][data-style="inactive"],
 .liquid-color-switch-fixed .liquid-custom-pop {
 	top: auto;
 	bottom: calc(100% + 8px);
+	transform-origin: bottom right;
 }
 
 /* ==========================================================================
