@@ -1846,8 +1846,9 @@ input[type="radio"] {
 }
 
 :root[data-darkmode="true"] .cbi-dropdown > ul > li:hover {
-	/* 暗黑 hover：玻璃磨砂（半透明 + 背景模糊），替代灰色实色高亮 */
-	background: rgba(255, 255, 255, 0.07);
+	/* 暗黑 hover：玻璃磨砂（半透明偏一点白 + 背景模糊），替代灰色实色、
+	   也覆盖选中项的原胶囊（accent）高亮 —— hover 时统一磨砂效果 */
+	background: rgba(255, 255, 255, 0.07) !important;
 	-webkit-backdrop-filter: blur(10px) saturate(140%);
 	backdrop-filter: blur(10px) saturate(140%);
 	color: #ffffff;
