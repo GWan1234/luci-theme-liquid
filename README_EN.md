@@ -60,7 +60,8 @@ Supports **light / dark / auto** modes, **5 accent colors + a custom color picke
 - **Dropdown controls**: every dropdown setting renders as a "Save & Apply"-style gradient capsule (body + divider + arrow); the opened option list keeps the glass design; near the viewport bottom the list flips upward so it is never clipped by the footer.
 - **Tooltips**: frosted glass background, portaled to the page top-level (never hidden behind a neighbouring card), auto-avoid viewport edges, mutual exclusion against stale popups.
 - **Tables**: equal-height cells per row (dividers align); on mobile, tables lay out at content width with horizontal scrolling (long columns like MAC / MTU no longer overlap).
-- **Interfaces / Devices pages**: uniform 24px interface icons, forced opaque (link state is told by the icon file, not translucency); GridSection rows keep equal heights; action buttons never wrap.
+- **Interfaces / Devices pages**: uniform 24px interface icons, forced opaque (link state is told by the icon file, not translucency); GridSection rows keep equal heights; action buttons never wrap; interface boxes align 4px from their row card on mobile.
+- **Mobile adaptation**: modals at 95% width with nested cards stepping in per layer (larger usable area); the drawer menu closes on tapping outside and starts collapsed with no first-load flash; dropdowns flip upward near the viewport bottom so they are never clipped.
 - **Lock screen (login)**: macOS-style frosted login card + Monterey wallpaper (light/dark) + optional **Bing daily wallpaper** (auto-fetched and cached) + inline SVG waterdrop logo (follows the accent color with a glass highlight).
 - **SVG icons**: network / interface status icons taken from [xylz0928/luci-mod][luci-mod] `immortalwrt-24.10`; UI element icons (sun / moon / auto / refresh / lock / search / close / chevron) are built-in SVGs.
 
@@ -131,10 +132,10 @@ make package/luci-theme-liquid/compile -j4 V=s
 
 > Note: `make package/<name>/compile` only really builds packages enabled (`=y`/`=m`) in `.config`; otherwise make no-ops (just prints `Entering/Leaving`), which is not a successful build.
 
-The produced `bin/packages/<arch>/base/luci-theme-liquid-0.2-r<rel>.apk` (or `.ipk`) can be installed with `apk` / `opkg`:
+The produced `bin/packages/<arch>/base/luci-theme-liquid-0.3-r<rel>.apk` (or `.ipk`) can be installed with `apk` / `opkg`:
 
 ```sh
-apk add --allow-untrusted luci-theme-liquid-0.2-r13.apk
+apk add --allow-untrusted luci-theme-liquid-0.3-r1.apk
 ```
 
 On first install the theme is registered automatically (`luci.themes.Liquid=/luci-static/liquid`); if `luci.main.mediaurlbase` is not set it is set to the theme, otherwise pick **Liquid** manually at **System → Advanced → Theme**.
@@ -160,7 +161,7 @@ luci-theme-liquid/
 ├── root/usr/share/luci/menu.d/       # dispatcher route registration
 │   └── liquid.json
 ├── ucode/template/themes/liquid/     # theme ucode templates
-│   ├── header.ut / footer.ut         # page skeleton (incl. anti-flash mode script)
+│   ├── header.ut / footer.ut         # page skeleton (uci config / anti-flash / Bing wallpaper cache)
 │   └── sysauth.ut                    # login template (blank_page + centered login box)
 └── root/etc/uci-defaults/            # registers luci.themes.Liquid on install
 ```
