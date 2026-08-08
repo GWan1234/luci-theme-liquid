@@ -2335,7 +2335,7 @@ body.liquid-login #modal_overlay > .modal.login hr {
 
 body.liquid-login p.luci {
 	position: fixed;
-	bottom: 24px;
+	bottom: 12px;
 	left: 0;
 	width: 100%;
 	margin: 0;
