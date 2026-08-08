@@ -560,6 +560,12 @@ header [data-indicator][data-style="inactive"],
 	pointer-events: none;
 }
 
+/* 暗黑模式：模式开关图标（外链 svg 的 currentColor 在 <img> 里不继承
+   CSS color，解析为默认黑色）反色为浅色，避免深色背景下黑图标 */
+:root[data-darkmode="true"] .liquid-mode-btn img {
+	filter: invert(1);
+}
+
 .liquid-mode-switch-fixed {
 	position: fixed;
 	top: 16px;
