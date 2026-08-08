@@ -251,6 +251,30 @@
 	--accent-glass-soft: linear-gradient(135deg, rgba(163, 208, 74, 0.22), rgba(46, 58, 84, 0.4));
 }
 
+/* 自定义主题色（data-accent="custom"）：主色来自 --accent-custom（JS 从
+   uci accent_custom / 输入框设置），派生色变量由 main.js 的
+   applyCustomAccent() 生成，此处给出默认蓝 fallback（JS 未跑时防闪烁） */
+:root[data-accent="custom"] {
+	--primary-color-high: var(--accent-custom, #2f7fe0);
+	--primary-color-medium: var(--accent-custom-medium, #286cbe);
+	--primary-color-low: var(--accent-custom-low, #205698);
+	--accent-grad: var(--accent-custom-grad, linear-gradient(135deg, #639fe8 0%, #2f7fe0 48%, #1c4c86 100%));
+	--accent-glow: var(--accent-custom-glow, rgba(47, 127, 224, 0.38));
+	--accent-glass: var(--accent-custom-glass, linear-gradient(135deg, rgba(47, 127, 224, 0.30), rgba(255, 255, 255, 0.62)));
+	--accent-glass-soft: var(--accent-custom-glass-soft, linear-gradient(135deg, rgba(47, 127, 224, 0.24), rgba(255, 255, 255, 0.72)));
+}
+
+:root[data-darkmode="true"][data-accent="custom"] {
+	--primary-color-high: var(--accent-custom-dark-high, #6da5e9);
+	--primary-color-medium: var(--accent-custom-dark-medium, #488ee4);
+	--primary-color-low: var(--accent-custom-dark-low, #2f7fe0);
+	--accent-grad: var(--accent-custom-dark-grad, linear-gradient(135deg, #9cc8f7 0%, #6da5e9 48%, #488ee4 100%));
+	--accent-glow: var(--accent-custom-dark-glow, rgba(109, 165, 233, 0.42));
+	--accent-glass: var(--accent-custom-dark-glass, linear-gradient(135deg, rgba(109, 165, 233, 0.28), rgba(46, 58, 84, 0.45)));
+	--accent-glass-soft: var(--accent-custom-dark-glass-soft, linear-gradient(135deg, rgba(109, 165, 233, 0.22), rgba(46, 58, 84, 0.40)));
+}
+
+
 /* ==========================================================================
    2. Reset & base
    ========================================================================== */
@@ -631,6 +655,60 @@ header [data-indicator][data-style="inactive"],
 	right: 16px;
 	z-index: 2001;
 	margin: 0;
+}
+
+/* 自定义主题色按钮（5 色之后）：彩虹圆点；激活时显示当前自定义色 */
+.liquid-custom-btn {
+	background: conic-gradient(#f66, #fc3, #6c6, #3cf, #96f, #f66) !important;
+	opacity: .85;
+}
+
+.liquid-custom-btn.active {
+	background: var(--accent-custom, #2f7fe0) !important;
+	opacity: 1;
+}
+
+/* 自定义颜色输入面板（点击彩虹圆点下拉） */
+.liquid-color-switch {
+	position: relative;
+}
+
+.liquid-custom-pop {
+	display: none;
+	position: absolute;
+	top: calc(100% + 8px);
+	right: 0;
+	z-index: 9999;
+	padding: 6px;
+	border-radius: 8px;
+	background: var(--glass-bg);
+	border: 1px solid var(--glass-border);
+	box-shadow: var(--glass-shadow-soft), inset 0 1px 0 var(--glass-inset);
+	-webkit-backdrop-filter: blur(var(--glass-blur));
+	backdrop-filter: blur(var(--glass-blur));
+}
+
+.liquid-custom-input {
+	width: 112px;
+	padding: 4px 8px;
+	font-size: 12px;
+	font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+	color: var(--text-color);
+	background: var(--input-bg, rgba(255, 255, 255, 0.7));
+	border: 1px solid var(--glass-border);
+	border-radius: 6px;
+	outline: none;
+}
+
+.liquid-custom-input:focus {
+	border-color: var(--primary-color-high);
+	box-shadow: 0 0 0 2px var(--accent-glow);
+}
+
+/* 锁屏（无菜单栏，开关固定在右上角）：输入面板向上弹出 */
+.liquid-color-switch-fixed .liquid-custom-pop {
+	top: auto;
+	bottom: calc(100% + 8px);
 }
 
 /* ==========================================================================

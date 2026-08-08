@@ -60,6 +60,54 @@
 		{ id: 'lime',    color: '#7fb52a', title: 'Yellow-green' }
 	];
 
+	var DEFAULT_ACCENT = '#2f7fe0';
+
+	/* 自定义主题色工具：hex 校验/规范化 + 由单个主色派生全套 accent 变量 */
+	function normalizeHex(v) {
+		v = String(v || '').trim().replace(/^#/, '');
+		if (/^[0-9a-fA-F]{3}$/.test(v))
+			v = v[0] + v[0] + v[1] + v[1] + v[2] + v[2];
+		return /^[0-9a-fA-F]{6}$/.test(v) ? '#' + v.toLowerCase() : null;
+	}
+
+	function hexToRgb(hex) {
+		var n = parseInt(hex.slice(1), 16);
+		return { r: (n >> 16) & 255, g: (n >> 8) & 255, b: n & 255 };
+	}
+
+	function shade(rgb, pct) {
+		var c = function (v) {
+			v = Math.round(pct > 0 ? v + (255 - v) * pct : v * (1 + pct));
+			return Math.max(0, Math.min(255, v));
+		};
+		return 'rgb(' + c(rgb.r) + ',' + c(rgb.g) + ',' + c(rgb.b) + ')';
+	}
+
+	function rgba(rgb, a) {
+		return 'rgba(' + rgb.r + ',' + rgb.g + ',' + rgb.b + ',' + a + ')';
+	}
+
+	/* 在 <html> 上生成自定义色全套变量（亮/暗两套） */
+	function applyCustomAccent(hex) {
+		hex = normalizeHex(hex) || DEFAULT_ACCENT;
+		var rgb = hexToRgb(hex);
+		var root = document.documentElement;
+		root.style.setProperty('--accent-custom', hex);
+		root.style.setProperty('--accent-custom-medium', shade(rgb, -0.15));
+		root.style.setProperty('--accent-custom-low', shade(rgb, -0.32));
+		root.style.setProperty('--accent-custom-glow', rgba(rgb, 0.38));
+		root.style.setProperty('--accent-custom-grad', 'linear-gradient(135deg, ' + shade(rgb, 0.25) + ' 0%, ' + hex + ' 48%, ' + shade(rgb, -0.4) + ' 100%)');
+		root.style.setProperty('--accent-custom-glass', 'linear-gradient(135deg, ' + rgba(rgb, 0.3) + ', rgba(255,255,255,0.62))');
+		root.style.setProperty('--accent-custom-glass-soft', 'linear-gradient(135deg, ' + rgba(rgb, 0.24) + ', rgba(255,255,255,0.72))');
+		root.style.setProperty('--accent-custom-dark-high', shade(rgb, 0.3));
+		root.style.setProperty('--accent-custom-dark-medium', shade(rgb, 0.12));
+		root.style.setProperty('--accent-custom-dark-low', hex);
+		root.style.setProperty('--accent-custom-dark-glow', rgba(rgb, 0.42));
+		root.style.setProperty('--accent-custom-dark-grad', 'linear-gradient(135deg, ' + shade(rgb, 0.5) + ' 0%, ' + shade(rgb, 0.3) + ' 48%, ' + shade(rgb, 0.12) + ' 100%)');
+		root.style.setProperty('--accent-custom-dark-glass', 'linear-gradient(135deg, ' + rgba(rgb, 0.28) + ', rgba(46,58,84,0.45))');
+		root.style.setProperty('--accent-custom-dark-glass-soft', 'linear-gradient(135deg, ' + rgba(rgb, 0.22) + ', rgba(46,58,84,0.4))');
+	}
+
 	function getMode() {
 		var d = document.body ? document.body.getAttribute('data-liquid-mode') : null;
 		if (d)
@@ -107,8 +155,27 @@
 		if (document.body)
 			document.body.setAttribute('data-liquid-accent', id);
 		document.documentElement.setAttribute('data-accent', id);
+		if (id == 'custom')
+			applyCustomAccent(getAccentCustom());
 		updateColorSwitch();
 		saveConfig('accent', id);
+	}
+
+	function getAccentCustom() {
+		var d = document.body ? document.body.getAttribute('data-liquid-accent-custom') : null;
+		if (d)
+			return d;
+		try { return localStorage.getItem('liquid-accent-custom') || DEFAULT_ACCENT; } catch (e) { return DEFAULT_ACCENT; }
+	}
+
+	/* 设置自定义主题色：非法值退回默认蓝，但仍启用自定义模式 */
+	function setCustomAccent(hex) {
+		hex = normalizeHex(hex) || DEFAULT_ACCENT;
+		try { localStorage.setItem('liquid-accent-custom', hex); } catch (e) {}
+		if (document.body)
+			document.body.setAttribute('data-liquid-accent-custom', hex);
+		setAccent('custom');
+		saveConfig('accent_custom', hex);
 	}
 
 	function getBing() {
@@ -171,6 +238,64 @@
 			btn.style.background = c.color;
 			btn.addEventListener('click', function () { setAccent(c.id); });
 			wrap.appendChild(btn);
+		});
+
+		/* 自定义主题色（5 色之后）：彩虹圆点，点击下拉输入框输入颜色编码 */
+		var customBtn = document.createElement('button');
+		customBtn.type = 'button';
+		customBtn.className = 'liquid-color-btn liquid-custom-btn';
+		customBtn.title = 'Custom color';
+		customBtn.setAttribute('data-accent', 'custom');
+		customBtn.setAttribute('aria-label', 'Custom color');
+		wrap.appendChild(customBtn);
+
+		var pop = document.createElement('div');
+		pop.id = 'liquid-custom-pop';
+		pop.className = 'liquid-custom-pop';
+		pop.style.display = 'none';
+		var input = document.createElement('input');
+		input.type = 'text';
+		input.className = 'liquid-custom-input';
+		input.placeholder = '#RRGGBB';
+		input.maxLength = 7;
+		input.setAttribute('spellcheck', 'false');
+		pop.appendChild(input);
+		wrap.appendChild(pop);
+
+		function toggleCustomPop() {
+			var show = pop.style.display == 'none';
+			pop.style.display = show ? 'block' : 'none';
+			if (show) {
+				input.value = getAccentCustom();
+				setTimeout(function () { input.focus(); input.select(); }, 0);
+			}
+		}
+
+		/* 离开输入框（blur）即保存；非法值退回默认蓝 */
+		function commitCustom() {
+			var hex = normalizeHex(input.value);
+			if (!hex)
+				hex = DEFAULT_ACCENT;
+			setCustomAccent(hex);
+		}
+
+		customBtn.addEventListener('click', function (e) {
+			e.stopPropagation();
+			toggleCustomPop();
+		});
+		input.addEventListener('keydown', function (e) {
+			if (e.key == 'Enter') {
+				commitCustom();
+				pop.style.display = 'none';
+			}
+			else if (e.key == 'Escape') {
+				pop.style.display = 'none';
+			}
+		});
+		input.addEventListener('blur', function () { commitCustom(); });
+		document.addEventListener('click', function (e) {
+			if (!wrap.contains(e.target))
+				pop.style.display = 'none';
 		});
 
 		var menubar = document.querySelector('#mainmenu');
@@ -679,6 +804,8 @@
 	function scheduleMenuTop() {
 		setTimeout(syncMenuTop, 0);
 	}
+
+	applyCustomAccent(getAccentCustom());
 
 	if (document.readyState == 'loading')
 		document.addEventListener('DOMContentLoaded', function () {

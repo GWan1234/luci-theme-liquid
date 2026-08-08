@@ -17,6 +17,7 @@
 	/* ---- 主题配置（uci /etc/config/liquid，换客户端保留） ---- */
 	let cfg_mode = 'auto';
 	let cfg_accent = 'blue';
+	let cfg_accent_custom = '';
 	let cfg_bing = '0';
 	let cfg = fs.readfile('/etc/config/liquid') ?? '';
 	let cm = match(cfg, /option[ \t]+mode[ \t]+'?([^' \t\n]+)'?/);
@@ -25,6 +26,9 @@
 	let ca = match(cfg, /option[ \t]+accent[ \t]+'?([^' \t\n]+)'?/);
 	if (ca !== null)
 		cfg_accent = ca[1];
+	let cc = match(cfg, /option[ \t]+accent_custom[ \t]+'?([^' \t\n]+)'?/);
+	if (cc !== null)
+		cfg_accent_custom = cc[1];
 	let cb = match(cfg, /option[ \t]+bing[ \t]+'?([^' \t\n]+)'?/);
 	if (cb !== null)
 		cfg_bing = cb[1];
@@ -35,6 +39,10 @@
 	   fs.readfile"获取 wget 输出 ---- */
 	let bing_style = '';
 	let bing_ok = '0';
+	let accent_custom_style = '';
+	if (cfg_accent == 'custom' && cfg_accent_custom != '')
+		accent_custom_style = sprintf(':root{--accent-custom:%s;}', cfg_accent_custom);
+
 	if (cfg_bing == '1') {
 		system('mkdir -p /tmp/liquid && ln -sfn /tmp/liquid /www/liquid-cache && date +%Y%m%d > /tmp/liquid-date.txt');
 		let today = trim(fs.readfile('/tmp/liquid-date.txt') ?? '');
@@ -70,6 +78,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="darkreader-lock">
 {% if (bing_style != ''): %}<style>{{ bing_style }}</style>{% endif %}
+{% if (accent_custom_style != ''): %}<style>{{ accent_custom_style }}</style>{% endif %}
 <script>
 	/* Liquid theme: apply uci-persisted light/dark/auto mode + accent before CSS paints.
 	   uci（服务端模板读取）优先：其他客户端修改后本机刷新即生效；
@@ -99,7 +108,7 @@
 <style title="text/css">{{ css }}</style>
 {% endif %}
 </head>
-<body class="lang_{{ dispatcher.lang }}{% if (blank_page): %} liquid-login{% endif %}" data-page="{{ entityencode(join('-', ctx.request_path), true) }}" data-hostname="{{ striptags(boardinfo.hostname ?? '') }}" data-liquid-mode="{{ cfg_mode }}" data-liquid-accent="{{ cfg_accent }}" data-liquid-bing="{{ cfg_bing }}" data-liquid-bing-ok="{{ bing_ok }}">
+<body class="lang_{{ dispatcher.lang }}{% if (blank_page): %} liquid-login{% endif %}" data-page="{{ entityencode(join('-', ctx.request_path), true) }}" data-hostname="{{ striptags(boardinfo.hostname ?? '') }}" data-liquid-mode="{{ cfg_mode }}" data-liquid-accent="{{ cfg_accent }}" data-liquid-bing="{{ cfg_bing }}" data-liquid-bing-ok="{{ bing_ok }}" data-liquid-accent-custom="{{ cfg_accent_custom }}">
 
 <p class="skiplink">
 <span id="skiplink1"><a href="#navigation">{{ _('Skip to navigation') }}</a></span>
