@@ -66,6 +66,13 @@ Supports **light / dark / auto** modes, **5 accent colors** and adjustable blur 
 
 ## Changelog
 
+- **2026-08-08 · v0.2-r52**: mobile UX & dropdown improvements
+  - **Mobile interfaces page**: ifacebox aligned 4px from its row card's left edge for a cleaner look
+  - **Mobile nested-card insets**: modal at 95% width, each nested layer steps in 2px, giving a larger usable area
+  - **Mobile menu**: tapping outside closes the menu
+  - **Desktop modal / nested cards**: improved display (modal at 80% width, nested layers width-constrained to prevent overflow)
+  - **Dropdowns**: single-select & multi-select interaction and display polish
+
 - **2026-08-07 · v0.2**: persistent config (uci) + Bing daily wallpaper + fixes
   - **Persistent config (uci)**: light/dark/auto mode, the 5 accent colors and the Bing switch are stored in `uci /etc/config/liquid`, so the settings follow the router across clients (browsers / devices); changes are committed through the theme's own ucode endpoint and take effect immediately with no "pending apply" entries or save prompts.
   - **Bing daily wallpaper (lock screen)**: a Bing toggle button (letter-b logo) sits before the five accent colors; when enabled, the lock screen shows Bing's picture of the day (cached per device in `/tmp/liquid/`); when offline or disabled it falls back to the default wallpaper (per mode).
