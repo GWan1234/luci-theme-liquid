@@ -2820,10 +2820,12 @@ pre {
 
 @media screen and (max-width: 854px) {
 
-	/* 移动端：弹出窗口（modal）宽 95%（80% 会把内容挤太小） */
+	/* 移动端：弹出窗口（modal）宽 95%（80% 会把内容挤太小）；
+	   左右内边距收到 2px，让第一层卡片也按 2px 缩进（与嵌套每层一致） */
 	#modal_overlay > .modal {
 		width: 95%;
 		max-width: 95vw;
+		padding: 16px 2px 20px;
 	}
 
 	/* 移动端：多层嵌套卡片（network/dns/主机名记录等会套 2-4 层）压缩
