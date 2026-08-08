@@ -1647,6 +1647,20 @@ input[type="radio"] {
 	overflow-wrap: break-word;
 }
 
+/* 多选下拉：打开（选择中）时 preview 当前值行同样换行，胶囊实时拓高，
+   让"打勾中"就能看到已选集合 */
+.cbi-dropdown[multiple][open] > ul.preview {
+	flex-wrap: wrap;
+	overflow: visible;
+	max-height: none;
+}
+
+.cbi-dropdown[multiple][open] > ul.preview > li[display] {
+	flex: 0 1 auto;
+	white-space: normal;
+	overflow-wrap: break-word;
+}
+
 /* 打开时：触发器淡出（背景/边框/箭头/预览行全部隐去），
    视觉上只剩一个弹出的选项列表——避免“框 + 弹出列表”看起来像
    两个下拉菜单堆叠。ui.js 打开时会把原 ul 克隆为 ul.preview，

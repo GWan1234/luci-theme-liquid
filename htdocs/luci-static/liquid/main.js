@@ -326,8 +326,11 @@
 				if (w > maxW)
 					maxW = w;
 			});
-			if (maxW > 0)
-				dd.style.width = Math.min(Math.max(maxW + 40, 60), 240) + 'px';
+			if (maxW > 0) {
+				var w = Math.min(Math.max(maxW + 40, 60), 240);
+				dd.style.width = w + 'px';
+				dd.dataset.liquidW = w;   /* 记录，关闭后恢复（luci 会清） */
+			}
 		});
 
 		document.querySelectorAll('.cbi-select').forEach(function (sel) {
@@ -352,10 +355,26 @@
 	   哪一侧剩余空间更多就朝哪侧弹出；并给列表设动态 max-height，
 	   使其始终完整落在屏幕内（超出部分出滚动条，不再被屏幕边缘裁掉） */
 	function adjustDropdownDirection() {
-		document.querySelectorAll('.cbi-dropdown[open] > ul.dropdown').forEach(function (ul) {
-			var dd = ul.closest('.cbi-dropdown');
-			if (!dd)
+		document.querySelectorAll('.cbi-dropdown').forEach(function (dd) {
+			var ul = dd.querySelector('ul.dropdown') || dd.querySelector('ul');
+			if (!ul)
 				return;
+			var open = dd.classList.contains('open') || dd.hasAttribute('open');
+
+			if (!open) {
+				/* 关闭后清理 luci 开合流程残留的 inline 定位（触屏分支的
+				   left/right 会把闭合胶囊横向拉长）并恢复 fit 宽度
+				   （luci closeDropdown 会清 dd.style.width） */
+				ul.style.left = '';
+				ul.style.right = '';
+				ul.style.top = '';
+				ul.style.bottom = '';
+				ul.style.maxHeight = '';
+				if (dd.dataset.liquidW)
+					dd.style.width = dd.dataset.liquidW + 'px';
+				return;
+			}
+
 			var r = dd.getBoundingClientRect();
 			var vh = window.innerHeight;
 			var downSpace = vh - r.bottom;   /* 按钮底 → 屏幕底 */
@@ -422,6 +441,9 @@
 			   若关闭流程因任何原因中断（如 preview 缺失使 closeDropdown 抛错、
 			   open 属性残留），强制把下拉重置为闭合态并让选中值显示在框里。 */
 			dd.addEventListener('click', function (e) {
+				/* 多选：luci 保持打开以便连续勾选，兜底不强制关闭 */
+				if (dd.hasAttribute('multiple'))
+					return;
 				var li = e.target.closest ? e.target.closest('li') : null;
 				if (!li || !li.parentNode || !li.parentNode.classList.contains('dropdown'))
 					return;
