@@ -3042,7 +3042,8 @@ pre {
       stacking context，避免被相邻卡片盖住；
    3) 移动端滚动容器（.cbi-section-node / #maincontent）：两轴 visible，
       不再横向裁剪弹出列表 */
-.cbi-section-table:has(.cbi-dropdown) {
+/* 只在"打开"时解除裁剪（加载/闭合时保持原样，不影响胶囊尺寸） */
+.cbi-section-table:has(.cbi-dropdown[open]) {
 	overflow: visible !important;
 }
 
@@ -3053,8 +3054,8 @@ pre {
 }
 
 @media screen and (max-width: 854px) {
-	.cbi-section-node:has(.cbi-dropdown),
-	#maincontent:has(.cbi-dropdown) {
+	.cbi-section-node:has(.cbi-dropdown[open]),
+	#maincontent:has(.cbi-dropdown[open]) {
 		overflow-x: visible !important;
 		overflow-y: visible !important;
 	}

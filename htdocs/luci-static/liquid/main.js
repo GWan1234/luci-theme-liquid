@@ -348,8 +348,9 @@
 		});
 	}
 
-	/* 下拉框自动避让：按钮靠近视口底部（或被页脚遮挡）时向上弹出，
-	   下方空间足够则照常向下 */
+	/* 下拉框避让：按"屏幕上下可用空间"全局计算（而非卡片内相对位置）：
+	   哪一侧剩余空间更多就朝哪侧弹出；并给列表设动态 max-height，
+	   使其始终完整落在屏幕内（超出部分出滚动条，不再被屏幕边缘裁掉） */
 	function adjustDropdownDirection() {
 		document.querySelectorAll('.cbi-dropdown[open] > ul.dropdown').forEach(function (ul) {
 			var dd = ul.closest('.cbi-dropdown');
@@ -357,14 +358,30 @@
 				return;
 			var r = dd.getBoundingClientRect();
 			var vh = window.innerHeight;
-			var listH = ul.offsetHeight || 220;
-			if (r.bottom + listH + 12 > vh) {
-				ul.style.top = 'auto';
-				ul.style.bottom = 'calc(100% + 4px)';
-			} else {
+			var downSpace = vh - r.bottom;   /* 按钮底 → 屏幕底 */
+			var upSpace = r.top;             /* 屏幕顶 → 按钮顶 */
+			var maxH;
+
+			/* 先量出内容完整高度（临时去掉 max-height 限制） */
+			ul.style.maxHeight = '';
+			var fullH = ul.offsetHeight || 220;
+
+			if (downSpace >= upSpace) {
+				/* 下方空间更多：向下弹出，上限 = 下方可用空间 */
 				ul.style.top = 'calc(100% + 4px)';
 				ul.style.bottom = 'auto';
+				maxH = Math.max(60, downSpace - 8);
+			} else {
+				/* 上方空间更多：向上弹出，上限 = 上方可用空间 */
+				ul.style.top = 'auto';
+				ul.style.bottom = 'calc(100% + 4px)';
+				maxH = Math.max(60, upSpace - 8);
 			}
+
+			if (fullH > maxH)
+				ul.style.maxHeight = maxH + 'px';
+			else
+				ul.style.maxHeight = '';
 		});
 	}
 
