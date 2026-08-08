@@ -2144,6 +2144,13 @@ body.liquid-login #modal_overlay > .modal.login {
 	            inset 0 1px 0 var(--glass-inset);
 }
 
+/* 登录页表单卡片：排除全局 overflow-x:auto（r43 为嵌套卡片滚动而加），
+   否则圆角 + 滚动容器会把左上角"用户名"裁掉一角 */
+body.liquid-login .cbi-map,
+body.liquid-login .cbi-section {
+	overflow: visible !important;
+}
+
 /* 登录页 logo（main.js 注入内联 SVG，跟随主题色 + 玻璃水滴感） */
 body.liquid-login #modal_overlay > .modal.login .liquid-logo {
 	display: block;
