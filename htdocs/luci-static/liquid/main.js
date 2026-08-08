@@ -24,7 +24,9 @@
 	     不弹"保存更改"询问，改动立即生效
 	   - 锁屏（登录页，未认证）不允许修改配置：只做本地预览
 	     （localStorage），登录后刷新才真正持久化 */
-	function saveConfig(opt, val) {
+	/* 一次 POST 全部 option（对象 {option: value}），后端一次写盘，
+	   避免多次请求并发时后写覆盖先写（accent 与 accent_custom 一起存） */
+	function saveConfig(opts) {
 		if (!document.body ||
 		    document.body.classList.contains('liquid-login'))
 			return;
@@ -34,12 +36,10 @@
 		try {
 			var base = (window.L && L.env && L.env.admin_path)
 				? L.env.admin_path : '/cgi-bin/luci/admin/';
-			var data = {};
-			data[opt] = val;
 			var xhr = new XMLHttpRequest();
 			xhr.open('POST', base + 'system/liquid/save_config');
 			xhr.setRequestHeader('Content-Type', 'application/json');
-			xhr.send(JSON.stringify(data));
+			xhr.send(JSON.stringify(opts));
 		} catch (e) {}
 	}
 	var mql = (typeof window.matchMedia == 'function')
@@ -121,7 +121,7 @@
 			document.body.setAttribute('data-liquid-mode', mode);
 		applyMode(mode);
 		updateSwitch();
-		saveConfig('mode', mode);
+		saveConfig({ mode: mode });
 	}
 
 	function isDark(mode) {
@@ -158,7 +158,8 @@
 		if (id == 'custom')
 			applyCustomAccent(getAccentCustom());
 		updateColorSwitch();
-		saveConfig('accent', id);
+		if (id != 'custom')
+			saveConfig({ accent: id });
 	}
 
 	function getAccentCustom() {
@@ -175,7 +176,7 @@
 		if (document.body)
 			document.body.setAttribute('data-liquid-accent-custom', hex);
 		setAccent('custom');
-		saveConfig('accent_custom', hex);
+		saveConfig({ accent: 'custom', accent_custom: hex });
 	}
 
 	function getBing() {
@@ -194,7 +195,7 @@
 			document.body.setAttribute('data-liquid-bing-ok', v);
 		}
 		updateColorSwitch();
-		saveConfig('bing', v);
+		saveConfig({ bing: v });
 	}
 
 	function updateColorSwitch() {

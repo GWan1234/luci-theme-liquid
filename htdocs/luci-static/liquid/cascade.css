@@ -587,6 +587,7 @@ header [data-indicator][data-style="inactive"],
 
 /* accent color switch */
 .liquid-color-switch {
+	position: relative;
 	display: inline-flex;
 	align-items: center;
 	gap: 5px;
@@ -669,10 +670,6 @@ header [data-indicator][data-style="inactive"],
 }
 
 /* 自定义颜色输入面板（点击彩虹圆点下拉） */
-.liquid-color-switch {
-	position: relative;
-}
-
 .liquid-custom-pop {
 	display: none;
 	position: absolute;
