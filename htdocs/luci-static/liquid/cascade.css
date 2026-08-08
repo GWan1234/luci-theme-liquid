@@ -1032,6 +1032,22 @@ ul.cbi-tabmenu > li.cbi-tab-disabled > a {
 	animation: liquid-fade-in .22s ease;
 }
 
+/* 卡片宽度：逐层按父可用宽 100% 套用；内容超宽时卡片内横向滚动，
+   不再溢出外层卡片 —— 仅限 modal 内嵌套（接口编辑等）；
+   概况页等主内容卡片自适应内部模块高度/宽度，不设滚动条 */
+#modal_overlay .cbi-map,
+#modal_overlay .cbi-section {
+	width: 100%;
+	overflow-x: auto;
+}
+
+/* 打开下拉时该层解除裁剪（滚动容器会裁掉弹出的选项列表） */
+.cbi-map:has(.cbi-dropdown[open]),
+.cbi-section:has(.cbi-dropdown[open]) {
+	overflow-x: visible !important;
+	overflow-y: visible !important;
+}
+
 #tabmenu {
 	padding: 16px 0 14px;
 }
@@ -1319,8 +1335,10 @@ input[type="radio"] {
 input[type="checkbox"]:checked,
 input[type="radio"]:checked {
 	background: var(--accent-grad);
-	border-color: transparent;
-	box-shadow: 0 2px 8px var(--accent-glow);
+	/* 白边 + 外发光：下拉选项高亮背景（accent）盖住勾选框时，
+	   勾号和边框仍清晰可见 */
+	border: 2px solid rgba(255, 255, 255, 0.9);
+	box-shadow: 0 0 0 2px var(--accent-glow), 0 2px 8px var(--accent-glow);
 }
 
 input[type="checkbox"]:checked::after {
@@ -1333,12 +1351,12 @@ input[type="checkbox"]:checked {
 }
 
 input[type="checkbox"]:checked::after {
-	left: 5px;
-	top: 1px;
-	width: 5px;
-	height: 9px;
-	border: solid var(--on-primary-color);
-	border-width: 0 2px 2px 0;
+	left: 4px;
+	top: 0;
+	width: 6px;
+	height: 10px;
+	border: solid #ffffff;
+	border-width: 0 2.5px 2.5px 0;
 	transform: rotate(45deg);
 }
 
@@ -1571,6 +1589,9 @@ input[type="radio"] {
 	align-items: center;
 	position: relative;
 	min-width: 140px;
+	/* 多选空值等"无当前值行"（ul 内无 li[display]）时 ul 高度为 0，
+	   胶囊会塌成扁条：给固定最小高度，与含当前值行的胶囊等高 */
+	min-height: 35px;
 	padding: 8px 34px 8px 12px;
 	font-size: 13px;
 	/* 闭合按钮：参照"保存并应用"（ComboButton）的一体化设计——
@@ -1629,6 +1650,22 @@ input[type="radio"] {
 	overflow: hidden;
 	text-overflow: ellipsis;
 }
+
+/* 多选下拉：选中的多个选项在胶囊内换行展示（每个一行），
+   按钮随之动态拓高，页面上直观看得出已选哪些；
+   行高随内容在文档流中自然增高，不溢出所在行/卡片 */
+.cbi-dropdown[multiple] > ul {
+	flex-wrap: wrap;
+	gap: 2px 8px;
+}
+
+.cbi-dropdown[multiple] > ul > li[display] {
+	/* 一个选项一行（竖向），不允许并行显示 */
+	flex: 0 0 100%;
+	white-space: normal;
+	overflow-wrap: break-word;
+}
+
 
 /* 打开时：触发器淡出（背景/边框/箭头/预览行全部隐去），
    视觉上只剩一个弹出的选项列表——避免“框 + 弹出列表”看起来像
@@ -1824,8 +1861,12 @@ input[type="radio"] {
 	color: var(--text-color-highest);
 }
 
-:root[data-darkmode="true"] .cbi-dropdown > ul > li:hover {
-	background: rgba(74, 92, 128, 0.95);
+:root[data-darkmode="true"] .cbi-dropdown li:hover {
+	/* 暗黑 hover：半透明白磨砂高亮。
+	   注意不能加 backdrop-filter —— li 已位于带玻璃背景的 ul 内，
+	   再叠一层 blur 会把深色玻璃模糊加深，反而显得比胶囊更暗；
+	   半透明白叠在深色上即是"凸起的白玻璃"质感 */
+	background: rgba(255, 255, 255, 0.07) !important;
 	color: #ffffff;
 }
 
@@ -1834,11 +1875,11 @@ input[type="radio"] {
 	background: var(--accent-grad);
 }
 
-/* 下拉弹出列表里的当前选中项：压深一档的主题色实底 + 白字。
-   accent-grad 是半透明渐变，在浅色玻璃列表上看不清白字；且当
-   鼠标悬浮其他项时，当前项必须保持醒目。 */
+/* 下拉弹出列表里的当前选中项：玻璃磨砂白（半透明白，略强于 hover），
+   不取主题/胶囊色 —— 胶囊（含保存并应用的 positive/negative 变色）与
+   选中项不再出现"红胶囊 + 绿选项"式的颜色冲突 */
 .cbi-dropdown[open] > ul.dropdown > li[selected] {
-	background: color-mix(in srgb, var(--primary-color-high) 72%, #000);
+	background: rgba(255, 255, 255, 0.12) !important;
 	color: #ffffff;
 }
 
@@ -2103,6 +2144,13 @@ body.liquid-login #modal_overlay > .modal.login {
 	            inset 0 1px 0 var(--glass-inset);
 }
 
+/* 登录页表单卡片：排除全局 overflow-x:auto（r43 为嵌套卡片滚动而加），
+   否则圆角 + 滚动容器会把左上角"用户名"裁掉一角 */
+body.liquid-login .cbi-map,
+body.liquid-login .cbi-section {
+	overflow: visible !important;
+}
+
 /* 登录页 logo（main.js 注入内联 SVG，跟随主题色 + 玻璃水滴感） */
 body.liquid-login #modal_overlay > .modal.login .liquid-logo {
 	display: block;
@@ -2234,9 +2282,10 @@ body.modal-overlay-active #modal_overlay {
 }
 
 #modal_overlay > .modal {
-	width: 90%;
+	/* 弹出窗口宽 = 屏幕可用宽度 80%（嵌套卡片按此逐层套宽） */
+	width: 80%;
 	min-width: 270px;
-	max-width: 600px;
+	max-width: 80vw;
 	margin: 5em auto;
 	min-height: 32px;
 	border-radius: 18px;
@@ -2778,10 +2827,27 @@ pre {
 
 @media screen and (max-width: 854px) {
 
+	/* 移动端：弹出窗口（modal）宽 95%（80% 会把内容挤太小）；
+	   左右内边距收到 2px，让第一层卡片也按 2px 缩进（与嵌套每层一致） */
+	#modal_overlay > .modal {
+		width: 95%;
+		max-width: 95vw;
+		padding: 16px 2px 20px;
+	}
+
 	/* 移动端：多层嵌套卡片（network/dns/主机名记录等会套 2-4 层）压缩
-	   各层左右缩进到 2px，避免嵌套层数多了最内层内容被挤出视口 */
+	   各层左右缩进到 2px，避免嵌套层数多了最内层内容被挤出视口；
+	   嵌套的每层再往内缩 2px（margin），层级越深内容越窄 */
 	.cbi-map {
 		padding: 10px 2px 12px;
+	}
+
+	.cbi-map .cbi-map,
+	.cbi-map .cbi-section,
+	.cbi-section .cbi-map,
+	.cbi-section .cbi-section {
+		margin-left: 2px;
+		margin-right: 2px;
 	}
 
 	.cbi-section {
@@ -2801,6 +2867,8 @@ pre {
 	.cbi-section-table td[data-name="_ifacebox"] {
 		width: auto;
 		max-width: 42%;
+		padding-left: 4px;
+		padding-right: 4px;
 	}
 
 	.cbi-section-table .ifacebox {
@@ -2863,10 +2931,59 @@ pre {
 		overflow-x: auto;
 	}
 
+	/* 接口小框（接口名 + 设备/IP 信息）与其所在行卡片左缘间隔 4px：
+	   把 td[data-name="_ifacebox"] 的左右 padding 从 14px 收到 4px
+	   （小框往左移；对称留空保持，右侧也不贴相邻列） */
+	.cbi-section-table td[data-name="_ifacebox"] {
+		padding-left: 4px;
+		padding-right: 4px;
+	}
+
 	/* 移动端接口图标：宽度固定 24px，高度等比缩放（不强制高度） */
 	img[src*="icons/"][src$=".svg"] {
 		width: 24px !important;
 		height: auto !important;
+	}
+
+	/* 移动端接口页表格（含接口图标列的 GridSection）：锁定视口宽，
+	   覆盖上面的 max-content（行不再按内容撑宽、按钮不再溢出到屏幕
+	   右侧），所有内容在视口内换行显示 */
+	.cbi-section-table:has(td[data-name="_ifacebox"]) {
+		width: 100% !important;
+		min-width: 100% !important;
+		max-width: 100% !important;
+	}
+
+	/* 移动端接口页：每接口两行 —— 第一行 = 接口图标 + 详细信息，
+	   第二行 = 重启/停止/编辑/删除四个操作按钮（整行，右对齐） */
+	.cbi-section-table-row {
+		display: flex;
+		flex-wrap: wrap;
+		/* 图标列与详细信息列等高对齐；二者合在一起超宽时才允许分行。
+		   横向 gap 归零：各 td 本来自带的分割线（border-bottom）就能
+		   首尾相连成一条连续线；垂直 gap 保留作换行/与按钮行的间距 */
+		align-items: stretch;
+		gap: 6px 0;
+	}
+
+	.cbi-section-table-row > td {
+		flex: 0 1 auto;
+		min-width: 0;
+		/* 移动端接口页：隐藏行分割线（线与列对齐难兼顾，先试无分割线） */
+		border-bottom: 0 !important;
+	}
+
+	.cbi-section-table-row > td.cbi-section-actions {
+		flex: 1 1 100%;
+		order: 99;
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: center;
+		align-items: center;
+		gap: 4px;
+		padding: 2px 0 4px;
+		/* 四个按钮下方多 8px：让相邻两个接口之间稍微区分 */
+		margin-bottom: 8px;
 	}
 
 	#menubar .navigation {
@@ -2993,4 +3110,29 @@ pre {
    否则插件声明 hidden 的元素会全部显示出来。 */
 .hidden {
 	display: none;
+}
+
+/* ===== 下拉浮层突破卡片裁剪（纯 CSS，不动 JS/DOM） =====
+   1) 含下拉的表格：overflow:hidden（圆角裁剪）→ visible，弹出列表可见；
+   2) 含"打开"下拉的卡片提升 z-index：突破 backdrop-filter 形成的
+      stacking context，避免被相邻卡片盖住；
+   3) 移动端滚动容器（.cbi-section-node / #maincontent）：两轴 visible，
+      不再横向裁剪弹出列表 */
+/* 只在"打开"时解除裁剪（加载/闭合时保持原样，不影响胶囊尺寸） */
+.cbi-section-table:has(.cbi-dropdown[open]) {
+	overflow: visible !important;
+}
+
+.cbi-section:has(.cbi-dropdown[open]),
+.cbi-map:has(.cbi-dropdown[open]) {
+	position: relative;
+	z-index: 1000;
+}
+
+@media screen and (max-width: 854px) {
+	.cbi-section-node:has(.cbi-dropdown[open]),
+	#maincontent:has(.cbi-dropdown[open]) {
+		overflow-x: visible !important;
+		overflow-y: visible !important;
+	}
 }

@@ -313,6 +313,15 @@
 			[].forEach.call(ul.querySelectorAll('li'), function (li) {
 				if (li.classList.contains('hide-close') || li.classList.contains('hide-open'))
 					return;
+				/* 隐藏 li 无法直接测宽：临时 absolute+hidden 测量。
+				   图标（img）未加载时宽度为 0 会漏算：临时给 24px 估算 */
+				var imgs = li.querySelectorAll('img');
+				var saved = [];
+				[].forEach.call(imgs, function (img, i) {
+					saved[i] = img.style.width;
+					img.style.width = '24px';
+					img.style.flexShrink = '0';
+				});
 				var st = li.style;
 				st.display = 'block';
 				st.position = 'absolute';
@@ -323,11 +332,44 @@
 				st.position = '';
 				st.visibility = '';
 				st.whiteSpace = '';
+				[].forEach.call(imgs, function (img, i) {
+					img.style.width = saved[i];
+					img.style.flexShrink = '';
+				});
 				if (w > maxW)
 					maxW = w;
 			});
-			if (maxW > 0)
-				dd.style.width = Math.min(Math.max(maxW + 40, 60), 240) + 'px';
+
+			/* 初始加载（读 uci 已选中项）：当前值行 li[display] 是闭合时
+			   唯一可见的项，实测其渲染宽（含图标），保证胶囊不短于已选项 */
+			[].forEach.call(ul.querySelectorAll('li[display]'), function (li) {
+				var imgs = li.querySelectorAll('img');
+				var saved = [];
+				[].forEach.call(imgs, function (img, i) {
+					saved[i] = img.style.width;
+					img.style.width = '24px';
+					img.style.flexShrink = '0';
+				});
+				var st = li.style;
+				st.position = 'absolute';
+				st.visibility = 'hidden';
+				st.whiteSpace = 'nowrap';
+				var w = li.scrollWidth || 0;
+				st.position = '';
+				st.visibility = '';
+				st.whiteSpace = '';
+				[].forEach.call(imgs, function (img, i) {
+					img.style.width = saved[i];
+					img.style.flexShrink = '';
+				});
+				if (w > maxW)
+					maxW = w;
+			});
+			if (maxW > 0) {
+				var w = Math.min(Math.max(maxW + 40, 60), 240);
+				dd.style.width = w + 'px';
+				dd.dataset.liquidW = w;   /* 记录，关闭后恢复（luci 会清） */
+			}
 		});
 
 		document.querySelectorAll('.cbi-select').forEach(function (sel) {
@@ -348,23 +390,75 @@
 		});
 	}
 
-	/* 下拉框自动避让：按钮靠近视口底部（或被页脚遮挡）时向上弹出，
-	   下方空间足够则照常向下 */
+	/* 下拉框避让：按"屏幕上下可用空间"全局计算（而非卡片内相对位置）：
+	   哪一侧剩余空间更多就朝哪侧弹出；并给列表设动态 max-height，
+	   使其始终完整落在屏幕内（超出部分出滚动条，不再被屏幕边缘裁掉） */
 	function adjustDropdownDirection() {
-		document.querySelectorAll('.cbi-dropdown[open] > ul.dropdown').forEach(function (ul) {
-			var dd = ul.closest('.cbi-dropdown');
-			if (!dd)
+		document.querySelectorAll('.cbi-dropdown').forEach(function (dd) {
+			var ul = dd.querySelector('ul.dropdown') || dd.querySelector('ul');
+			if (!ul)
 				return;
+			var open = dd.classList.contains('open') || dd.hasAttribute('open');
+
+			if (!open) {
+				/* 关闭后清理 luci 开合流程残留的 inline 定位（触屏分支的
+				   left/right 会把闭合胶囊横向拉长）并恢复 fit 宽度
+				   （luci closeDropdown 会清 dd.style.width） */
+				ul.style.left = '';
+				ul.style.right = '';
+				ul.style.top = '';
+				ul.style.bottom = '';
+				ul.style.maxHeight = '';
+				if (dd.dataset.liquidW)
+					dd.style.width = dd.dataset.liquidW + 'px';
+				return;
+			}
+
+			/* 清掉 luci 触屏分支残留的 left/right inline 定位：否则选项
+			   列表可能被压成短短一横条/错位（F12 触发 resize 重算才恢复） */
+			ul.style.left = '';
+			ul.style.right = '';
+
+			/* 打开时校准宽度：选项实际渲染宽（含图标，无论 img/背景），
+			   修正初始 fit 对图标漏算导致的"图标被截" */
+			var maxW = 0;
+			ul.querySelectorAll('li').forEach(function (li) {
+				var w = li.offsetWidth || 0;
+				if (w > maxW)
+					maxW = w;
+			});
+			if (maxW > 0) {
+				var nw = Math.min(Math.max(maxW + 40, 60), 240);
+				dd.style.width = nw + 'px';
+				dd.dataset.liquidW = nw;
+			}
+
 			var r = dd.getBoundingClientRect();
 			var vh = window.innerHeight;
-			var listH = ul.offsetHeight || 220;
-			if (r.bottom + listH + 12 > vh) {
-				ul.style.top = 'auto';
-				ul.style.bottom = 'calc(100% + 4px)';
-			} else {
+			var downSpace = vh - r.bottom;   /* 按钮底 → 屏幕底 */
+			var upSpace = r.top;             /* 屏幕顶 → 按钮顶 */
+			var maxH;
+
+			/* 先量出内容完整高度（临时去掉 max-height 限制） */
+			ul.style.maxHeight = '';
+			var fullH = ul.offsetHeight || 220;
+
+			if (downSpace >= upSpace) {
+				/* 下方空间更多：向下弹出，上限 = 下方可用空间 */
 				ul.style.top = 'calc(100% + 4px)';
 				ul.style.bottom = 'auto';
+				maxH = Math.max(60, downSpace - 8);
+			} else {
+				/* 上方空间更多：向上弹出，上限 = 上方可用空间 */
+				ul.style.top = 'auto';
+				ul.style.bottom = 'calc(100% + 4px)';
+				maxH = Math.max(60, upSpace - 8);
 			}
+
+			if (fullH > maxH)
+				ul.style.maxHeight = maxH + 'px';
+			else
+				ul.style.maxHeight = '';
 		});
 	}
 
@@ -376,9 +470,37 @@
 			dd.classList.add('liquid-dd-init');
 
 			function sync() {
-				var ul = dd.querySelector('ul');
+				var ul = dd.querySelector('ul') || dd._liquidUl;
 				if (!ul)
 					return;
+
+				/* 复选框与 selected 状态同步（luci 偶发只改其一） */
+				ul.querySelectorAll('li').forEach(function (li) {
+					var cb = li.querySelector('input[type="checkbox"]');
+					if (cb)
+						cb.checked = li.hasAttribute('selected');
+				});
+
+				var open = dd.classList.contains('open') || dd.hasAttribute('open');
+				if (open)
+					return;   /* 打开（多选打勾）时胶囊不变，避免频繁渲染 */
+
+				if (dd.hasAttribute('multiple')) {
+					/* 关闭后：把全部选中项设为 display 徽章（解除 luci 默认
+					   只显示前几个的限制），竖向展示在胶囊内 */
+					var n = 0;
+					ul.querySelectorAll('li[display]').forEach(function (l) {
+						if (!l.hasAttribute('selected'))
+							l.removeAttribute('display');
+					});
+					ul.querySelectorAll('li[selected]').forEach(function (l) {
+						if (!l.hasAttribute('display'))
+							l.setAttribute('display', n);
+						n++;
+					});
+					return;
+				}
+
 				var sel = ul.querySelector('li[selected]');
 				var cur = ul.querySelector('li[display]');
 				if (sel && cur !== sel) {
@@ -389,18 +511,45 @@
 			}
 
 			sync();
+			/* luci 每次选值/取消都会派发 cbi-dropdown-change：同步勾选框与
+			   selected 状态（点击即生效，不依赖 observer 时序） */
+			dd.addEventListener('cbi-dropdown-change', function () {
+				var u = dd.querySelector('ul') || dd._liquidUl;
+				if (!u)
+					return;
+				u.querySelectorAll('li').forEach(function (li) {
+					var cb = li.querySelector('input[type="checkbox"]');
+					if (cb)
+						cb.checked = li.hasAttribute('selected');
+				});
+			});
 			if (window.MutationObserver) {
 				var mo = new MutationObserver(function () {
 					sync();
 					adjustDropdownDirection();
 				});
-				mo.observe(dd, { attributes: true, subtree: true, attributeFilter: ['class', 'display', 'open'] });
+				mo.observe(dd, { attributes: true, subtree: true, attributeFilter: ['class', 'display', 'open', 'selected'] });
 			}
 
 			/* 兜底：点击选项后（ui.js toggleItem/closeDropdown 之后），
 			   若关闭流程因任何原因中断（如 preview 缺失使 closeDropdown 抛错、
 			   open 属性残留），强制把下拉重置为闭合态并让选中值显示在框里。 */
 			dd.addEventListener('click', function (e) {
+				/* 多选：luci 保持打开以便连续勾选，兜底不强制关闭；
+				   但立即同步勾选框（当前事件循环结束、luci 处理完后） */
+				if (dd.hasAttribute('multiple')) {
+					setTimeout(function () {
+						var u = dd.querySelector('ul') || dd._liquidUl;
+						if (!u)
+							return;
+						u.querySelectorAll('li').forEach(function (li) {
+							var cb = li.querySelector('input[type="checkbox"]');
+							if (cb)
+								cb.checked = li.hasAttribute('selected');
+						});
+					}, 0);
+					return;
+				}
 				var li = e.target.closest ? e.target.closest('li') : null;
 				if (!li || !li.parentNode || !li.parentNode.classList.contains('dropdown'))
 					return;
@@ -586,9 +735,53 @@
 
 	document.addEventListener('click', function (e) {
 		var nav = document.querySelector('#menubar .navigation');
-		if (nav && nav.contains(e.target))
+		if (nav && nav.contains(e.target)) {
 			scheduleMenuTop();
+			return;
+		}
+		/* 移动端：点击菜单（抽屉）外的任意区域 → 闭合侧边栏。
+		   菜单内点击（子菜单展开等）不干预，菜单按钮交给原生 toggle */
+		var menu = document.getElementById('mainmenu');
+		if (menu && menu.classList.contains('active') && !menu.contains(e.target)) {
+			menu.classList.remove('active');
+			if (nav)
+				nav.classList.remove('active');
+		}
 	});
 
 	window.addEventListener('resize', syncMenuTop);
+
+	/* 页面资源加载完成（图标 naturalWidth 就绪）后重测下拉宽度，
+	   修正带图标选项的宽度估算 */
+	window.addEventListener('load', function () {
+		document.querySelectorAll('.cbi-dropdown.liquid-dd-fit').forEach(function (dd) {
+			dd.classList.remove('liquid-dd-fit');
+		});
+		fitDropdownWidths();
+	});
+
+	/* 全局兜底：任何下拉 open 属性变化（含动态 modal 里尚未经
+	   syncDropdownValues 初始化的 dd）都重算定位 —— 修复某些终端
+	   下拉只剩一横条（luci 残留 inline 定位 / maxHeight 1px） */
+	if (window.MutationObserver) {
+		var globalDdObserver = new MutationObserver(function (muts) {
+			var need = false;
+			muts.forEach(function (m) {
+				if (m.type === 'attributes' && m.attributeName === 'open')
+					need = true;
+			});
+			if (!need)
+				return;
+			adjustDropdownDirection();
+			/* luci 触屏分支用 rAF 动画（约 100ms）滚动定位，会在微任务
+			   之后再次覆盖 inline 样式 —— 延迟再清理一次，覆盖它
+			   （Windows 触屏/Edge 上尤甚） */
+			setTimeout(adjustDropdownDirection, 200);
+		});
+		globalDdObserver.observe(document.documentElement, {
+			attributes: true,
+			subtree: true,
+			attributeFilter: ['open']
+		});
+	}
 })();
