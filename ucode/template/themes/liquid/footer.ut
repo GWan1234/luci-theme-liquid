@@ -58,9 +58,12 @@
 
 {% if (blank_page): %}
 <p class="luci">
-	<a href="https://github.com/zzsj0928/luci-theme-liquid" target="_blank" rel="noopener">Liquid Theme {{ theme_ver }}</a><br>
-	<a href="{{ fw_release }}" target="_blank" rel="noopener">{{ fw_text }}</a><br>
-	Kernel: {{ boardinfo.kernel ?? '?' }}<br>
+	<a href="https://github.com/zzsj0928/luci-theme-liquid" target="_blank" rel="noopener">Liquid Theme {{ theme_ver }}</a>
+	<span class="luci-sep">·</span>
+	<a href="{{ fw_release }}" target="_blank" rel="noopener">{{ fw_text }}</a>
+	<span class="luci-sep">·</span>
+	<span>Kernel: {{ boardinfo.kernel ?? '?' }}</span>
+	<span class="luci-sep">·</span>
 	<a href="{{ luci_release }}" target="_blank" rel="noopener">{{ version.luciname }} {{ version.luciversion }}</a>
 </p>
 {% endif %}
