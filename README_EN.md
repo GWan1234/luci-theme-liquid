@@ -31,7 +31,7 @@
 
 **macOS-style Liquid Glass OpenWrt LuCI theme**, for **LuCI ≥ 23** (OpenWrt 23.05 / 24.10 / master).
 
-Supports **light / dark / auto** modes, **5 accent colors** and adjustable blur & transparency; frosted glass design across the login page, sidebar, content cards, dropdowns and tooltips.
+Supports **light / dark / auto** modes, **5 accent colors + a custom color picker** and adjustable blur & transparency; frosted glass design across the login page, sidebar, content cards, dropdowns and tooltips.
 
 [![license][license-badge]][license]
 [![prs][prs-badge]][prs]
@@ -54,14 +54,14 @@ Supports **light / dark / auto** modes, **5 accent colors** and adjustable blur 
 ## Features
 
 - **Liquid glass design language**: sidebar, content cards, login card and footer share a frosted-glass look (blur + highlight + theme-colored glow); the dark mode glass is more solid for readable text.
-- **Three-way mode switch**: light / dark / auto (follow system), located at the top-right of the top bar (next to LuCI's native refresh/poll indicators), persisted via `localStorage`, applied before paint with no flash; the lock screen offers the same switch.
-- **Accent colors**: 5 themes (blue / magenta / amber / tulip purple / yellow-green) driving the selected menu, hover slider, buttons, tabs and logo in one linked system.
+- **Three-way mode switch**: light / dark / auto (follow system), located at the top-right of the top bar (next to LuCI's native refresh/poll indicators), persisted via uci (survives across browsers/devices) with `localStorage` as a fallback; applied before paint with no flash; the lock screen offers the same switch.
+- **Accent colors**: 5 themes (blue / magenta / amber / tulip purple / yellow-green) driving the selected menu, hover slider, buttons, tabs and logo in one linked system; plus a **custom accent color** — type a hex code (`#RRGGBB`) into the rainbow-dot picker and it saves on blur, invalid values fall back to default blue, also uci-persisted.
 - **Sidebar menu**: all top-level menus collapsed by default — click a level-1 menu to expand its own submenu; hover-tracking slider + selected glass capsule; the mobile slide-out menu avoids the top bar.
 - **Dropdown controls**: every dropdown setting renders as a "Save & Apply"-style gradient capsule (body + divider + arrow); the opened option list keeps the glass design; near the viewport bottom the list flips upward so it is never clipped by the footer.
 - **Tooltips**: frosted glass background, portaled to the page top-level (never hidden behind a neighbouring card), auto-avoid viewport edges, mutual exclusion against stale popups.
 - **Tables**: equal-height cells per row (dividers align); on mobile, tables lay out at content width with horizontal scrolling (long columns like MAC / MTU no longer overlap).
 - **Interfaces / Devices pages**: uniform 24px interface icons, forced opaque (link state is told by the icon file, not translucency); GridSection rows keep equal heights; action buttons never wrap.
-- **Lock screen (login)**: macOS-style frosted login card + Monterey wallpaper (light/dark) + inline SVG waterdrop logo (follows the accent color with a glass highlight).
+- **Lock screen (login)**: macOS-style frosted login card + Monterey wallpaper (light/dark) + optional **Bing daily wallpaper** (auto-fetched and cached) + inline SVG waterdrop logo (follows the accent color with a glass highlight).
 - **SVG icons**: network / interface status icons taken from [xylz0928/luci-mod][luci-mod] `immortalwrt-24.10`; UI element icons (sun / moon / auto / refresh / lock / search / close / chevron) are built-in SVGs.
 
 ## Changelog
