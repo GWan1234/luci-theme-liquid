@@ -412,13 +412,37 @@
 			dd.classList.add('liquid-dd-init');
 
 			function sync() {
-				/* 多选下拉的 display 由 luci toggleItem 管理（多个选中项
-				   各占一个 display 徽章），这里只处理单选，避免误删 */
-				if (dd.hasAttribute('multiple'))
-					return;
-				var ul = dd.querySelector('ul');
+				var ul = dd.querySelector('ul') || dd._liquidUl;
 				if (!ul)
 					return;
+
+				/* 复选框与 selected 状态同步（luci 偶发只改其一） */
+				ul.querySelectorAll('li').forEach(function (li) {
+					var cb = li.querySelector('input[type="checkbox"]');
+					if (cb)
+						cb.checked = li.hasAttribute('selected');
+				});
+
+				var open = dd.classList.contains('open') || dd.hasAttribute('open');
+				if (open)
+					return;   /* 打开（多选打勾）时胶囊不变，避免频繁渲染 */
+
+				if (dd.hasAttribute('multiple')) {
+					/* 关闭后：把全部选中项设为 display 徽章（解除 luci 默认
+					   只显示前几个的限制），竖向展示在胶囊内 */
+					var n = 0;
+					ul.querySelectorAll('li[display]').forEach(function (l) {
+						if (!l.hasAttribute('selected'))
+							l.removeAttribute('display');
+					});
+					ul.querySelectorAll('li[selected]').forEach(function (l) {
+						if (!l.hasAttribute('display'))
+							l.setAttribute('display', n);
+						n++;
+					});
+					return;
+				}
+
 				var sel = ul.querySelector('li[selected]');
 				var cur = ul.querySelector('li[display]');
 				if (sel && cur !== sel) {
@@ -434,7 +458,7 @@
 					sync();
 					adjustDropdownDirection();
 				});
-				mo.observe(dd, { attributes: true, subtree: true, attributeFilter: ['class', 'display', 'open'] });
+				mo.observe(dd, { attributes: true, subtree: true, attributeFilter: ['class', 'display', 'open', 'selected'] });
 			}
 
 			/* 兜底：点击选项后（ui.js toggleItem/closeDropdown 之后），
