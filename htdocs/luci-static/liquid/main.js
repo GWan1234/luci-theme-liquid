@@ -393,6 +393,10 @@
 			dd.classList.add('liquid-dd-init');
 
 			function sync() {
+				/* 多选下拉的 display 由 luci toggleItem 管理（多个选中项
+				   各占一个 display 徽章），这里只处理单选，避免误删 */
+				if (dd.hasAttribute('multiple'))
+					return;
 				var ul = dd.querySelector('ul');
 				if (!ul)
 					return;
