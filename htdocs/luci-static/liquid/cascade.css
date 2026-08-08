@@ -1032,11 +1032,11 @@ ul.cbi-tabmenu > li.cbi-tab-disabled > a {
 	animation: liquid-fade-in .22s ease;
 }
 
-/* 卡片宽度：不按内容撑（max-content 会把内层拉到异常宽），逐层按父
-   可用宽 100% 套用（modal 固定 80% 屏宽）；内容超宽时卡片内横向滚动，
-   不再溢出外层卡片 */
-.cbi-map,
-.cbi-section {
+/* 卡片宽度：逐层按父可用宽 100% 套用；内容超宽时卡片内横向滚动，
+   不再溢出外层卡片 —— 仅限 modal 内嵌套（接口编辑等）；
+   概况页等主内容卡片自适应内部模块高度/宽度，不设滚动条 */
+#modal_overlay .cbi-map,
+#modal_overlay .cbi-section {
 	width: 100%;
 	overflow-x: auto;
 }
