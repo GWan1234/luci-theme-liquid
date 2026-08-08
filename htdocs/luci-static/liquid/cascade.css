@@ -1571,6 +1571,9 @@ input[type="radio"] {
 	align-items: center;
 	position: relative;
 	min-width: 140px;
+	/* 多选空值等"无当前值行"（ul 内无 li[display]）时 ul 高度为 0，
+	   胶囊会塌成扁条：给固定最小高度，与含当前值行的胶囊等高 */
+	min-height: 35px;
 	padding: 8px 34px 8px 12px;
 	font-size: 13px;
 	/* 闭合按钮：参照"保存并应用"（ComboButton）的一体化设计——
