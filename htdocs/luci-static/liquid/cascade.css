@@ -3035,3 +3035,27 @@ pre {
 .hidden {
 	display: none;
 }
+
+/* ===== 下拉浮层突破卡片裁剪（纯 CSS，不动 JS/DOM） =====
+   1) 含下拉的表格：overflow:hidden（圆角裁剪）→ visible，弹出列表可见；
+   2) 含"打开"下拉的卡片提升 z-index：突破 backdrop-filter 形成的
+      stacking context，避免被相邻卡片盖住；
+   3) 移动端滚动容器（.cbi-section-node / #maincontent）：两轴 visible，
+      不再横向裁剪弹出列表 */
+.cbi-section-table:has(.cbi-dropdown) {
+	overflow: visible !important;
+}
+
+.cbi-section:has(.cbi-dropdown[open]),
+.cbi-map:has(.cbi-dropdown[open]) {
+	position: relative;
+	z-index: 1000;
+}
+
+@media screen and (max-width: 854px) {
+	.cbi-section-node:has(.cbi-dropdown),
+	#maincontent:has(.cbi-dropdown) {
+		overflow-x: visible !important;
+		overflow-y: visible !important;
+	}
+}
