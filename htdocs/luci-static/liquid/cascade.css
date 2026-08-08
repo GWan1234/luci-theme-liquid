@@ -1032,16 +1032,15 @@ ul.cbi-tabmenu > li.cbi-tab-disabled > a {
 	animation: liquid-fade-in .22s ease;
 }
 
-/* 卡片宽度跟随内容：所有 .cbi-map / .cbi-section 用 fit-content，
-   嵌套时每一层都等于"下层内容宽 + 自身 padding"，最内层（tab 内容、
-   表格）变宽时逐层向上传递，外层卡片同步加宽 —— 修复多层嵌套
-   （接口 lan → 空层 → 常规/高级/防火墙/dhcp → dhcp 子 tab）切到更宽
-   的 tab 时外层不跟随、内层溢出的问题。min-width:100% 保证内容少时
-   仍撑满容器（视觉不变）。luci 用 height:0 折叠非活动 pane，fit-content
-   只按活动 pane 计算，切 tab 实时跟随 */
+/* 卡片宽度跟随内容（max-content）：fit-content 有"可用宽度"上限
+   （min(max-content, available)），外层会被父容器宽锁死、撑不开；
+   max-content 取内容固有宽、不受父宽限制 —— 嵌套时每一层 = 下层内容
+   宽 + 自身 padding，最内层（tab 内容/表格）多宽，外层就逐层撑到多宽，
+   修复多层嵌套（接口 lan → 空层 → 常规/高级/防火墙/dhcp → dhcp 子 tab）
+   切到更宽 tab 时外层不跟随的问题。min-width:100% 保证内容少时仍撑满 */
 .cbi-map,
 .cbi-section {
-	width: fit-content;
+	width: max-content;
 	min-width: 100%;
 }
 
