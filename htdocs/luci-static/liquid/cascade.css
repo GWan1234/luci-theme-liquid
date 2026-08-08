@@ -1032,16 +1032,20 @@ ul.cbi-tabmenu > li.cbi-tab-disabled > a {
 	animation: liquid-fade-in .22s ease;
 }
 
-/* 卡片宽度跟随内容（max-content）：fit-content 有"可用宽度"上限
-   （min(max-content, available)），外层会被父容器宽锁死、撑不开；
-   max-content 取内容固有宽、不受父宽限制 —— 嵌套时每一层 = 下层内容
-   宽 + 自身 padding，最内层（tab 内容/表格）多宽，外层就逐层撑到多宽，
-   修复多层嵌套（接口 lan → 空层 → 常规/高级/防火墙/dhcp → dhcp 子 tab）
-   切到更宽 tab 时外层不跟随的问题。min-width:100% 保证内容少时仍撑满 */
+/* 卡片宽度：不按内容撑（max-content 会把内层拉到异常宽），逐层按父
+   可用宽 100% 套用（modal 固定 80% 屏宽）；内容超宽时卡片内横向滚动，
+   不再溢出外层卡片 */
 .cbi-map,
 .cbi-section {
-	width: max-content;
-	min-width: 100%;
+	width: 100%;
+	overflow-x: auto;
+}
+
+/* 打开下拉时该层解除裁剪（滚动容器会裁掉弹出的选项列表） */
+.cbi-map:has(.cbi-dropdown[open]),
+.cbi-section:has(.cbi-dropdown[open]) {
+	overflow-x: visible !important;
+	overflow-y: visible !important;
 }
 
 #tabmenu {
@@ -2271,9 +2275,10 @@ body.modal-overlay-active #modal_overlay {
 }
 
 #modal_overlay > .modal {
-	width: 90%;
+	/* 弹出窗口宽 = 屏幕可用宽度 80%（嵌套卡片按此逐层套宽） */
+	width: 80%;
 	min-width: 270px;
-	max-width: 600px;
+	max-width: 80vw;
 	margin: 5em auto;
 	min-height: 32px;
 	border-radius: 18px;
