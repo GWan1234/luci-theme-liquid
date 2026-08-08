@@ -770,8 +770,13 @@
 				if (m.type === 'attributes' && m.attributeName === 'open')
 					need = true;
 			});
-			if (need)
-				adjustDropdownDirection();
+			if (!need)
+				return;
+			adjustDropdownDirection();
+			/* luci 触屏分支用 rAF 动画（约 100ms）滚动定位，会在微任务
+			   之后再次覆盖 inline 样式 —— 延迟再清理一次，覆盖它
+			   （Windows 触屏/Edge 上尤甚） */
+			setTimeout(adjustDropdownDirection, 200);
 		});
 		globalDdObserver.observe(document.documentElement, {
 			attributes: true,

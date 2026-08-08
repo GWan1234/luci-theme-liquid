@@ -2820,10 +2820,25 @@ pre {
 
 @media screen and (max-width: 854px) {
 
+	/* 移动端：弹出窗口（modal）宽 95%（80% 会把内容挤太小） */
+	#modal_overlay > .modal {
+		width: 95%;
+		max-width: 95vw;
+	}
+
 	/* 移动端：多层嵌套卡片（network/dns/主机名记录等会套 2-4 层）压缩
-	   各层左右缩进到 2px，避免嵌套层数多了最内层内容被挤出视口 */
+	   各层左右缩进到 2px，避免嵌套层数多了最内层内容被挤出视口；
+	   嵌套的每层再往内缩 2px（margin），层级越深内容越窄 */
 	.cbi-map {
 		padding: 10px 2px 12px;
+	}
+
+	.cbi-map .cbi-map,
+	.cbi-map .cbi-section,
+	.cbi-section .cbi-map,
+	.cbi-section .cbi-section {
+		margin-left: 2px;
+		margin-right: 2px;
 	}
 
 	.cbi-section {
