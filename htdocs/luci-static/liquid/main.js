@@ -759,4 +759,24 @@
 		});
 		fitDropdownWidths();
 	});
+
+	/* 全局兜底：任何下拉 open 属性变化（含动态 modal 里尚未经
+	   syncDropdownValues 初始化的 dd）都重算定位 —— 修复某些终端
+	   下拉只剩一横条（luci 残留 inline 定位 / maxHeight 1px） */
+	if (window.MutationObserver) {
+		var globalDdObserver = new MutationObserver(function (muts) {
+			var need = false;
+			muts.forEach(function (m) {
+				if (m.type === 'attributes' && m.attributeName === 'open')
+					need = true;
+			});
+			if (need)
+				adjustDropdownDirection();
+		});
+		globalDdObserver.observe(document.documentElement, {
+			attributes: true,
+			subtree: true,
+			attributeFilter: ['open']
+		});
+	}
 })();

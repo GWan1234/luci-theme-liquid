@@ -1032,6 +1032,16 @@ ul.cbi-tabmenu > li.cbi-tab-disabled > a {
 	animation: liquid-fade-in .22s ease;
 }
 
+/* 嵌套 tab 卡片：外层宽度跟随当前 pane 的内容宽度（luci 用
+   height:0/overflow:hidden 折叠非活动 pane，外层若按 100% 锁定，
+   切到更宽的 tab 时内层表格会溢出外层卡片）。fit-content 让外层
+   随活动 pane 变宽；min-width:100% 保证内容少时仍撑满容器 */
+.cbi-map:has(ul.cbi-tabmenu),
+.cbi-section:has(ul.cbi-tabmenu) {
+	width: fit-content;
+	min-width: 100%;
+}
+
 #tabmenu {
 	padding: 16px 0 14px;
 }
