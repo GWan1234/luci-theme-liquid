@@ -638,8 +638,8 @@ header [data-indicator][data-style="inactive"],
 
 .liquid-bing-btn.active {
 	transform: scale(1.15);
-	border-color: var(--primary-color-high);
-	box-shadow: 0 0 0 3px var(--accent-glow);
+	border-color: rgba(255, 255, 255, 0.85);
+	box-shadow: 0 0 0 2px var(--text-color-high), 0 2px 6px rgba(0, 0, 0, 0.3);
 	opacity: 1;
 }
 
@@ -676,7 +676,7 @@ header [data-indicator][data-style="inactive"],
 		conic-gradient(#f66, #fc3, #6c6, #3cf, #96f, #f66);
 	background-clip: padding-box, border-box;
 	background-origin: padding-box, border-box;
-	border: 2px solid transparent;
+	border: 3px solid transparent;
 	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
 	opacity: 1;
 }
