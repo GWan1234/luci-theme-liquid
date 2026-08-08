@@ -414,6 +414,11 @@
 				return;
 			}
 
+			/* 清掉 luci 触屏分支残留的 left/right inline 定位：否则选项
+			   列表可能被压成短短一横条/错位（F12 触发 resize 重算才恢复） */
+			ul.style.left = '';
+			ul.style.right = '';
+
 			/* 打开时校准宽度：选项实际渲染宽（含图标，无论 img/背景），
 			   修正初始 fit 对图标漏算导致的"图标被截" */
 			var maxW = 0;
