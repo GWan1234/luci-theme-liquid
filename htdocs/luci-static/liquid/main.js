@@ -306,7 +306,7 @@
 			if (dd.classList.contains('liquid-dd-fit'))
 				return;
 			dd.classList.add('liquid-dd-fit');
-			var ul = dd.querySelector('ul') || dd._liquidUl;
+			var ul = dd.querySelector('ul');
 			if (!ul)
 				return;
 			var maxW = 0;
@@ -348,81 +348,22 @@
 		});
 	}
 
-	/* 下拉框自动避让 + 浮层：按钮靠近视口底部（或被页脚遮挡）时向上弹出；
-	   弹出列表 portal 到 <body>，突破所在卡片的 overflow 裁剪、始终浮于
-	   上层（z-index 9999）；用文档坐标（absolute）定位，滚动自然跟随 */
+	/* 下拉框自动避让：按钮靠近视口底部（或被页脚遮挡）时向上弹出，
+	   下方空间足够则照常向下 */
 	function adjustDropdownDirection() {
-		/* 清理残留克隆：所属 dd 已销毁或未打开 → 移除（页面重渲染后
-		   body 里可能残留旧克隆，不清理会重叠） */
-		document.querySelectorAll('ul.liquid-dd-portal').forEach(function (pul) {
-			var owner = pul._liquidDd;
-			if (!owner || !document.documentElement.contains(owner) ||
-			    !(owner.classList.contains('open') || owner.hasAttribute('open'))) {
-				pul.remove();
-			}
-		});
-
-		document.querySelectorAll('.cbi-dropdown').forEach(function (dd) {
-			var ul = dd.querySelector('ul.dropdown') || dd.querySelector('ul');
-			if (!ul)
+		document.querySelectorAll('.cbi-dropdown[open] > ul.dropdown').forEach(function (ul) {
+			var dd = ul.closest('.cbi-dropdown');
+			if (!dd)
 				return;
-			var open = dd.classList.contains('open') || dd.hasAttribute('open');
-
-			if (open) {
-				/* 原列表留在原处（luci 的 open/close/toggle 全靠它），
-				   仅隐藏弹出，避免和浮层克隆重复；胶囊由 ul.preview 撑住 */
-				ul.classList.add('liquid-dd-orig-hidden');
-
-				/* 重新克隆（快照最新选中态），替换旧的 */
-				if (dd._liquidClone && dd._liquidClone.parentNode === document.body)
-					dd._liquidClone.remove();
-				var clone = ul.cloneNode(true);
-				clone.classList.add('liquid-dd-portal', 'liquid-dd-open');
-				clone._liquidDd = dd;
-				document.body.appendChild(clone);
-				dd._liquidClone = clone;
-
-				/* 点击浮层选项 → 转发回原列表对应项（luci 在 dd 上
-				   委托处理 click） */
-				(function (orig, cl) {
-					cl.addEventListener('click', function (e) {
-						var li = e.target.closest ? e.target.closest('li') : null;
-						if (!li)
-							return;
-						var idx = -1;
-						[].forEach.call(cl.children, function (c, i) {
-							if (c === li)
-								idx = i;
-						});
-						var target = orig.children[idx];
-						if (target)
-							target.click();
-					});
-				})(ul, clone);
-
-				/* 浮层定位：文档坐标 + 屏幕边缘避让 + 顶部贴边兜底 */
-				var r = dd.getBoundingClientRect();
-				var vh = window.innerHeight;
-				var listH = clone.offsetHeight || 220;
-				var sx = window.scrollX || 0, sy = window.scrollY || 0;
-				clone.style.minWidth = Math.max(dd.offsetWidth - 2, 60) + 'px';
-				clone.style.left = (r.left + sx) + 'px';
-				clone.style.bottom = 'auto';
-				if (r.bottom + listH + 12 > vh) {
-					var topY = r.top - listH - 4 + sy;
-					if (topY < sy + 4)
-						topY = sy + 4;
-					clone.style.top = topY + 'px';
-				} else {
-					clone.style.top = (r.bottom + 4 + sy) + 'px';
-				}
-			}
-			else {
-				ul.classList.remove('liquid-dd-orig-hidden');
-				if (dd._liquidClone) {
-					dd._liquidClone.remove();
-					dd._liquidClone = null;
-				}
+			var r = dd.getBoundingClientRect();
+			var vh = window.innerHeight;
+			var listH = ul.offsetHeight || 220;
+			if (r.bottom + listH + 12 > vh) {
+				ul.style.top = 'auto';
+				ul.style.bottom = 'calc(100% + 4px)';
+			} else {
+				ul.style.top = 'calc(100% + 4px)';
+				ul.style.bottom = 'auto';
 			}
 		});
 	}
@@ -435,7 +376,7 @@
 			dd.classList.add('liquid-dd-init');
 
 			function sync() {
-				var ul = dd.querySelector('ul') || dd._liquidUl;
+				var ul = dd.querySelector('ul');
 				if (!ul)
 					return;
 				var sel = ul.querySelector('li[selected]');
