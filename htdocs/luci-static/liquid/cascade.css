@@ -2930,9 +2930,9 @@ pre {
 	}
 
 	/* 接口小框（ifacebox：接口名 + 设备/IP 信息）往左移一点，与其所在
-	   网格卡片（非外层 .cbi-map）左缘间隔 8px */
+	   网格卡片（非外层 .cbi-map）左缘间隔 4px */
 	div[style*="grid-template-columns:repeat(auto-fit, minmax(70px, 1fr))"] .ifacebox {
-		margin-left: 8px;
+		margin-left: 4px;
 	}
 
 	/* 移动端接口图标：宽度固定 24px，高度等比缩放（不强制高度） */
