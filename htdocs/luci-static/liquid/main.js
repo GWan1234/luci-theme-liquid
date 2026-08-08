@@ -352,6 +352,16 @@
 	   弹出列表 portal 到 <body>，突破所在卡片的 overflow 裁剪、始终浮于
 	   上层（z-index 9999）；用文档坐标（absolute）定位，滚动自然跟随 */
 	function adjustDropdownDirection() {
+		/* 已 portal 的下拉列表：先全部收起，随后只把"当前打开"的重新显示。
+		   页面重渲染后 body 里可能残留旧的列表（新 ul 再 portal），不清理
+		   会出现两个重叠的下拉菜单；归属 dd 已销毁的列表直接移除 */
+		document.querySelectorAll('ul.liquid-dd-portal').forEach(function (pul) {
+			pul.classList.remove('liquid-dd-open');
+			var owner = pul._liquidDd;
+			if (owner && !document.documentElement.contains(owner))
+				pul.remove();
+		});
+
 		document.querySelectorAll('.cbi-dropdown').forEach(function (dd) {
 			var ul = dd.querySelector('ul.dropdown') || dd.querySelector('ul') || dd._liquidUl;
 			if (!ul)
@@ -361,6 +371,7 @@
 			if (open) {
 				if (ul.parentNode !== document.body) {
 					dd._liquidUl = ul;
+					ul._liquidDd = dd;
 					document.body.appendChild(ul);
 					ul.classList.add('liquid-dd-portal');
 				}
