@@ -1228,8 +1228,8 @@ body:not(.liquid-login) p.luci {
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	flex-wrap: wrap;
-	gap: 8px 14px;
+	flex-wrap: nowrap;
+	gap: 0 10px;
 	font-size: 11.5px;
 	color: var(--text-color-low);
 	background: var(--glass-bg-strong);
@@ -1253,7 +1253,7 @@ body:not(.liquid-login) p.luci a:hover {
 }
 
 .luci-sep {
-	opacity: .4;
+	opacity: .6;
 }
 
 /* ==========================================================================
