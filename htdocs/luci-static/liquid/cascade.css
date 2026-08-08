@@ -1787,6 +1787,12 @@ ul.liquid-dd-portal.liquid-dd-open {
 	display: block;
 }
 
+/* 打开时原下拉列表隐藏（浮层由 body 上的克隆承担；胶囊由 luci 的
+   ul.preview 撑住），闭合时 JS 移除本 class，胶囊恢复原状 */
+ul.liquid-dd-orig-hidden {
+	display: none !important;
+}
+
 :root[data-darkmode="true"] ul.liquid-dd-portal {
 	background: rgba(22, 29, 44, 0.92);
 	-webkit-backdrop-filter: blur(32px) saturate(var(--glass-sat));

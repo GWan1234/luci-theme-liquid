@@ -352,50 +352,77 @@
 	   弹出列表 portal 到 <body>，突破所在卡片的 overflow 裁剪、始终浮于
 	   上层（z-index 9999）；用文档坐标（absolute）定位，滚动自然跟随 */
 	function adjustDropdownDirection() {
-		/* 已 portal 的下拉列表：先全部收起，随后只把"当前打开"的重新显示。
-		   页面重渲染后 body 里可能残留旧的列表（新 ul 再 portal），不清理
-		   会出现两个重叠的下拉菜单；归属 dd 已销毁的列表直接移除 */
+		/* 清理残留克隆：所属 dd 已销毁或未打开 → 移除（页面重渲染后
+		   body 里可能残留旧克隆，不清理会重叠） */
 		document.querySelectorAll('ul.liquid-dd-portal').forEach(function (pul) {
-			pul.classList.remove('liquid-dd-open');
 			var owner = pul._liquidDd;
-			if (owner && !document.documentElement.contains(owner))
+			if (!owner || !document.documentElement.contains(owner) ||
+			    !(owner.classList.contains('open') || owner.hasAttribute('open'))) {
 				pul.remove();
+			}
 		});
 
 		document.querySelectorAll('.cbi-dropdown').forEach(function (dd) {
-			var ul = dd.querySelector('ul.dropdown') || dd.querySelector('ul') || dd._liquidUl;
+			var ul = dd.querySelector('ul.dropdown') || dd.querySelector('ul');
 			if (!ul)
 				return;
 			var open = dd.classList.contains('open') || dd.hasAttribute('open');
 
 			if (open) {
-				if (ul.parentNode !== document.body) {
-					dd._liquidUl = ul;
-					ul._liquidDd = dd;
-					document.body.appendChild(ul);
-					ul.classList.add('liquid-dd-portal');
-				}
-				ul.classList.add('liquid-dd-open');
+				/* 原列表留在原处（luci 的 open/close/toggle 全靠它），
+				   仅隐藏弹出，避免和浮层克隆重复；胶囊由 ul.preview 撑住 */
+				ul.classList.add('liquid-dd-orig-hidden');
 
+				/* 重新克隆（快照最新选中态），替换旧的 */
+				if (dd._liquidClone && dd._liquidClone.parentNode === document.body)
+					dd._liquidClone.remove();
+				var clone = ul.cloneNode(true);
+				clone.classList.add('liquid-dd-portal', 'liquid-dd-open');
+				clone._liquidDd = dd;
+				document.body.appendChild(clone);
+				dd._liquidClone = clone;
+
+				/* 点击浮层选项 → 转发回原列表对应项（luci 在 dd 上
+				   委托处理 click） */
+				(function (orig, cl) {
+					cl.addEventListener('click', function (e) {
+						var li = e.target.closest ? e.target.closest('li') : null;
+						if (!li)
+							return;
+						var idx = -1;
+						[].forEach.call(cl.children, function (c, i) {
+							if (c === li)
+								idx = i;
+						});
+						var target = orig.children[idx];
+						if (target)
+							target.click();
+					});
+				})(ul, clone);
+
+				/* 浮层定位：文档坐标 + 屏幕边缘避让 + 顶部贴边兜底 */
 				var r = dd.getBoundingClientRect();
 				var vh = window.innerHeight;
-				var listH = ul.offsetHeight || 220;
+				var listH = clone.offsetHeight || 220;
 				var sx = window.scrollX || 0, sy = window.scrollY || 0;
-				ul.style.minWidth = Math.max(dd.offsetWidth - 2, 60) + 'px';
-				ul.style.left = (r.left + sx) + 'px';
-				ul.style.bottom = 'auto';
+				clone.style.minWidth = Math.max(dd.offsetWidth - 2, 60) + 'px';
+				clone.style.left = (r.left + sx) + 'px';
+				clone.style.bottom = 'auto';
 				if (r.bottom + listH + 12 > vh) {
-					/* 下方空间不足：向上弹出（顶部贴边兜底） */
 					var topY = r.top - listH - 4 + sy;
 					if (topY < sy + 4)
 						topY = sy + 4;
-					ul.style.top = topY + 'px';
+					clone.style.top = topY + 'px';
 				} else {
-					ul.style.top = (r.bottom + 4 + sy) + 'px';
+					clone.style.top = (r.bottom + 4 + sy) + 'px';
 				}
 			}
-			else if (ul.classList.contains('liquid-dd-portal')) {
-				ul.classList.remove('liquid-dd-open');
+			else {
+				ul.classList.remove('liquid-dd-orig-hidden');
+				if (dd._liquidClone) {
+					dd._liquidClone.remove();
+					dd._liquidClone = null;
+				}
 			}
 		});
 	}
