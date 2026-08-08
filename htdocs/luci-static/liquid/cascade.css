@@ -3101,6 +3101,7 @@ pre {
 		bottom: 0;
 		width: 264px;
 		transform: translateX(-102%);
+		animation: none;
 		z-index: 800;
 		overflow-y: auto;
 		overscroll-behavior: contain;
@@ -3124,6 +3125,10 @@ pre {
 	/* 移动端 foot 横幅只保留固件版本 */
 	body:not(.liquid-login) p.luci > *:not(.luci-fw) {
 		display: none;
+	}
+
+	body:not(.liquid-login) p.luci {
+		padding: 6px 22px;
 	}
 
 	.luci-foot-spacer {
