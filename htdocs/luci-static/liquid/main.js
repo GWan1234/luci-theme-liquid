@@ -388,6 +388,20 @@
 				return;
 			}
 
+			/* 打开时校准宽度：选项实际渲染宽（含图标，无论 img/背景），
+			   修正初始 fit 对图标漏算导致的"图标被截" */
+			var maxW = 0;
+			ul.querySelectorAll('li').forEach(function (li) {
+				var w = li.offsetWidth || 0;
+				if (w > maxW)
+					maxW = w;
+			});
+			if (maxW > 0) {
+				var nw = Math.min(Math.max(maxW + 40, 60), 240);
+				dd.style.width = nw + 'px';
+				dd.dataset.liquidW = nw;
+			}
+
 			var r = dd.getBoundingClientRect();
 			var vh = window.innerHeight;
 			var downSpace = vh - r.bottom;   /* 按钮底 → 屏幕底 */
@@ -490,9 +504,21 @@
 			   若关闭流程因任何原因中断（如 preview 缺失使 closeDropdown 抛错、
 			   open 属性残留），强制把下拉重置为闭合态并让选中值显示在框里。 */
 			dd.addEventListener('click', function (e) {
-				/* 多选：luci 保持打开以便连续勾选，兜底不强制关闭 */
-				if (dd.hasAttribute('multiple'))
+				/* 多选：luci 保持打开以便连续勾选，兜底不强制关闭；
+				   但立即同步勾选框（当前事件循环结束、luci 处理完后） */
+				if (dd.hasAttribute('multiple')) {
+					setTimeout(function () {
+						var u = dd.querySelector('ul') || dd._liquidUl;
+						if (!u)
+							return;
+						u.querySelectorAll('li').forEach(function (li) {
+							var cb = li.querySelector('input[type="checkbox"]');
+							if (cb)
+								cb.checked = li.hasAttribute('selected');
+						});
+					}, 0);
 					return;
+				}
 				var li = e.target.closest ? e.target.closest('li') : null;
 				if (!li || !li.parentNode || !li.parentNode.classList.contains('dropdown'))
 					return;

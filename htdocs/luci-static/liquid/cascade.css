@@ -1319,8 +1319,10 @@ input[type="radio"] {
 input[type="checkbox"]:checked,
 input[type="radio"]:checked {
 	background: var(--accent-grad);
-	border-color: transparent;
-	box-shadow: 0 2px 8px var(--accent-glow);
+	/* 白边 + 外发光：下拉选项高亮背景（accent）盖住勾选框时，
+	   勾号和边框仍清晰可见 */
+	border: 2px solid rgba(255, 255, 255, 0.9);
+	box-shadow: 0 0 0 2px var(--accent-glow), 0 2px 8px var(--accent-glow);
 }
 
 input[type="checkbox"]:checked::after {
@@ -1333,12 +1335,12 @@ input[type="checkbox"]:checked {
 }
 
 input[type="checkbox"]:checked::after {
-	left: 5px;
-	top: 1px;
-	width: 5px;
-	height: 9px;
-	border: solid var(--on-primary-color);
-	border-width: 0 2px 2px 0;
+	left: 4px;
+	top: 0;
+	width: 6px;
+	height: 10px;
+	border: solid #ffffff;
+	border-width: 0 2.5px 2.5px 0;
 	transform: rotate(45deg);
 }
 
