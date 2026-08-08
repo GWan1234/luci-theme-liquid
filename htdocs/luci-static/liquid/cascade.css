@@ -2867,6 +2867,8 @@ pre {
 	.cbi-section-table td[data-name="_ifacebox"] {
 		width: auto;
 		max-width: 42%;
+		padding-left: 4px;
+		padding-right: 4px;
 	}
 
 	.cbi-section-table .ifacebox {
@@ -2929,11 +2931,12 @@ pre {
 		overflow-x: auto;
 	}
 
-	/* 接口小框（ifacebox：接口名 + 设备/IP 信息）往左移一点，与其所在
-	   行卡片左缘间隔 4px（luci 接口页移动端是 flex 布局，
-	   .td[data-name="_ifacebox"] 内的小框） */
-	[data-page="admin-network-network"] .ifacebox {
-		margin-left: 4px !important;
+	/* 接口小框（接口名 + 设备/IP 信息）与其所在行卡片左缘间隔 4px：
+	   把 td[data-name="_ifacebox"] 的左右 padding 从 14px 收到 4px
+	   （小框往左移；对称留空保持，右侧也不贴相邻列） */
+	.cbi-section-table td[data-name="_ifacebox"] {
+		padding-left: 4px;
+		padding-right: 4px;
 	}
 
 	/* 移动端接口图标：宽度固定 24px，高度等比缩放（不强制高度） */
