@@ -586,7 +586,7 @@ header [data-indicator][data-style="inactive"],
 	justify-content: center;
 	box-sizing: border-box;
 	width: 100%;
-	margin: 10px 0 12px;
+	margin: 0 0 12px;
 	padding: 4px 7px;
 	flex-shrink: 0;
 }
@@ -781,7 +781,7 @@ header [data-indicator][data-style="inactive"],
 	flex-shrink: 0;
 	height: auto;
 	overflow-y: auto;
-	padding: 14px 10px 24px;
+	padding: 12px 10px 24px;
 	animation: liquid-slide-in .5s cubic-bezier(.22, .9, .3, 1);
 	background: var(--menu-bg);
 	-webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
@@ -2335,7 +2335,7 @@ body.liquid-login #modal_overlay > .modal.login hr {
 
 body.liquid-login p.luci {
 	position: fixed;
-	bottom: 18px;
+	bottom: 24px;
 	left: 0;
 	width: 100%;
 	margin: 0;
