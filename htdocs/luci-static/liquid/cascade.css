@@ -1846,7 +1846,10 @@ input[type="radio"] {
 }
 
 :root[data-darkmode="true"] .cbi-dropdown > ul > li:hover {
-	background: rgba(74, 92, 128, 0.95);
+	/* 暗黑 hover：玻璃磨砂（半透明 + 背景模糊），替代灰色实色高亮 */
+	background: rgba(255, 255, 255, 0.07);
+	-webkit-backdrop-filter: blur(10px) saturate(140%);
+	backdrop-filter: blur(10px) saturate(140%);
 	color: #ffffff;
 }
 
