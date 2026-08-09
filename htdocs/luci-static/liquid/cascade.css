@@ -1984,6 +1984,27 @@ input[type="radio"] {
 }
 
 /* 试点（接口页 proto，main.js 替换的 Combobox 加 liquid-combo-pilot）：
+   闭合样式不用主题色渐变胶囊，改为半透明玻璃普通下拉框——透明显示
+   文字与选中项，与半透明圆弧弹出列表风格统一 */
+.cbi-dropdown.liquid-combo-pilot {
+	background: var(--glass-bg);
+	border: 1px solid var(--glass-border);
+	box-shadow: var(--glass-shadow-soft), inset 0 1px 0 var(--glass-inset);
+	color: var(--text-color-high);
+}
+
+.cbi-dropdown.liquid-combo-pilot > .open {
+	border-left: 1px solid var(--glass-border);
+	color: var(--text-color-medium);
+}
+
+.cbi-dropdown.liquid-combo-pilot[open] {
+	background: var(--glass-bg);
+	border-color: var(--glass-border);
+	box-shadow: var(--glass-shadow-soft), inset 0 1px 0 var(--glass-inset);
+}
+
+/* 试点（接口页 proto，main.js 替换的 Combobox 加 liquid-combo-pilot）：
    弹出面板去掉 backdrop-filter blur（性能主因）改用高不透明度半透明底，
    阴影降级——视觉几乎不变，打开/滚动明显更顺。仅试点范围生效。 */
 .cbi-dropdown.liquid-combo-pilot[open] > ul.dropdown {
