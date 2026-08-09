@@ -134,6 +134,36 @@
 		root.setAttribute('data-liquid-mode', mode);
 	}
 
+	/* 明暗模式守护：OpenClash 等第三方脚本会覆写 <html data-darkmode>
+	   （其 ocApplyRootTheme 按背景亮度判定后直接 setAttribute，且默认
+	   oc-theme=auto），导致一进入 OpenClash 页面主题就被强制切成暗黑。
+	   这里用 MutationObserver 监视该属性，任何与主题有效模式不符的外部
+	   写入都被立即还原，并顺带同步 meta[name=color-scheme]——主题的
+	   明暗由主题自身决定，不受第三方反控制。 */
+	var _liquidGuardSelf = false;
+	function guardDarkmode() {
+		var root = document.documentElement;
+		if (root.getAttribute('data-liquid-guard'))
+			return;
+		root.setAttribute('data-liquid-guard', '1');
+		if (typeof MutationObserver == 'undefined')
+			return;
+		var obs = new MutationObserver(function () {
+			if (_liquidGuardSelf)
+				return;
+			var want = isDark(getMode()) ? 'true' : 'false';
+			if (root.getAttribute('data-darkmode') !== want) {
+				_liquidGuardSelf = true;
+				root.setAttribute('data-darkmode', want);
+				_liquidGuardSelf = false;
+			}
+			var m = document.querySelector('meta[name="color-scheme"]');
+			if (m && m.content !== (want == 'true' ? 'dark' : 'light'))
+				m.content = (want == 'true' ? 'dark' : 'light');
+		});
+		obs.observe(root, { attributes: true, attributeFilter: ['data-darkmode'] });
+	}
+
 	function updateSwitch() {
 		var mode = getMode();
 		[].forEach.call(document.querySelectorAll('.liquid-mode-btn'), function (b) {
@@ -807,6 +837,7 @@
 	}
 
 	applyCustomAccent(getAccentCustom());
+	guardDarkmode();
 
 	if (document.readyState == 'loading')
 		document.addEventListener('DOMContentLoaded', function () {
