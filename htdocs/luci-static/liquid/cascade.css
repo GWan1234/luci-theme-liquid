@@ -1469,6 +1469,20 @@ select:not([multiple]):hover {
 	background-image: none !important;
 }
 
+/* 原生 select 弹出列表的选项项美化（浏览器原生面板本身无法定制，
+   但 option 的背景/文字色/字体在 Chrome/Edge/Firefox 上可生效） */
+select option {
+	background: var(--field-bg, #fff);
+	color: var(--text-color-high);
+	font-size: 13px;
+	padding: 4px 8px;
+}
+
+select option:checked {
+	background: var(--primary-color-high);
+	color: var(--on-primary-color, #fff);
+}
+
 
 textarea {
 	min-height: 72px;
