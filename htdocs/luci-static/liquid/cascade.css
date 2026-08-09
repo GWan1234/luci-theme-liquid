@@ -533,6 +533,7 @@ header [data-indicator][data-style="inactive"],
 	display: flex;
 	align-items: center;
 	justify-content: center;
+	flex: none;
 	width: 28px;
 	height: 28px;
 	padding: 0;
@@ -580,14 +581,20 @@ header [data-indicator][data-style="inactive"],
 	flex-shrink: 0;
 }
 
-/* 菜单栏顶部颜色胶囊（水平居中） */
+/* 菜单栏顶部颜色胶囊（水平居中）。胶囊宽度固定 100%：圆点按钮
+   固定尺寸不压缩（flex:none 防椭圆），空间不足时允许换行成两排
+   （flex-wrap）而不是溢出胶囊或被裁掉 */
 #mainmenu > .liquid-color-switch {
 	display: flex;
+	flex-wrap: wrap;
 	justify-content: center;
 	box-sizing: border-box;
 	width: 100%;
+	height: auto;
+	min-height: 35px;
 	margin: 0 0 12px;
 	padding: 4px 7px;
+	row-gap: 4px;
 	flex-shrink: 0;
 }
 
@@ -610,6 +617,7 @@ header [data-indicator][data-style="inactive"],
 }
 
 .liquid-color-btn {
+	flex: none;
 	width: 18px;
 	height: 18px;
 	padding: 0;
@@ -1146,6 +1154,29 @@ ul.cbi-tabmenu > li.cbi-tab-disabled > a {
 	overflow-x: auto;
 }
 
+/* 软件包页（package-manager）：filter / 下载 / 操作按钮组都是
+   div.controls > div > span.control-group > input + button。luci 的
+   .controls > * > * { flex-grow:1 } 会把组内 input 和按钮一起拉伸；
+   主题全局 input{width:100%} 又让输入框撑满 span，同组按钮被挤出、
+   与相邻控件重叠。控制组改 inline-flex：输入框占剩余空间、按钮按内容宽 */
+.controls .control-group {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	max-width: 100%;
+}
+
+.controls .control-group input {
+	width: auto !important;
+	min-width: 100px;
+	flex: 1 1 auto !important;
+}
+
+.controls .control-group .btn {
+	flex: 0 0 auto !important;
+	margin: 0;
+}
+
 /* 打开下拉时该层解除裁剪（滚动容器会裁掉弹出的选项列表） */
 .cbi-map:has(.cbi-dropdown[open]),
 .cbi-section:has(.cbi-dropdown[open]) {
@@ -1379,6 +1410,7 @@ textarea,
 .cbi-input-number {
 	width: 100%;
 	max-width: 100%;
+	box-sizing: border-box;
 	padding: 8px 12px;
 	font-family: inherit;
 	font-size: 13px;
