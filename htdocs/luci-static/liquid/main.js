@@ -713,6 +713,10 @@
 				var li = e.target.closest ? e.target.closest('li') : null;
 				if (!li || !li.parentNode || !li.parentNode.classList.contains('dropdown'))
 					return;
+				/* 点击"自定义"输入行（unselectable / 含 create 输入框）时
+				   不能强制关闭——那是输入框，需要滞留让用户输入 */
+				if (li.hasAttribute('unselectable') || li.querySelector('.create-item-input'))
+					return;
 				setTimeout(function () {
 					var ul = dd.querySelector('ul.dropdown');
 					if (!ul)
