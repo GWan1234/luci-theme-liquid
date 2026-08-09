@@ -1993,17 +1993,17 @@ input[type="radio"] {
 	color: var(--text-color-high);
 }
 
-/* 高度压缩到原 60%（35px → 21px）：收紧垂直 padding 与当前值行，
+/* 高度压缩到原 ~70%（35px → 24px）：收紧垂直 padding 与当前值行，
    弹出列表项（无 display 属性）保持舒适行高不受影响 */
 .cbi-dropdown.liquid-combo-pilot {
-	min-height: 21px;
-	padding: 3px 34px 3px 10px;
+	min-height: 24px;
+	padding: 4px 34px 4px 10px;
 }
 
 .cbi-dropdown.liquid-combo-pilot > ul > li[display],
 .cbi-dropdown.liquid-combo-pilot[open] > ul.preview > li[display] {
-	padding-top: 1px;
-	padding-bottom: 1px;
+	padding-top: 2px;
+	padding-bottom: 2px;
 }
 
 .cbi-dropdown.liquid-combo-pilot > .open {
