@@ -1870,16 +1870,10 @@ input[type="radio"] {
    内部弹出列表 z-index 9999 出不去，会被后续卡片/层盖住 */
 .cbi-dropdown[open] {
 	z-index: 1000;
-	/* 打开时保持主题色渐变玻璃 */
-	background:
-		linear-gradient(100deg,
-			color-mix(in srgb, var(--primary-color-high) 24%, transparent),
-			color-mix(in srgb, var(--primary-color-high) 5%, transparent) 62%,
-			color-mix(in srgb, var(--primary-color-high) 12%, transparent)),
-		var(--glass-bg);
-	border-color: color-mix(in srgb, var(--primary-color-high) 42%, transparent);
-	box-shadow: 0 4px 16px color-mix(in srgb, var(--primary-color-high) 20%, transparent),
-	            inset 0 1px 0 rgba(255, 255, 255, 0.55);
+	/* 打开时胶囊纯玻璃（preview 显示当前值），取消主题色渐变 */
+	background: var(--glass-bg);
+	border-color: var(--glass-border);
+	box-shadow: var(--glass-shadow-soft), inset 0 1px 0 var(--glass-inset);
 }
 
 /* 暗黑下闭合/打开：外发光略强、内高光调暗（与左侧菜单选中项一致） */
@@ -2016,7 +2010,7 @@ input[type="radio"] {
 	max-height: 260px;
 	overflow-y: auto;
 	padding: 5px;
-	background: var(--glass-bg-strong);
+	background: rgba(255, 255, 255, 0.92);
 	-webkit-backdrop-filter: blur(var(--glass-blur));
 	backdrop-filter: blur(var(--glass-blur));
 	border: 1px solid var(--glass-border);
@@ -2024,10 +2018,10 @@ input[type="radio"] {
 	box-shadow: var(--glass-shadow);
 }
 
-/* 暗黑模式下下拉选项列表更实一些（alpha 0.74 → 0.92 + 更强模糊），
+/* 暗黑模式下下拉选项列表更实一些（alpha 0.74 → 0.97 + 更强模糊），
    避免透出下方内容导致选项文字看不清；仍保留玻璃质感 */
 :root[data-darkmode="true"] .cbi-dropdown[open] > ul.dropdown {
-	background: rgba(22, 29, 44, 0.92);
+	background: rgba(22, 29, 44, 0.97);
 	-webkit-backdrop-filter: blur(32px) saturate(var(--glass-sat));
 	backdrop-filter: blur(32px) saturate(var(--glass-sat));
 }
