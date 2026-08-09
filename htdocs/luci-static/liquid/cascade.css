@@ -2134,6 +2134,15 @@ input[type="radio"] {
 	text-overflow: ellipsis;
 }
 
+/* 打开时胶囊内 preview（当前值克隆）无条件透明：点击瞬间鼠标压在其
+   上会命中全局主题色 hover，出现深色渐变背景——所有下拉统一清除 */
+.cbi-dropdown[open] > ul.preview > li,
+.cbi-dropdown[open] > ul.preview > li[selected],
+.cbi-dropdown[open] > ul.preview > li[display],
+.cbi-dropdown[open] > ul.preview > li:hover {
+	background: transparent !important;
+}
+
 .cbi-dropdown[open] > ul.dropdown > li {
 	display: flex;
 	align-items: center;
