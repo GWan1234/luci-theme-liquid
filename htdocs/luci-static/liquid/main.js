@@ -889,6 +889,11 @@
 	function initSelectCombos() {
 		if (typeof L == 'undefined' || typeof L.require != 'function')
 			return;
+		/* 触屏设备跳过替换：LuCI 移动端分支打开下拉时会把页面滚动到
+		   视口中央，下拉靠近页面顶部时直接闪回顶部，无法使用；移动端
+		   保留原生 select，用系统滚动选择器 */
+		if ('ontouchstart' in window)
+			return;
 		var todo = [];
 		[].forEach.call(document.querySelectorAll('select:not([multiple])'), function (sel) {
 			if (sel.__liquidCombo || sel.disabled || sel.hasAttribute('data-choices') || sel.size > 1)
@@ -927,6 +932,12 @@
 					});
 					sel.parentNode.replaceChild(node, sel);
 					sel.__liquidCombo = true;
+					/* Combobox 强制 create:true，但原生 select 没有自定义
+					   选项：移除多余的自定义输入行 */
+					[].forEach.call(node.querySelectorAll('li[data-value="-"]'), function (li) {
+						if (li.parentNode)
+							li.parentNode.removeChild(li);
+					});
 				} catch (e) {}
 			});
 			fixComboPillClick();
