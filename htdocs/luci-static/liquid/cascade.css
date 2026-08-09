@@ -3292,12 +3292,59 @@ pre {
 		overflow-y: visible !important;
 	}
 }
-
 /* ==========================================================================
-   OpenClash 页面适配（仿 zargon 居中设计）
-   运行状态 / 控制面板（IP:端口）/ 混合代理 卡片内容居中。
-   openclash 自带明暗变量（html[data-darkmode="true"] .oc），背景不干预。
+   OpenClash 页面适配（透明玻璃卡片 + 内容居中）
+   status 页上下两块大卡片（.main-card，各自嵌套 .card-row > .sub-card
+   多层）全部主题化：大卡片透明融入页面背景，内层 sub-card / 公告卡片
+   用主题玻璃配方（半透明 + 模糊 + 玻璃边框 + 内高光）。明暗由
+   openclash 自带变量（html[data-darkmode="true"] .oc）与主题
+   --glass-* 变量联动，无需单独处理暗色。
    ========================================================================== */
+
+/* 大卡片（两块 .main-card）：去掉白底/边框/阴影，透明融入主题背景 */
+[data-page^="admin-services-openclash"] #cbi-openclash > fieldset .main-card {
+	background: transparent;
+	border: none;
+	box-shadow: none;
+	padding: 0 10px 10px 10px;
+}
+
+[data-page^="admin-services-openclash"] #cbi-openclash > fieldset .myip-main-card {
+	margin: 0;
+	padding: 10px;
+	border: none;
+	background: transparent;
+}
+
+/* 公告卡片：玻璃 */
+[data-page^="admin-services-openclash"] .oc .announcement-card {
+	background: var(--glass-bg);
+	border: 1px solid var(--glass-border);
+	border-radius: var(--glass-radius);
+	box-shadow: var(--glass-shadow-soft), inset 0 1px 0 var(--glass-inset);
+	-webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
+	backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
+}
+
+/* 内层嵌套卡片（sub-card）：主题玻璃配方，替代 openclash 白/灰实底 */
+[data-page^="admin-services-openclash"] .oc .sub-card {
+	background: var(--glass-bg);
+	border: 1px solid var(--glass-border);
+	border-radius: var(--glass-radius);
+	box-shadow: var(--glass-shadow-soft), inset 0 1px 0 var(--glass-inset);
+	-webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
+	backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
+}
+
+/* hover：主题玻璃高亮（主色边框 + tint 背景），去掉 openclash 位移 */
+[data-page^="admin-services-openclash"] .oc .sub-card:hover {
+	background: var(--glass-bg-hover);
+	border-color: color-mix(in srgb, var(--primary-color-high) 55%, var(--glass-border));
+	box-shadow: var(--glass-shadow), inset 0 1px 0 var(--glass-inset);
+	transform: none;
+}
+
+/* ---- 内容居中（运行状态 / 控制面板 IP:端口 / 混合代理） ---- */
 [data-page^="admin-services-openclash"] .oc .card-content {
 	align-items: center !important;
 	justify-content: center !important;
@@ -3320,12 +3367,6 @@ pre {
 	min-width: auto !important;
 }
 
-/* 控制面板 / 混合代理卡片里的 IP:端口 值居中 */
 [data-page^="admin-services-openclash"] .oc .card-value {
 	justify-content: center;
-}
-
-/* 去掉 openclash 自带 hover 位移，与主题卡片风格统一 */
-[data-page^="admin-services-openclash"] .oc .sub-card:hover {
-	transform: none;
 }
