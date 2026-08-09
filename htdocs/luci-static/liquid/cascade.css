@@ -2007,7 +2007,8 @@ input[type="radio"] {
 }
 
 .cbi-dropdown.liquid-combo-pilot > .open {
-	border-left: 1px solid var(--glass-border);
+	border-left: none;
+	width: 24px;
 	color: var(--text-color-medium);
 }
 
