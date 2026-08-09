@@ -2026,11 +2026,19 @@ input[type="radio"] {
 	backdrop-filter: blur(32px) saturate(var(--glass-sat));
 }
 
-/* 试点（main.js 替换的 Combobox 加 liquid-combo-pilot）：闭合继承
-   全局主题色渐变玻璃，此处仅保留高度/箭头/文字等专属微调 */
+/* 替换型下拉（liquid-combo-pilot）：不用主题色渐变，纯玻璃光色，
+   黑白场景各自适配（亮色浅玻璃 / 暗色深玻璃实底） */
 .cbi-dropdown.liquid-combo-pilot {
 	min-height: 24px;
 	padding: 4px 34px 4px 10px;
+	background: var(--glass-bg);
+	border: 1px solid var(--glass-border);
+	box-shadow: var(--glass-shadow-soft), inset 0 1px 0 var(--glass-inset);
+}
+
+:root[data-darkmode="true"] .cbi-dropdown.liquid-combo-pilot {
+	background: rgba(22, 29, 44, 0.92);
+	border-color: rgba(255, 255, 255, 0.16);
 }
 
 .cbi-dropdown.liquid-combo-pilot > ul > li[display],
