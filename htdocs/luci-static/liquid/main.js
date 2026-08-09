@@ -905,6 +905,7 @@
 					optional: false
 				});
 				var node = cb.render();
+				node.classList.add('liquid-combo-pilot');
 				node.addEventListener('cbi-dropdown-change', function () {
 					try {
 						sel.value = cb.getValue();
