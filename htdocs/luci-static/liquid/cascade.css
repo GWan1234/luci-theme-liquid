@@ -1445,17 +1445,13 @@ textarea[disabled] {
 }
 
 /* 原生裸 select（.cbi-input-select 等）现代化：去浏览器原生外观，
-   自绘现代 chevron 箭头（16px，亮暗两套），hover 主题色高亮，
-   圆角/底色沿用主题输入框 */
+   主题圆角/边框/聚焦；不自绘箭头（避免在 pushbot 等第三方页面出现
+   重复箭头，桌面/移动统一简洁） */
 select:not([multiple]) {
 	appearance: none !important;
 	-webkit-appearance: none !important;
-	padding: 8px 36px 8px 12px !important;
+	padding: 8px 12px !important;
 	background-color: var(--field-bg) !important;
-	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") !important;
-	background-repeat: no-repeat;
-	background-position: right 10px center;
-	background-size: 16px;
 	border: 1px solid var(--border-color-medium) !important;
 	border-radius: 12px !important;
 	cursor: pointer;
@@ -1466,25 +1462,7 @@ select:not([multiple]):hover {
 	border-color: var(--primary-color-high) !important;
 }
 
-:root[data-darkmode="true"] select:not([multiple]) {
-	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23cbd5e1' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") !important;
-}
-
-/* .cbi-select（分割按钮风格）内部 select 已由外层 ::after 提供箭头，
-   去掉这里的背景箭头避免双箭头（覆盖上面的通用规则） */
-.cbi-select select:not([multiple]) {
-	background-image: none !important;
-}
-
-/* 触屏设备：原生 select 不自绘箭头（系统有自己的指示/简洁外观），
-   桌面保留主题箭头。用 any-pointer:coarse 覆盖手机与触屏笔记本
-   （后者主指针是 fine，hover/pointer 条件匹配不到） */
-@media (any-pointer: coarse) {
-	select:not([multiple]) {
-		background-image: none !important;
-		padding-right: 12px;
-	}
-}
+/* .cbi-select（分割按钮风格）内部 select 由外层 ::after 提供箭头 */
 
 /* 原生 select 弹出列表的选项项美化（浏览器原生面板本身无法定制，
    但 option 的背景/文字色/字体在 Chrome/Edge/Firefox 上可生效） */
