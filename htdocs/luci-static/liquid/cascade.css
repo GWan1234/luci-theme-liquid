@@ -1775,14 +1775,21 @@ input[type="radio"] {
 	min-height: 35px;
 	padding: 8px 34px 8px 12px;
 	font-size: 13px;
-	/* 闭合按钮：参照"保存并应用"（ComboButton）的一体化设计——
-	   accent 渐变胶囊 + 右侧分隔的下拉箭头区。只改闭合显示，
-	   点开后的选项列表样式保持不变 */
-	color: var(--on-primary-color);
-	background: var(--accent-grad);
-	border: 1px solid transparent;
+	/* 闭合：仿左侧菜单选中项——主题色柔和渐变（左浓右淡）叠加玻璃，
+	   透明带模糊，不再整块 accent 渐变填充 */
+	color: var(--text-color-high);
+	background:
+		linear-gradient(100deg,
+			color-mix(in srgb, var(--primary-color-high) 24%, transparent),
+			color-mix(in srgb, var(--primary-color-high) 5%, transparent) 62%,
+			color-mix(in srgb, var(--primary-color-high) 12%, transparent)),
+		var(--glass-bg);
+	border: 1px solid color-mix(in srgb, var(--primary-color-high) 42%, transparent);
 	border-radius: 10px;
-	box-shadow: 0 6px 16px var(--accent-glow), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+	box-shadow: 0 4px 16px color-mix(in srgb, var(--primary-color-high) 20%, transparent),
+	            inset 0 1px 0 rgba(255, 255, 255, 0.55);
+	-webkit-backdrop-filter: blur(10px) saturate(var(--glass-sat));
+	backdrop-filter: blur(10px) saturate(var(--glass-sat));
 	cursor: pointer;
 }
 
@@ -1853,10 +1860,28 @@ input[type="radio"] {
    两个下拉菜单堆叠。ui.js 打开时会把原 ul 克隆为 ul.preview，
    弹出规则只作用于 ul.dropdown。 */
 .cbi-dropdown[open] {
-	/* 打开时按钮保持渐变胶囊（一体但分割），下拉列表照常弹出 */
-	background: var(--accent-grad);
-	border-color: transparent;
-	box-shadow: 0 6px 16px var(--accent-glow), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+	/* 打开时保持主题色渐变玻璃 */
+	background:
+		linear-gradient(100deg,
+			color-mix(in srgb, var(--primary-color-high) 24%, transparent),
+			color-mix(in srgb, var(--primary-color-high) 5%, transparent) 62%,
+			color-mix(in srgb, var(--primary-color-high) 12%, transparent)),
+		var(--glass-bg);
+	border-color: color-mix(in srgb, var(--primary-color-high) 42%, transparent);
+	box-shadow: 0 4px 16px color-mix(in srgb, var(--primary-color-high) 20%, transparent),
+	            inset 0 1px 0 rgba(255, 255, 255, 0.55);
+}
+
+/* 暗黑下闭合/打开：外发光略强、内高光调暗（与左侧菜单选中项一致） */
+:root[data-darkmode="true"] .cbi-dropdown {
+	box-shadow: 0 4px 18px color-mix(in srgb, var(--primary-color-high) 30%, transparent),
+	            inset 0 1px 0 rgba(255, 255, 255, 0.14);
+}
+
+/* 普通下拉（非"保存并应用"类按钮）无分隔：箭头区不画竖线，窄一点 */
+.cbi-dropdown:not(.cbi-button-apply):not(.cbi-button-negative) > .open {
+	border-left: none;
+	width: 26px;
 }
 
 .cbi-dropdown[open] > .more,
@@ -1983,18 +2008,8 @@ input[type="radio"] {
 	backdrop-filter: blur(32px) saturate(var(--glass-sat));
 }
 
-/* 试点（接口页 proto，main.js 替换的 Combobox 加 liquid-combo-pilot）：
-   闭合样式不用主题色渐变胶囊，改为半透明玻璃普通下拉框——透明显示
-   文字与选中项，与半透明圆弧弹出列表风格统一 */
-.cbi-dropdown.liquid-combo-pilot {
-	background: var(--glass-bg);
-	border: 1px solid var(--glass-border);
-	box-shadow: var(--glass-shadow-soft), inset 0 1px 0 var(--glass-inset);
-	color: var(--text-color-high);
-}
-
-/* 高度压缩到原 ~70%（35px → 24px）：收紧垂直 padding 与当前值行，
-   弹出列表项（无 display 属性）保持舒适行高不受影响 */
+/* 试点（main.js 替换的 Combobox 加 liquid-combo-pilot）：闭合继承
+   全局主题色渐变玻璃，此处仅保留高度/箭头/文字等专属微调 */
 .cbi-dropdown.liquid-combo-pilot {
 	min-height: 24px;
 	padding: 4px 34px 4px 10px;
@@ -2018,11 +2033,8 @@ input[type="radio"] {
 	box-shadow: var(--glass-shadow-soft), inset 0 1px 0 var(--glass-inset);
 }
 
-/* 暗黑下闭合框更实（glass-bg 0.4 太透，透出内容会淹没浅色文字） */
-:root[data-darkmode="true"] .cbi-dropdown.liquid-combo-pilot {
-	background: rgba(22, 29, 44, 0.92);
-	border-color: rgba(255, 255, 255, 0.16);
-}
+/* 暗黑下闭合框更实（glass-bg 0.4 太透，透出内容会淹没浅色文字）：
+   已由全局暗色渐变覆盖，此处删除旧实底覆盖 */
 
 /* 试点弹出列表悬浮：中性灰高亮，不用主题色 */
 .cbi-dropdown.liquid-combo-pilot[open] > ul.dropdown > li:hover {
@@ -2040,17 +2052,8 @@ input[type="radio"] {
 	color: var(--text-color-high) !important;
 }
 
-/* 打开时胶囊本体强制玻璃底（防被 accent 渐变或其他规则覆盖） */
-.cbi-dropdown.liquid-combo-pilot[open] {
-	background: var(--glass-bg) !important;
-	border-color: var(--glass-border) !important;
-	box-shadow: var(--glass-shadow-soft), inset 0 1px 0 var(--glass-inset) !important;
-}
-
-:root[data-darkmode="true"] .cbi-dropdown.liquid-combo-pilot[open] {
-	background: rgba(22, 29, 44, 0.92) !important;
-	border-color: rgba(255, 255, 255, 0.16) !important;
-}
+/* 打开时胶囊本体跟随全局主题色渐变玻璃（r43 的强制覆盖已由全局
+   [open] 样式取代，此处删除） */
 
 /* 试点下拉全部文字强制主题文字色（防内联样式/其他规则把闭合或
    列表文字染成黑色，暗色下看不清） */
