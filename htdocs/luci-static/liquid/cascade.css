@@ -2018,10 +2018,24 @@ input[type="radio"] {
 
 /* 打开下拉瞬间：胶囊内 preview（当前值克隆）在鼠标下方会命中全局
    主题色 hover——强制中性透明，避免"点击时当前选项突然变主题色" */
+.cbi-dropdown.liquid-combo-pilot[open] > ul.preview > li,
+.cbi-dropdown.liquid-combo-pilot[open] > ul.preview > li[selected],
 .cbi-dropdown.liquid-combo-pilot[open] > ul.preview > li:hover,
 .cbi-dropdown.liquid-combo-pilot[open] > ul.preview > li[display]:hover {
 	background: transparent !important;
 	color: var(--text-color-high) !important;
+}
+
+/* 打开时胶囊本体强制玻璃底（防被 accent 渐变或其他规则覆盖） */
+.cbi-dropdown.liquid-combo-pilot[open] {
+	background: var(--glass-bg) !important;
+	border-color: var(--glass-border) !important;
+	box-shadow: var(--glass-shadow-soft), inset 0 1px 0 var(--glass-inset) !important;
+}
+
+:root[data-darkmode="true"] .cbi-dropdown.liquid-combo-pilot[open] {
+	background: rgba(22, 29, 44, 0.92) !important;
+	border-color: rgba(255, 255, 255, 0.16) !important;
 }
 
 /* 试点下拉全部文字强制主题文字色（防内联样式/其他规则把闭合或
