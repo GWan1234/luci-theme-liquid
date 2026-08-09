@@ -164,64 +164,6 @@
 		obs.observe(root, { attributes: true, attributeFilter: ['data-darkmode'] });
 	}
 
-	/* OpenClash 页面轮询中断：LuCI 是 SPA，切页只替换内容区，OpenClash
-	   页面的 setInterval/setTimeout 轮询（website_check 等）在离开页面后
-	   仍在后台运行，持续占用单核路由的 uwsgi worker 导致页面切换卡顿。
-	   这里包装全局定时器并标记创建时所在页面，检测到离开 openclash
-	   页面时统一清除其轮询定时器。不依赖 openclash 内部实现，升级兼容；
-	   主题自身定时器一律走 _liquidNativeST/_liquidNativeSI 不受影响。 */
-	var _liquidNativeSI = window.setInterval;
-	var _liquidNativeST = window.setTimeout;
-	var _liquidNativeCI = window.clearInterval;
-	var _liquidNativeCT = window.clearTimeout;
-	var _liquidOcTimers = {};
-	var _liquidOcWrapOn = false;
-
-	function _liquidIsOcPage() {
-		return !!(document.querySelector('.oc, #cbi-openclash'));
-	}
-
-	function _liquidOcWrap() {
-		if (_liquidOcWrapOn)
-			return;
-		_liquidOcWrapOn = true;
-		window.setInterval = function (fn, ms) {
-			var id = _liquidNativeSI(fn, ms);
-			_liquidOcTimers[id] = _liquidIsOcPage();
-			return id;
-		};
-		window.setTimeout = function (fn, ms) {
-			var id = _liquidNativeST(fn, ms);
-			_liquidOcTimers[id] = _liquidIsOcPage();
-			return id;
-		};
-	}
-
-	function initOcTimerKill() {
-		_liquidOcWrap();
-		var killOcTimers = function () {
-			Object.keys(_liquidOcTimers).forEach(function (id) {
-				if (_liquidOcTimers[id]) {
-					try { _liquidNativeCI(id); } catch (e) {}
-					try { _liquidNativeCT(id); } catch (e) {}
-					delete _liquidOcTimers[id];
-				}
-			});
-		};
-		var check = function () {
-			var nowOc = _liquidIsOcPage();
-			if (lastOc && !nowOc)
-				killOcTimers();
-			lastOc = nowOc;
-		};
-		var lastOc = null;
-		check();
-		if (window.MutationObserver) {
-			new MutationObserver(check).observe(document.body, { childList: true, subtree: true });
-		}
-		_liquidNativeSI(check, 2000);
-	}
-
 	function updateSwitch() {
 		var mode = getMode();
 		[].forEach.call(document.querySelectorAll('.liquid-mode-btn'), function (b) {
@@ -356,7 +298,7 @@
 			pop.style.display = show ? 'block' : 'none';
 			if (show) {
 				input.value = getAccentCustom();
-				_liquidNativeST(function () { input.focus(); input.select(); }, 0);
+				setTimeout(function () { input.focus(); input.select(); }, 0);
 			}
 		}
 
@@ -752,7 +694,7 @@
 				/* 多选：luci 保持打开以便连续勾选，兜底不强制关闭；
 				   但立即同步勾选框（当前事件循环结束、luci 处理完后） */
 				if (dd.hasAttribute('multiple')) {
-					_liquidNativeST(function () {
+					setTimeout(function () {
 						var u = dd.querySelector('ul') || dd._liquidUl;
 						if (!u)
 							return;
@@ -767,7 +709,7 @@
 				var li = e.target.closest ? e.target.closest('li') : null;
 				if (!li || !li.parentNode || !li.parentNode.classList.contains('dropdown'))
 					return;
-				_liquidNativeST(function () {
+				setTimeout(function () {
 					var ul = dd.querySelector('ul.dropdown');
 					if (!ul)
 						return;  /* ui.js 已正常关闭 */
@@ -871,7 +813,7 @@
 
 	/* 窗口尺寸变化时重新计算已打开下拉框的方向 */
 	window.addEventListener('resize', function () {
-		_liquidNativeST(adjustDropdownDirection, 60);
+		setTimeout(adjustDropdownDirection, 60);
 	});
 
 	/* 移动端菜单 top 跟随顶栏实际高度（防顶栏被撑高后菜单盖住它） */
@@ -891,12 +833,11 @@
 	/* #indicators 由 ui.js 动态渲染，顶栏高度在 DOMContentLoaded 时可能未定型：
 	   延迟二次校准 + 汉堡点击时校准 */
 	function scheduleMenuTop() {
-		_liquidNativeST(syncMenuTop, 0);
+		setTimeout(syncMenuTop, 0);
 	}
 
 	applyCustomAccent(getAccentCustom());
 	guardDarkmode();
-	initOcTimerKill();
 
 	if (document.readyState == 'loading')
 		document.addEventListener('DOMContentLoaded', function () {
@@ -908,9 +849,9 @@
 			fitDropdownWidths();
 			portalTooltips();
 			injectLoginLogo();
-			_liquidNativeST(syncMenuTop, 300);
-			_liquidNativeST(initTabSliders, 300);
-			_liquidNativeST(syncDropdownValues, 300);
+			setTimeout(syncMenuTop, 300);
+			setTimeout(initTabSliders, 300);
+			setTimeout(syncDropdownValues, 300);
 		});
 	else {
 		initSwitch();
@@ -921,15 +862,15 @@
 		fitDropdownWidths();
 		portalTooltips();
 		injectLoginLogo();
-		_liquidNativeST(syncMenuTop, 300);
-		_liquidNativeST(initTabSliders, 300);
-		_liquidNativeST(syncDropdownValues, 300);
+		setTimeout(syncMenuTop, 300);
+		setTimeout(initTabSliders, 300);
+		setTimeout(syncDropdownValues, 300);
 	}
 
 	/* 定时清除所有内联 opacity（非 0/1 的残留值，luci 的离线/hover
 	   样式会残留在接口徽章图标/文字、删除按钮、'取消配置'按钮等元素上，
 	   让已连接内容呈半透、被误判为未连接）。统一压回不透明。 */
-	_liquidNativeSI(function () {
+	setInterval(function () {
 		document.querySelectorAll('[style*="opacity"]').forEach(function (el) {
 			var o = el.style.opacity;
 			if (o && o !== '1' && o !== '0')
@@ -994,7 +935,7 @@
 			/* luci 触屏分支用 rAF 动画（约 100ms）滚动定位，会在微任务
 			   之后再次覆盖 inline 样式 —— 延迟再清理一次，覆盖它
 			   （Windows 触屏/Edge 上尤甚） */
-			_liquidNativeST(adjustDropdownDirection, 200);
+			setTimeout(adjustDropdownDirection, 200);
 		});
 		globalDdObserver.observe(document.documentElement, {
 			attributes: true,
