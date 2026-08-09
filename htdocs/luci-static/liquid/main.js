@@ -878,6 +878,45 @@
 		});
 	}, 600);
 
+	/* 试点：接口页 proto 下拉替换为 LuCI ui.Combobox（自绘下拉，弹出
+	   面板可完全定制）。仅限 widget.cbid.network.*.proto，验证效果与
+	   功能（选值/保存/依赖联动）后再决定是否扩大范围。 */
+	function initProtoComboPilot() {
+		if (typeof L == 'undefined' || typeof L.require != 'function')
+			return;
+		var selects = document.querySelectorAll('select[id^="widget.cbid.network."][id$=".proto"]');
+		if (!selects.length)
+			return;
+		L.require('ui').then(function (ui) {
+			[].forEach.call(selects, function (sel) {
+				if (sel.__liquidCombo)
+					return;
+				var vals = [], labels = [], i, choices = {};
+				for (i = 0; i < sel.options.length; i++) {
+					vals.push(sel.options[i].value);
+					labels.push(sel.options[i].textContent);
+				}
+				for (i = 0; i < vals.length; i++)
+					choices[vals[i]] = labels[i];
+				var cb = new ui.Combobox(sel.value, choices, {
+					name: sel.getAttribute('name') || sel.id,
+					sort: false,
+					create: false,
+					optional: false
+				});
+				var node = cb.render();
+				node.addEventListener('cbi-dropdown-change', function () {
+					try {
+						sel.value = cb.getValue();
+						sel.dispatchEvent(new Event('change', { bubbles: true }));
+					} catch (e) {}
+				});
+				sel.parentNode.replaceChild(node, sel);
+				sel.__liquidCombo = true;
+			});
+		});
+	}
+
 	/* 页面内容动态变化（view 切换、cbi 渲染等）时初始化新出现的 tab 菜单 */
 	if (window.MutationObserver) {
 		var tabObserver = new MutationObserver(function () {
@@ -886,6 +925,7 @@
 			fitDropdownWidths();
 			portalTooltips();
 			injectLoginLogo();
+			initProtoComboPilot();
 		});
 		document.addEventListener('DOMContentLoaded', function () {
 			tabObserver.observe(document.body, { childList: true, subtree: true });
