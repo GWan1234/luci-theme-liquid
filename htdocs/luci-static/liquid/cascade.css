@@ -3302,14 +3302,14 @@ pre {
    ========================================================================== */
 
 /* 大卡片（两块 .main-card）：去掉白底/边框/阴影，透明融入主题背景 */
-html[data-page^="admin-services-openclash"] #cbi-openclash > fieldset .main-card {
+body[data-page^="admin-services-openclash"] #cbi-openclash > fieldset .main-card {
 	background: transparent !important;
 	border: none !important;
 	box-shadow: none !important;
 	padding: 0 10px 10px 10px;
 }
 
-html[data-page^="admin-services-openclash"] #cbi-openclash > fieldset .myip-main-card {
+body[data-page^="admin-services-openclash"] #cbi-openclash > fieldset .myip-main-card {
 	margin: 0;
 	padding: 10px;
 	border: none !important;
@@ -3317,7 +3317,7 @@ html[data-page^="admin-services-openclash"] #cbi-openclash > fieldset .myip-main
 }
 
 /* 公告卡片：玻璃 */
-html[data-page^="admin-services-openclash"] .oc .announcement-card {
+body[data-page^="admin-services-openclash"] .oc .announcement-card {
 	background: var(--glass-bg) !important;
 	border: 1px solid var(--glass-border) !important;
 	border-radius: var(--glass-radius);
@@ -3327,7 +3327,7 @@ html[data-page^="admin-services-openclash"] .oc .announcement-card {
 }
 
 /* 内层嵌套卡片（sub-card）：主题玻璃配方，替代 openclash 白/灰实底 */
-html[data-page^="admin-services-openclash"] .oc .sub-card {
+body[data-page^="admin-services-openclash"] .oc .sub-card {
 	background: var(--glass-bg) !important;
 	border: 1px solid var(--glass-border) !important;
 	border-radius: var(--glass-radius);
@@ -3337,7 +3337,7 @@ html[data-page^="admin-services-openclash"] .oc .sub-card {
 }
 
 /* hover：主题玻璃高亮（主色边框 + tint 背景），去掉 openclash 位移 */
-html[data-page^="admin-services-openclash"] .oc .sub-card:hover {
+body[data-page^="admin-services-openclash"] .oc .sub-card:hover {
 	background: var(--glass-bg-hover) !important;
 	border-color: color-mix(in srgb, var(--primary-color-high) 55%, var(--glass-border)) !important;
 	box-shadow: var(--glass-shadow), inset 0 1px 0 var(--glass-inset) !important;
@@ -3345,8 +3345,8 @@ html[data-page^="admin-services-openclash"] .oc .sub-card:hover {
 }
 
 /* myip 页：IP 地址 / 访问检查 输出块玻璃化 */
-html[data-page^="admin-services-openclash"] .oc .myip-ip-item,
-html[data-page^="admin-services-openclash"] .oc .myip-check-item {
+body[data-page^="admin-services-openclash"] .oc .myip-ip-item,
+body[data-page^="admin-services-openclash"] .oc .myip-check-item {
 	background: var(--glass-bg) !important;
 	border: 1px solid var(--glass-border) !important;
 	border-radius: var(--glass-radius);
@@ -3355,8 +3355,8 @@ html[data-page^="admin-services-openclash"] .oc .myip-check-item {
 	backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
 }
 
-html[data-page^="admin-services-openclash"] .oc .myip-ip-item:hover,
-html[data-page^="admin-services-openclash"] .oc .myip-check-item:hover {
+body[data-page^="admin-services-openclash"] .oc .myip-ip-item:hover,
+body[data-page^="admin-services-openclash"] .oc .myip-check-item:hover {
 	background: var(--glass-bg-hover) !important;
 	border-color: color-mix(in srgb, var(--primary-color-high) 55%, var(--glass-border)) !important;
 	box-shadow: var(--glass-shadow), inset 0 1px 0 var(--glass-inset) !important;
@@ -3364,28 +3364,28 @@ html[data-page^="admin-services-openclash"] .oc .myip-check-item:hover {
 }
 
 /* ---- 内容居中（运行状态 / 控制面板 IP:端口 / 混合代理） ---- */
-html[data-page^="admin-services-openclash"] .oc .card-content {
+body[data-page^="admin-services-openclash"] .oc .card-content {
 	align-items: center !important;
 	justify-content: center !important;
 }
 
-html[data-page^="admin-services-openclash"] .oc .card-controls {
+body[data-page^="admin-services-openclash"] .oc .card-controls {
 	align-self: center;
 }
 
-html[data-page^="admin-services-openclash"] .oc .core-main-controls {
+body[data-page^="admin-services-openclash"] .oc .core-main-controls {
 	justify-content: center !important;
 }
 
-html[data-page^="admin-services-openclash"] .oc .plugin-toggle-container {
+body[data-page^="admin-services-openclash"] .oc .plugin-toggle-container {
 	margin-left: inherit !important;
 }
 
-html[data-page^="admin-services-openclash"] .oc .core-status-toggle {
+body[data-page^="admin-services-openclash"] .oc .core-status-toggle {
 	flex: 0 !important;
 	min-width: auto !important;
 }
 
-html[data-page^="admin-services-openclash"] .oc .card-value {
+body[data-page^="admin-services-openclash"] .oc .card-value {
 	justify-content: center;
 }
