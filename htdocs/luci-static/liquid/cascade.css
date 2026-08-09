@@ -3344,6 +3344,25 @@ pre {
 	transform: none;
 }
 
+/* myip 页：IP 地址 / 访问检查 输出块玻璃化 */
+[data-page^="admin-services-openclash"] .oc .myip-ip-item,
+[data-page^="admin-services-openclash"] .oc .myip-check-item {
+	background: var(--glass-bg);
+	border: 1px solid var(--glass-border);
+	border-radius: var(--glass-radius);
+	box-shadow: var(--glass-shadow-soft), inset 0 1px 0 var(--glass-inset);
+	-webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
+	backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
+}
+
+[data-page^="admin-services-openclash"] .oc .myip-ip-item:hover,
+[data-page^="admin-services-openclash"] .oc .myip-check-item:hover {
+	background: var(--glass-bg-hover);
+	border-color: color-mix(in srgb, var(--primary-color-high) 55%, var(--glass-border));
+	box-shadow: var(--glass-shadow), inset 0 1px 0 var(--glass-inset);
+	transform: none;
+}
+
 /* ---- 内容居中（运行状态 / 控制面板 IP:端口 / 混合代理） ---- */
 [data-page^="admin-services-openclash"] .oc .card-content {
 	align-items: center !important;
