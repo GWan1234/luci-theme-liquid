@@ -587,6 +587,7 @@ header [data-indicator][data-style="inactive"],
    flex-wrap 仅作极端兜底 */
 #mainmenu > .liquid-color-switch {
 	display: flex;
+	justify-content: center;
 	flex-wrap: wrap;
 	row-gap: 4px;
 	width: min(216px, 100%);
