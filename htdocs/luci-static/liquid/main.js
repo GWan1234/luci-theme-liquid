@@ -929,6 +929,28 @@
 					sel.__liquidCombo = true;
 				} catch (e) {}
 			});
+			fixComboPillClick();
+		});
+	}
+
+	/* 点击内容区（当前值行）也能稳定展开：LuCI 的 handleClick 虽支持整块
+	   点击，但内容区 click 会冒泡到 window 的 closeAllDropdowns，导致
+	   打开即关闭（闪烁）。拦截内容区 click，改为以胶囊本身为目标重新
+	   触发，走 handleClick 的打开路径（其内部 stopPropagation，不再
+	   冒泡到 window）。打开状态下的点击不拦截，LuCI 正常处理关闭。 */
+	function fixComboPillClick() {
+		document.querySelectorAll('.cbi-dropdown.liquid-combo-pilot > ul > li[display]').forEach(function (li) {
+			if (li.__liquidPillClick)
+				return;
+			li.__liquidPillClick = true;
+			li.addEventListener('click', function (ev) {
+				var sb = li.closest('.cbi-dropdown');
+				if (!sb || sb.hasAttribute('open'))
+					return;
+				ev.stopPropagation();
+				ev.preventDefault();
+				sb.click();
+			});
 		});
 	}
 
@@ -941,6 +963,7 @@
 			portalTooltips();
 			injectLoginLogo();
 			initSelectCombos();
+			fixComboPillClick();
 		});
 		document.addEventListener('DOMContentLoaded', function () {
 			tabObserver.observe(document.body, { childList: true, subtree: true });
