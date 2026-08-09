@@ -2004,6 +2004,18 @@ input[type="radio"] {
 	box-shadow: var(--glass-shadow-soft), inset 0 1px 0 var(--glass-inset);
 }
 
+/* 暗黑下闭合框更实（glass-bg 0.4 太透，透出内容会淹没浅色文字） */
+:root[data-darkmode="true"] .cbi-dropdown.liquid-combo-pilot {
+	background: rgba(22, 29, 44, 0.92);
+	border-color: rgba(255, 255, 255, 0.16);
+}
+
+/* 试点弹出列表悬浮：中性灰高亮，不用主题色 */
+.cbi-dropdown.liquid-combo-pilot[open] > ul.dropdown > li:hover {
+	background: rgba(127, 127, 127, 0.18) !important;
+	color: var(--text-color-highest);
+}
+
 /* 试点（接口页 proto，main.js 替换的 Combobox 加 liquid-combo-pilot）：
    弹出面板去掉 backdrop-filter blur（性能主因）改用高不透明度半透明底，
    阴影降级——视觉几乎不变，打开/滚动明显更顺。仅试点范围生效。 */
