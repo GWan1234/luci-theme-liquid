@@ -581,15 +581,17 @@ header [data-indicator][data-style="inactive"],
 	flex-shrink: 0;
 }
 
-/* 菜单栏顶部颜色胶囊（水平居中）。胶囊宽度按 min(200px, 100%)
-   自适应：正常侧栏下 200px（比圆点内容略宽、观感饱满），侧栏变窄
-   时随可用宽度收缩，7 个圆点仍排在同一行；flex-wrap 仅作极端兜底 */
+/* 菜单栏顶部颜色胶囊（水平居中）。胶囊宽度 min(216px, 100%)（侧栏
+   内容区上限即满宽），左右 padding 10px 让最左 Bing / 最右自定义圆点
+   与胶囊边缘留有清晰余量；侧栏变窄时随容器收缩，7 个圆点仍单行；
+   flex-wrap 仅作极端兜底 */
 #mainmenu > .liquid-color-switch {
 	display: flex;
 	flex-wrap: wrap;
 	row-gap: 4px;
-	width: min(200px, 100%);
+	width: min(216px, 100%);
 	margin: 0 auto 12px;
+	padding: 4px 10px;
 	flex-shrink: 0;
 }
 
@@ -602,7 +604,7 @@ header [data-indicator][data-style="inactive"],
 	align-items: center;
 	gap: 2px;
 	margin-left: 6px;
-	padding: 0 5px;
+	padding: 0 10px;
 	border-radius: 999px;
 	background: var(--glass-bg);
 	border: 1px solid var(--glass-border);
