@@ -461,6 +461,10 @@
 		document.querySelectorAll('.cbi-dropdown:not(.cbi-button-apply)').forEach(function (dd) {
 			if (dd.classList.contains('liquid-dd-fit'))
 				return;
+			/* 打开中的下拉跳过测量：LuCI 正在克隆 preview/聚焦输入，
+			   此时改 li/img 样式会干扰打开与自定义输入流程 */
+			if (dd.hasAttribute('open') || dd.classList.contains('open'))
+				return;
 			dd.classList.add('liquid-dd-fit');
 			var ul = dd.querySelector('ul');
 			if (!ul)

@@ -1476,6 +1476,15 @@ select:not([multiple]):hover {
 	background-image: none !important;
 }
 
+/* 触屏设备：原生 select 不自绘箭头（系统有自己的指示/简洁外观），
+   桌面保留主题箭头 */
+@media (hover: none), (pointer: coarse) {
+	select:not([multiple]) {
+		background-image: none !important;
+		padding-right: 12px;
+	}
+}
+
 /* 原生 select 弹出列表的选项项美化（浏览器原生面板本身无法定制，
    但 option 的背景/文字色/字体在 Chrome/Edge/Firefox 上可生效） */
 select option {
