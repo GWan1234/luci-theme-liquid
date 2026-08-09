@@ -2016,6 +2016,30 @@ input[type="radio"] {
 	color: var(--text-color-highest);
 }
 
+/* 打开下拉瞬间：胶囊内 preview（当前值克隆）在鼠标下方会命中全局
+   主题色 hover——强制中性透明，避免"点击时当前选项突然变主题色" */
+.cbi-dropdown.liquid-combo-pilot[open] > ul.preview > li:hover,
+.cbi-dropdown.liquid-combo-pilot[open] > ul.preview > li[display]:hover {
+	background: transparent !important;
+	color: var(--text-color-high) !important;
+}
+
+/* 试点下拉全部文字强制主题文字色（防内联样式/其他规则把闭合或
+   列表文字染成黑色，暗色下看不清） */
+.cbi-dropdown.liquid-combo-pilot > ul > li,
+.cbi-dropdown.liquid-combo-pilot > ul > li[display],
+.cbi-dropdown.liquid-combo-pilot > ul.preview > li,
+.cbi-dropdown.liquid-combo-pilot[open] > ul.dropdown > li {
+	color: var(--text-color-high) !important;
+}
+
+:root[data-darkmode="true"] .cbi-dropdown.liquid-combo-pilot > ul > li,
+:root[data-darkmode="true"] .cbi-dropdown.liquid-combo-pilot > ul > li[display],
+:root[data-darkmode="true"] .cbi-dropdown.liquid-combo-pilot > ul.preview > li,
+:root[data-darkmode="true"] .cbi-dropdown.liquid-combo-pilot[open] > ul.dropdown > li {
+	color: #d9dfe9 !important;
+}
+
 /* 试点（接口页 proto，main.js 替换的 Combobox 加 liquid-combo-pilot）：
    弹出面板去掉 backdrop-filter blur（性能主因）改用高不透明度半透明底，
    阴影降级——视觉几乎不变，打开/滚动明显更顺。仅试点范围生效。 */
