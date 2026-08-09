@@ -582,17 +582,17 @@ header [data-indicator][data-style="inactive"],
 }
 
 /* 菜单栏顶部颜色胶囊（水平居中）。胶囊宽度 min(216px, 100%)（侧栏
-   内容区上限即满宽），左右 padding 10px 让最左 Bing / 最右自定义圆点
-   与胶囊边缘留有清晰余量；侧栏变窄时随容器收缩，7 个圆点仍单行；
-   flex-wrap 仅作极端兜底 */
+   胶囊宽度 = 内容宽度(max-content)：7 个圆点（Bing + 5 色 + 自定义）
+   永远排在同一行，宽度随内容自适应，任何侧栏宽度都不会换行、不会
+   超出胶囊；margin auto 居中保证左右两侧间距一致；圆点 flex:none
+   固定 18px 正圆不压缩、不缩小。 */
 #mainmenu > .liquid-color-switch {
 	display: flex;
 	justify-content: center;
-	flex-wrap: wrap;
-	row-gap: 4px;
-	width: min(216px, 100%);
+	flex-wrap: nowrap;
+	width: max-content;
+	max-width: 100%;
 	margin: 0 auto 12px;
-	padding: 4px 10px;
 	flex-shrink: 0;
 }
 
@@ -605,7 +605,7 @@ header [data-indicator][data-style="inactive"],
 	align-items: center;
 	gap: 2px;
 	margin-left: 6px;
-	padding: 0 10px;
+	padding: 0 14px;
 	border-radius: 999px;
 	background: var(--glass-bg);
 	border: 1px solid var(--glass-border);
