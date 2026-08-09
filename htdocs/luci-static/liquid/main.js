@@ -461,6 +461,10 @@
 		document.querySelectorAll('.cbi-dropdown:not(.cbi-button-apply)').forEach(function (dd) {
 			if (dd.classList.contains('liquid-dd-fit'))
 				return;
+			/* 打开中的下拉跳过测量：LuCI 正在克隆 preview/聚焦输入，
+			   此时改 li/img 样式会干扰打开与自定义输入流程 */
+			if (dd.hasAttribute('open') || dd.classList.contains('open'))
+				return;
 			dd.classList.add('liquid-dd-fit');
 			var ul = dd.querySelector('ul');
 			if (!ul)
@@ -709,6 +713,10 @@
 				var li = e.target.closest ? e.target.closest('li') : null;
 				if (!li || !li.parentNode || !li.parentNode.classList.contains('dropdown'))
 					return;
+				/* 点击"自定义"输入行（unselectable / 含 create 输入框）时
+				   不能强制关闭——那是输入框，需要滞留让用户输入 */
+				if (li.hasAttribute('unselectable') || li.querySelector('.create-item-input'))
+					return;
 				setTimeout(function () {
 					var ul = dd.querySelector('ul.dropdown');
 					if (!ul)
@@ -843,6 +851,7 @@
 		document.addEventListener('DOMContentLoaded', function () {
 			initSwitch();
 			initColorSwitch();
+			initSelectCombos();
 			syncMenuTop();
 			initTabSliders();
 			syncDropdownValues();
@@ -856,6 +865,7 @@
 	else {
 		initSwitch();
 		initColorSwitch();
+		initSelectCombos();
 		syncMenuTop();
 		initTabSliders();
 		syncDropdownValues();
@@ -878,6 +888,91 @@
 		});
 	}, 600);
 
+	/* 单选原生 select → LuCI ui.Combobox（自绘玻璃下拉，弹出面板可
+	   完全定制、性能可接受）。范围：所有单选下拉；排除多选、disabled、
+	   隐藏、.cbi-select 内部（已有分割按钮结构）、data-choices（LuCI
+	   自行升级）、size>1（多行列表）；保存并应用是 div.cbi-button-apply
+	   非 select，天然排除。替换保留 name，change 转发给原 select 让
+	   LuCI 依赖联动/校验继续工作。 */
+	function initSelectCombos() {
+		if (typeof L == 'undefined' || typeof L.require != 'function')
+			return;
+		/* 触屏设备跳过替换：LuCI 移动端分支打开下拉时会把页面滚动到
+		   视口中央，下拉靠近页面顶部时直接闪回顶部，无法使用；移动端
+		   保留原生 select，用系统滚动选择器 */
+		if ('ontouchstart' in window)
+			return;
+		var todo = [];
+		[].forEach.call(document.querySelectorAll('select:not([multiple])'), function (sel) {
+			if (sel.__liquidCombo || sel.disabled || sel.hasAttribute('data-choices') || sel.size > 1)
+				return;
+			if (sel.closest('.cbi-select'))
+				return;
+			if (sel.offsetParent === null && getComputedStyle(sel).display === 'none')
+				return;
+			todo.push(sel);
+		});
+		if (!todo.length)
+			return;
+		L.require('ui').then(function (ui) {
+			todo.forEach(function (sel) {
+				try {
+					var vals = [], labels = [], i, choices = {};
+					for (i = 0; i < sel.options.length; i++) {
+						vals.push(sel.options[i].value);
+						labels.push(sel.options[i].textContent);
+					}
+					for (i = 0; i < vals.length; i++)
+						choices[vals[i]] = labels[i];
+					var cb = new ui.Combobox(sel.value, choices, {
+						name: sel.getAttribute('name') || sel.id,
+						sort: false,
+						create: false,
+						optional: false
+					});
+					var node = cb.render();
+					node.classList.add('liquid-combo-pilot');
+					node.addEventListener('cbi-dropdown-change', function () {
+						try {
+							sel.value = cb.getValue();
+							sel.dispatchEvent(new Event('change', { bubbles: true }));
+						} catch (e) {}
+					});
+					sel.parentNode.replaceChild(node, sel);
+					sel.__liquidCombo = true;
+					/* Combobox 强制 create:true，但原生 select 没有自定义
+					   选项：移除多余的自定义输入行 */
+					[].forEach.call(node.querySelectorAll('li[data-value="-"]'), function (li) {
+						if (li.parentNode)
+							li.parentNode.removeChild(li);
+					});
+				} catch (e) {}
+			});
+			fixComboPillClick();
+		});
+	}
+
+	/* 点击内容区（当前值行）也能稳定展开：LuCI 的 handleClick 虽支持整块
+	   点击，但内容区 click 会冒泡到 window 的 closeAllDropdowns，导致
+	   打开即关闭（闪烁）。拦截内容区 click，改为以胶囊本身为目标重新
+	   触发，走 handleClick 的打开路径（其内部 stopPropagation，不再
+	   冒泡到 window）。打开状态下的点击不拦截，LuCI 正常处理关闭。 */
+	function fixComboPillClick() {
+		document.querySelectorAll('.cbi-dropdown.liquid-combo-pilot > ul > li[display]').forEach(function (li) {
+			if (li.__liquidPillClick)
+				return;
+			li.__liquidPillClick = true;
+			li.addEventListener('click', function (ev) {
+				var sb = li.closest('.cbi-dropdown');
+				if (!sb || sb.hasAttribute('open'))
+					return;
+				ev.stopPropagation();
+				ev.preventDefault();
+				sb.click();
+			});
+		});
+	}
+
 	/* 页面内容动态变化（view 切换、cbi 渲染等）时初始化新出现的 tab 菜单 */
 	if (window.MutationObserver) {
 		var tabObserver = new MutationObserver(function () {
@@ -886,6 +981,8 @@
 			fitDropdownWidths();
 			portalTooltips();
 			injectLoginLogo();
+			initSelectCombos();
+			fixComboPillClick();
 		});
 		document.addEventListener('DOMContentLoaded', function () {
 			tabObserver.observe(document.body, { childList: true, subtree: true });
