@@ -1437,6 +1437,29 @@ textarea[disabled] {
 	cursor: not-allowed;
 }
 
+/* 原生裸 select（.cbi-input-select 等）现代化：去浏览器原生外观，
+   自绘现代 chevron 箭头，圆角/底色沿用主题输入框，亮暗两套箭头色 */
+select:not([multiple]) {
+	appearance: none;
+	-webkit-appearance: none;
+	padding-right: 34px;
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235b6b7d' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+	background-repeat: no-repeat;
+	background-position: right 10px center;
+	background-size: 15px;
+	cursor: pointer;
+}
+
+:root[data-darkmode="true"] select:not([multiple]) {
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23aab4c0' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+}
+
+/* .cbi-select（分割按钮风格）内部 select 已由外层 ::after 提供箭头，
+   去掉这里的背景箭头避免双箭头（覆盖上面的通用规则） */
+.cbi-select select:not([multiple]) {
+	background-image: none;
+}
+
 
 textarea {
 	min-height: 72px;
