@@ -843,6 +843,7 @@
 		document.addEventListener('DOMContentLoaded', function () {
 			initSwitch();
 			initColorSwitch();
+			initSelectCombos();
 			syncMenuTop();
 			initTabSliders();
 			syncDropdownValues();
@@ -856,6 +857,7 @@
 	else {
 		initSwitch();
 		initColorSwitch();
+		initSelectCombos();
 		syncMenuTop();
 		initTabSliders();
 		syncDropdownValues();
@@ -878,42 +880,54 @@
 		});
 	}, 600);
 
-	/* 试点：接口页 proto 下拉替换为 LuCI ui.Combobox（自绘下拉，弹出
-	   面板可完全定制）。仅限 widget.cbid.network.*.proto，验证效果与
-	   功能（选值/保存/依赖联动）后再决定是否扩大范围。 */
-	function initProtoComboPilot() {
+	/* 单选原生 select → LuCI ui.Combobox（自绘玻璃下拉，弹出面板可
+	   完全定制、性能可接受）。范围：所有单选下拉；排除多选、disabled、
+	   隐藏、.cbi-select 内部（已有分割按钮结构）、data-choices（LuCI
+	   自行升级）、size>1（多行列表）；保存并应用是 div.cbi-button-apply
+	   非 select，天然排除。替换保留 name，change 转发给原 select 让
+	   LuCI 依赖联动/校验继续工作。 */
+	function initSelectCombos() {
 		if (typeof L == 'undefined' || typeof L.require != 'function')
 			return;
-		var selects = document.querySelectorAll('select[id^="widget.cbid.network."][id$=".proto"]');
-		if (!selects.length)
+		var todo = [];
+		[].forEach.call(document.querySelectorAll('select:not([multiple])'), function (sel) {
+			if (sel.__liquidCombo || sel.disabled || sel.hasAttribute('data-choices') || sel.size > 1)
+				return;
+			if (sel.closest('.cbi-select'))
+				return;
+			if (sel.offsetParent === null && getComputedStyle(sel).display === 'none')
+				return;
+			todo.push(sel);
+		});
+		if (!todo.length)
 			return;
 		L.require('ui').then(function (ui) {
-			[].forEach.call(selects, function (sel) {
-				if (sel.__liquidCombo)
-					return;
-				var vals = [], labels = [], i, choices = {};
-				for (i = 0; i < sel.options.length; i++) {
-					vals.push(sel.options[i].value);
-					labels.push(sel.options[i].textContent);
-				}
-				for (i = 0; i < vals.length; i++)
-					choices[vals[i]] = labels[i];
-				var cb = new ui.Combobox(sel.value, choices, {
-					name: sel.getAttribute('name') || sel.id,
-					sort: false,
-					create: false,
-					optional: false
-				});
-				var node = cb.render();
-				node.classList.add('liquid-combo-pilot');
-				node.addEventListener('cbi-dropdown-change', function () {
-					try {
-						sel.value = cb.getValue();
-						sel.dispatchEvent(new Event('change', { bubbles: true }));
-					} catch (e) {}
-				});
-				sel.parentNode.replaceChild(node, sel);
-				sel.__liquidCombo = true;
+			todo.forEach(function (sel) {
+				try {
+					var vals = [], labels = [], i, choices = {};
+					for (i = 0; i < sel.options.length; i++) {
+						vals.push(sel.options[i].value);
+						labels.push(sel.options[i].textContent);
+					}
+					for (i = 0; i < vals.length; i++)
+						choices[vals[i]] = labels[i];
+					var cb = new ui.Combobox(sel.value, choices, {
+						name: sel.getAttribute('name') || sel.id,
+						sort: false,
+						create: false,
+						optional: false
+					});
+					var node = cb.render();
+					node.classList.add('liquid-combo-pilot');
+					node.addEventListener('cbi-dropdown-change', function () {
+						try {
+							sel.value = cb.getValue();
+							sel.dispatchEvent(new Event('change', { bubbles: true }));
+						} catch (e) {}
+					});
+					sel.parentNode.replaceChild(node, sel);
+					sel.__liquidCombo = true;
+				} catch (e) {}
 			});
 		});
 	}
@@ -926,7 +940,7 @@
 			fitDropdownWidths();
 			portalTooltips();
 			injectLoginLogo();
-			initProtoComboPilot();
+			initSelectCombos();
 		});
 		document.addEventListener('DOMContentLoaded', function () {
 			tabObserver.observe(document.body, { childList: true, subtree: true });
