@@ -1175,11 +1175,18 @@ ul.cbi-tabmenu > li.cbi-tab-disabled > a {
 	margin: 0;
 }
 
-/* 打开下拉时该层解除裁剪（滚动容器会裁掉弹出的选项列表） */
+/* 打开下拉时该层解除裁剪（滚动容器会裁掉弹出的选项列表），
+   并提升整条祖先链的层级：backdrop-filter 会让每层都形成层叠
+   上下文，仅提升一层不够，需让包含它的所有容器都高于后续兄弟 */
 .cbi-map:has(.cbi-dropdown[open]),
-.cbi-section:has(.cbi-dropdown[open]) {
+.cbi-section:has(.cbi-dropdown[open]),
+.cbi-section-node:has(.cbi-dropdown[open]),
+.cbi-section-table:has(.cbi-dropdown[open]),
+#maincontent:has(.cbi-dropdown[open]) {
 	overflow-x: visible !important;
 	overflow-y: visible !important;
+	position: relative;
+	z-index: 1000;
 }
 
 #tabmenu {
@@ -1859,7 +1866,10 @@ input[type="radio"] {
    视觉上只剩一个弹出的选项列表——避免“框 + 弹出列表”看起来像
    两个下拉菜单堆叠。ui.js 打开时会把原 ul 克隆为 ul.preview，
    弹出规则只作用于 ul.dropdown。 */
+/* 打开时提升自身层级：backdrop-filter 让胶囊形成层叠上下文，
+   内部弹出列表 z-index 9999 出不去，会被后续卡片/层盖住 */
 .cbi-dropdown[open] {
+	z-index: 1000;
 	/* 打开时保持主题色渐变玻璃 */
 	background:
 		linear-gradient(100deg,
@@ -1882,6 +1892,20 @@ input[type="radio"] {
 .cbi-dropdown:not(.cbi-button-apply):not(.cbi-button-negative) > .open {
 	border-left: none;
 	width: 26px;
+}
+
+/* 普通下拉文字强制主题文字色：on-primary-color 在亮/暗下分别是
+   白/黑，叠在新渐变玻璃上正好白底白字、黑底黑字看不清 */
+.cbi-dropdown:not(.cbi-button-apply):not(.cbi-button-negative),
+.cbi-dropdown:not(.cbi-button-apply):not(.cbi-button-negative) > ul > li,
+.cbi-dropdown:not(.cbi-button-apply):not(.cbi-button-negative) > ul > li[display] {
+	color: var(--text-color-high) !important;
+}
+
+:root[data-darkmode="true"] .cbi-dropdown:not(.cbi-button-apply):not(.cbi-button-negative),
+:root[data-darkmode="true"] .cbi-dropdown:not(.cbi-button-apply):not(.cbi-button-negative) > ul > li,
+:root[data-darkmode="true"] .cbi-dropdown:not(.cbi-button-apply):not(.cbi-button-negative) > ul > li[display] {
+	color: #d9dfe9 !important;
 }
 
 .cbi-dropdown[open] > .more,
