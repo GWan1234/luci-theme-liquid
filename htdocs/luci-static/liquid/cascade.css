@@ -3292,3 +3292,40 @@ pre {
 		overflow-y: visible !important;
 	}
 }
+
+/* ==========================================================================
+   OpenClash 页面适配（仿 zargon 居中设计）
+   运行状态 / 控制面板（IP:端口）/ 混合代理 卡片内容居中。
+   openclash 自带明暗变量（html[data-darkmode="true"] .oc），背景不干预。
+   ========================================================================== */
+[data-page^="admin-services-openclash"] .oc .card-content {
+	align-items: center !important;
+	justify-content: center !important;
+}
+
+[data-page^="admin-services-openclash"] .oc .card-controls {
+	align-self: center;
+}
+
+[data-page^="admin-services-openclash"] .oc .core-main-controls {
+	justify-content: center !important;
+}
+
+[data-page^="admin-services-openclash"] .oc .plugin-toggle-container {
+	margin-left: inherit !important;
+}
+
+[data-page^="admin-services-openclash"] .oc .core-status-toggle {
+	flex: 0 !important;
+	min-width: auto !important;
+}
+
+/* 控制面板 / 混合代理卡片里的 IP:端口 值居中 */
+[data-page^="admin-services-openclash"] .oc .card-value {
+	justify-content: center;
+}
+
+/* 去掉 openclash 自带 hover 位移，与主题卡片风格统一 */
+[data-page^="admin-services-openclash"] .oc .sub-card:hover {
+	transform: none;
+}
