@@ -1477,8 +1477,9 @@ select:not([multiple]):hover {
 }
 
 /* 触屏设备：原生 select 不自绘箭头（系统有自己的指示/简洁外观），
-   桌面保留主题箭头 */
-@media (hover: none), (pointer: coarse) {
+   桌面保留主题箭头。用 any-pointer:coarse 覆盖手机与触屏笔记本
+   （后者主指针是 fine，hover/pointer 条件匹配不到） */
+@media (any-pointer: coarse) {
 	select:not([multiple]) {
 		background-image: none !important;
 		padding-right: 12px;
