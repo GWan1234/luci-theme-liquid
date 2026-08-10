@@ -1385,6 +1385,12 @@ body:not(.liquid-login) p.luci a:hover {
 	min-width: 0;
 }
 
+/* 输入框下方的按钮组（如"与浏览器同步/与 NTP 服务器同步"）：
+   与上方输入框之间留出缝隙（全终端） */
+.cbi-value-field .control-group {
+	margin-top: 8px;
+}
+
 .cbi-value-description {
 	font-size: 11.5px;
 	color: var(--text-color-low);
