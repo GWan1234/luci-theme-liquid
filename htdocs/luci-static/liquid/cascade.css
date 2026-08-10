@@ -3176,7 +3176,9 @@ pre {
 	}
 
 	.cbi-section-node {
-		padding: 2px 0;
+		/* 左右 4px 余量：滚动容器 overflow-x:auto 会在可视右缘横向裁剪
+		   输入框聚焦 ring(3px)，留 4px 保证 ring 不被切；嵌套仍紧凑 */
+		padding: 2px 4px;
 	}
 
 	.cbi-section-node > .cbi-section {
@@ -3336,7 +3338,7 @@ pre {
 	}
 
 	#maincontent {
-		padding: 0 12px 64px;
+		padding: 0 16px 64px;
 		margin-left: 0;
 	}
 
