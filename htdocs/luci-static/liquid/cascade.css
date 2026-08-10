@@ -3104,6 +3104,12 @@ img[src*="icons/"][src$=".svg"] {
 	margin-top: 8px;
 }
 
+/* 防火墙区域标签（zonebadge）文字：LuCI 内置的淡 zone 色背景在暗色
+   下不变，白字会看不清——暗色下改用深色字，与亮色模式同等对比 */
+:root[data-darkmode="true"] .zonebadge {
+	color: #1d2633;
+}
+
 /* code / pre blocks */
 pre {
 	padding: 12px 14px;
