@@ -3124,9 +3124,16 @@ img[src*="icons/"][src$=".svg"] {
 }
 
 /* 防火墙区域标签（zonebadge）文字：LuCI 内置的淡 zone 色背景在暗色
-   下不变，白字会看不清——暗色下改用深色字，与亮色模式同等对比 */
-:root[data-darkmode="true"] .zonebadge {
+   下不变，白字会看不清——仅对带 zone 色背景的（内联 --zone-color-rgb）
+   在暗色下改用深色字；无 zone 色的 empty 标签走玻璃底+继承浅字 */
+:root[data-darkmode="true"] .zonebadge[style*="--zone-color-rgb"] {
 	color: #1d2633;
+}
+
+/* zonebadge-empty（如 ACCEPT / ACCEPT all others）：无 zone 色、玻璃底，
+   亮色下默认玻璃边框太淡看不见——用中灰边框；暗色文字继承浅色清晰 */
+.zonebadge-empty {
+	border-color: var(--border-color-medium);
 }
 
 /* code / pre blocks */
