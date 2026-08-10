@@ -1385,6 +1385,13 @@ body:not(.liquid-login) p.luci a:hover {
 	min-width: 0;
 }
 
+/* 输入框下方的按钮组（如"与浏览器同步/与 NTP 服务器同步"）：
+   span 默认 inline，margin-top 不生效——改 block 并与上方输入框留缝 */
+.cbi-value-field .control-group {
+	display: block;
+	margin-top: 8px;
+}
+
 .cbi-value-description {
 	font-size: 11.5px;
 	color: var(--text-color-low);
@@ -3086,7 +3093,9 @@ img[src*="icons/"][src$=".svg"] {
 }
 
 .zonebadge {
-	display: inline-block;
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
 	padding: 2px 8px;
 	border-radius: 999px;
 	font-size: 10px;
@@ -3095,6 +3104,29 @@ img[src*="icons/"][src$=".svg"] {
 	border: 1px solid var(--glass-border);
 	/* 与上方内容（概况页的 ifacebox-body 等）留出空隙 */
 	margin-top: 8px;
+}
+
+/* 区域名与成员接口横向排开；成员接口徽章之间用细竖线分隔，
+   结构更清晰（区域名 | 接口1 | 接口2） */
+.zonebadge > strong {
+	margin-right: 2px;
+}
+
+.zonebadge .ifacebadge + .ifacebadge {
+	border-left: 1px solid currentColor;
+	padding-left: 8px;
+}
+
+/* 胶囊内接口图标：全局 24px 偏大，缩到 15px 与紧凑胶囊匹配 */
+.zonebadge img[src$=".svg"] {
+	width: 15px !important;
+	height: 15px !important;
+}
+
+/* 防火墙区域标签（zonebadge）文字：LuCI 内置的淡 zone 色背景在暗色
+   下不变，白字会看不清——暗色下改用深色字，与亮色模式同等对比 */
+:root[data-darkmode="true"] .zonebadge {
+	color: #1d2633;
 }
 
 /* code / pre blocks */
@@ -3155,8 +3187,10 @@ pre {
 	}
 
 	/* 移动端：多层嵌套卡片（network/dns/主机名记录等会套 2-4 层）压缩
-	   各层左右缩进到 2px，避免嵌套层数多了最内层内容被挤出视口；
-	   嵌套的每层再往内缩 2px（margin），层级越深内容越窄 */
+	   各层左右缩进到 6px，避免嵌套层数多了最内层内容被挤出视口；
+	   嵌套的每层再往内缩 2px（margin），层级越深内容越窄。
+	   注意左右 padding 需 ≥ 6px：输入框/下拉聚焦高亮 ring 外扩 3px，
+	   2px 时高亮会被卡片边缘裁断（微超被切），6px 才留足余量 */
 	.cbi-map {
 		padding: 10px 2px 12px;
 	}
@@ -3170,11 +3204,19 @@ pre {
 	}
 
 	.cbi-section {
-		padding: 10px 2px 12px;
+		padding: 10px 6px 12px;
 	}
 
 	.cbi-section-node {
-		padding: 2px 0;
+		/* 左右 4px 余量：滚动容器 overflow-x:auto 会在可视右缘横向裁剪
+		   输入框聚焦 ring(3px)，留 4px 保证 ring 不被切；嵌套仍紧凑 */
+		padding: 2px 4px;
+	}
+
+	/* 登录页表单容器：上面的 overflow-x:auto 同样会横裁登录输入框的
+	   聚焦 ring；登录表单不超宽、无需横向滚动，改 visible 即可 */
+	body.liquid-login .cbi-section-node {
+		overflow-x: visible;
 	}
 
 	.cbi-section-node > .cbi-section {
@@ -3334,7 +3376,7 @@ pre {
 	}
 
 	#maincontent {
-		padding: 0 12px 64px;
+		padding: 0 16px 64px;
 		margin-left: 0;
 	}
 
