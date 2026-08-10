@@ -3181,6 +3181,12 @@ pre {
 		padding: 2px 4px;
 	}
 
+	/* 登录页表单容器：上面的 overflow-x:auto 同样会横裁登录输入框的
+	   聚焦 ring；登录表单不超宽、无需横向滚动，改 visible 即可 */
+	body.liquid-login .cbi-section-node {
+		overflow-x: visible;
+	}
+
 	.cbi-section-node > .cbi-section {
 		margin-top: 2px;
 	}
