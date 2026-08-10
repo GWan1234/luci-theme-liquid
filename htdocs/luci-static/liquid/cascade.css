@@ -3155,8 +3155,10 @@ pre {
 	}
 
 	/* 移动端：多层嵌套卡片（network/dns/主机名记录等会套 2-4 层）压缩
-	   各层左右缩进到 2px，避免嵌套层数多了最内层内容被挤出视口；
-	   嵌套的每层再往内缩 2px（margin），层级越深内容越窄 */
+	   各层左右缩进到 6px，避免嵌套层数多了最内层内容被挤出视口；
+	   嵌套的每层再往内缩 2px（margin），层级越深内容越窄。
+	   注意左右 padding 需 ≥ 6px：输入框/下拉聚焦高亮 ring 外扩 3px，
+	   2px 时高亮会被卡片边缘裁断（微超被切），6px 才留足余量 */
 	.cbi-map {
 		padding: 10px 2px 12px;
 	}
@@ -3170,7 +3172,7 @@ pre {
 	}
 
 	.cbi-section {
-		padding: 10px 2px 12px;
+		padding: 10px 6px 12px;
 	}
 
 	.cbi-section-node {
