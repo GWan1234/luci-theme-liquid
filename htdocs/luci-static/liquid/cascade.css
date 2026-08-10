@@ -1386,8 +1386,9 @@ body:not(.liquid-login) p.luci a:hover {
 }
 
 /* 输入框下方的按钮组（如"与浏览器同步/与 NTP 服务器同步"）：
-   与上方输入框之间留出缝隙（全终端） */
+   span 默认 inline，margin-top 不生效——改 block 并与上方输入框留缝 */
 .cbi-value-field .control-group {
+	display: block;
 	margin-top: 8px;
 }
 
