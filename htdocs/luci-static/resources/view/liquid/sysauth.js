@@ -16,26 +16,32 @@ return view.extend({
 			? (hostname + ' · ' + _('Authorization Required'))
 			: _('Authorization Required');
 
-		var dlg = ui.showModal(
-			title,
-			[].slice.call(document.querySelectorAll('section > *')),
-			'login'
-		);
+		/* 延迟渲染 modal：Android Edge 的 Bitwarden 扩展扫描时机
+		   与 ui.showModal 移动 DOM 存在竞态——section 中的 form 被移走
+		   的瞬间若被扫描到则字段不完整，导致填充错位（用户名→密码框）。
+		   延迟 200ms 给密码管理器充足的初始扫描窗口。 */
+		setTimeout(function() {
+			var dlg = ui.showModal(
+				title,
+				[].slice.call(document.querySelectorAll('section > *')),
+				'login'
+			);
 
-		form.addEventListener('keypress', function(ev) {
-			if (ev.key == 'Enter')
-				btn.click();
-		});
+			form.addEventListener('keypress', function(ev) {
+				if (ev.key == 'Enter')
+					btn.click();
+			});
 
-		btn.addEventListener('click', function(ev) {
-			ev.preventDefault();
-			dlg.querySelectorAll('*').forEach(function(node) { node.style.display = 'none' });
-			dlg.appendChild(E('div', { 'class': 'spinning' }, _('Logging in…')));
+			btn.addEventListener('click', function(ev) {
+				ev.preventDefault();
+				dlg.querySelectorAll('*').forEach(function(node) { node.style.display = 'none' });
+				dlg.appendChild(E('div', { 'class': 'spinning' }, _('Logging in…')));
 
-			form.submit()
-		});
+				form.submit()
+			});
 
-		document.querySelector('input[type="password"]').focus();
+			document.querySelector('input[type="password"]').focus();
+		}, 200);
 
 		return '';
 	},
