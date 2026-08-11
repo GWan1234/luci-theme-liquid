@@ -27,7 +27,8 @@ return view.extend({
 				btn.click();
 		});
 
-		btn.addEventListener('click', function() {
+		btn.addEventListener('click', function(ev) {
+			ev.preventDefault();
 			dlg.querySelectorAll('*').forEach(function(node) { node.style.display = 'none' });
 			dlg.appendChild(E('div', { 'class': 'spinning' }, _('Logging in…')));
 

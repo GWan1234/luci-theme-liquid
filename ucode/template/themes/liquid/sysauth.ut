@@ -6,7 +6,7 @@
 {% include('header', { blank_page: true }) %}
 
 <section hidden>
-	<form method="post" class="cbi-map">
+	<form method="post" action="/cgi-bin/luci/" class="cbi-map">
 		<div class="cbi-section">
 			<div class="cbi-section-node">
 				<div class="cbi-value">
@@ -53,11 +53,15 @@
 						{% endif %}
 					{% endfor %}
 				{% endif %}
+				<hr>
+				<div class="cbi-value">
+					<div class="cbi-value-field">
+						<button type="submit" class="btn cbi-button-positive important">{{ _('Log in') }}</button>
+					</div>
+				</div>
 			</div>
 		</div>
 	</form>
-
-	<hr>
 
 	{% if (auth_message): %}
 	<div class="alert-message{% if (auth_plugin): %} warning{% endif %}">
@@ -68,8 +72,6 @@
 		{{ _('Invalid username and/or password! Please try again.') }}
 	</div>
 	{% endif %}
-
-	<button class="btn cbi-button-positive important">{{ _('Log in') }}</button>
 </section>
 
 <div id="view">
