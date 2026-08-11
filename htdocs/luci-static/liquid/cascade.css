@@ -2475,14 +2475,23 @@ body.liquid-login #maincontainer {
 	height: 100vh;
 }
 
-body.liquid-login #modal_overlay {
+body.liquid-login #liquid-login {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	z-index: 1000;
+	overflow: auto;
 	display: flex;
 	align-items: center;
 	justify-content: center;
 	background: rgba(8, 11, 16, 0.22);
+	-webkit-backdrop-filter: blur(10px);
+	backdrop-filter: blur(10px);
 }
 
-body.liquid-login #modal_overlay > .modal.login {
+body.liquid-login #liquid-login > .modal.login {
 	width: 392px;
 	max-width: calc(100vw - 40px);
 	margin: 0;
@@ -2505,7 +2514,7 @@ body.liquid-login .cbi-section {
 }
 
 /* 登录页 logo（main.js 注入内联 SVG，跟随主题色 + 玻璃水滴感） */
-body.liquid-login #modal_overlay > .modal.login .liquid-logo {
+body.liquid-login #liquid-login > .modal.login .liquid-logo {
 	display: block;
 	width: 78px;
 	height: 78px;
@@ -2513,14 +2522,14 @@ body.liquid-login #modal_overlay > .modal.login .liquid-logo {
 	filter: drop-shadow(0 6px 18px rgba(31, 45, 70, 0.35));
 }
 
-body.liquid-login #modal_overlay > .modal.login h4 {
+body.liquid-login #liquid-login > .modal.login h4 {
 	font-size: 17px;
 	font-weight: 700;
 	margin-bottom: 16px;
 	color: var(--text-color-highest);
 }
 
-body.liquid-login #modal_overlay > .modal.login .cbi-value {
+body.liquid-login #liquid-login > .modal.login .cbi-value {
 	flex-direction: column;
 	align-items: stretch;
 	gap: 5px;
@@ -2528,7 +2537,7 @@ body.liquid-login #modal_overlay > .modal.login .cbi-value {
 	padding: 4px 0 12px;
 }
 
-body.liquid-login #modal_overlay > .modal.login .cbi-value-title {
+body.liquid-login #liquid-login > .modal.login .cbi-value-title {
 	flex: none;
 	max-width: none;
 	width: 100%;
@@ -2539,21 +2548,21 @@ body.liquid-login #modal_overlay > .modal.login .cbi-value-title {
 	color: var(--text-color-medium);
 }
 
-body.liquid-login #modal_overlay > .modal.login input {
+body.liquid-login #liquid-login > .modal.login input {
 	padding: 11px 13px;
 	font-size: 14px;
 	border-radius: 12px;
 }
 
-body.liquid-login #modal_overlay > .modal.login .alert-message {
+body.liquid-login #liquid-login > .modal.login .alert-message {
 	text-align: left;
 	margin: 0 0 8px;
 }
 
 /* avoid nested glass inside the lock card */
-body.liquid-login #modal_overlay > .modal.login .cbi-map,
-body.liquid-login #modal_overlay > .modal.login .cbi-section,
-body.liquid-login #modal_overlay > .modal.login .cbi-section-node {
+body.liquid-login #liquid-login > .modal.login .cbi-map,
+body.liquid-login #liquid-login > .modal.login .cbi-section,
+body.liquid-login #liquid-login > .modal.login .cbi-section-node {
 	margin: 0;
 	padding: 0;
 	background: transparent;
@@ -2563,7 +2572,7 @@ body.liquid-login #modal_overlay > .modal.login .cbi-section-node {
 	backdrop-filter: none;
 }
 
-body.liquid-login #modal_overlay > .modal.login button.important {
+body.liquid-login #liquid-login > .modal.login button.important {
 	width: 100%;
 	margin-top: 6px;
 	padding: 12px;
@@ -2576,7 +2585,7 @@ body.liquid-login #modal_overlay > .modal.login button.important {
 	box-shadow: 0 6px 16px var(--accent-glow), inset 0 1px 0 rgba(255, 255, 255, 0.35);
 }
 
-body.liquid-login #modal_overlay > .modal.login hr {
+body.liquid-login #liquid-login > .modal.login hr {
 	margin: 2px 0 12px;
 	border-color: var(--border-color-low);
 }

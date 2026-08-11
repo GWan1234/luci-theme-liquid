@@ -5,74 +5,95 @@
 
 {% include('header', { blank_page: true }) %}
 
-<section style="position:absolute;top:-9999px">
-	<form method="post" action="/cgi-bin/luci/" class="cbi-map">
-		<div class="cbi-section">
-			<div class="cbi-section-node">
-				<div class="cbi-value">
-					<label class="cbi-value-title" for="luci_username">{{ _('Username') }}</label>
-					<div class="cbi-value-field">
-						<input class="cbi-input-user" name="luci_username" id="luci_username" type="text" autocomplete="username" value="{{ entityencode(duser, true) }}">
-					</div>
-				</div>
-				<div class="cbi-value">
-					<label class="cbi-value-title" for="luci_password">{{ _('Password') }}</label>
-					<div class="cbi-value-field">
-						<input class="cbi-input-password" name="luci_password" id="luci_password" type="password" autocomplete="current-password">
-					</div>
-				</div>
-				{% if (auth_fields): %}
-					{% for (let field in auth_fields): %}
-						<div class="cbi-value">
-							<label class="cbi-value-title" for="{{ field.name }}">{{ _(field.label ?? field.name) }}</label>
-							<div class="cbi-value-field">
-								<input
-									name="{{ field.name }}"
-									id="{{ field.name }}"
-									type="{{ field.type ?? 'text' }}"
-									{% if (field.placeholder): %}placeholder="{{ field.placeholder }}"{% endif %}
-									{% if (field.inputmode): %}inputmode="{{ field.inputmode }}"{% endif %}
-									{% if (field.pattern): %}pattern="{{ field.pattern }}"{% endif %}
-									{% if (field.maxlength): %}maxlength="{{ field.maxlength }}"{% endif %}
-									{% if (field.autocomplete): %}autocomplete="{{ field.autocomplete }}"{% endif %}
-									{% if (field.required): %}required{% endif %}
-								>
-							</div>
-						</div>
-					{% endfor %}
-				{% endif %}
-				{% if (auth_html): %}
+{# 完全静态登录页：form 直接渲染在 DOM 中，无 hidden/opacity、无 DOM 移动、
+   不依赖 LuCI 的 #modal_overlay/ui.showModal。CSS (#liquid-login) 负责
+   全屏遮罩 + 居中玻璃卡片。密码管理器（Bitwarden 等）任何时机扫描
+   都能看到完整字段，无竞态。 #}
+
+<div id="liquid-login">
+	<div class="modal login">
+		<div class="liquid-logo">
+			<svg viewBox="0 0 64 68" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+				<defs>
+					<linearGradient id="liquid-lg-top" x1="0" y1="0" x2="0" y2="1">
+						<stop offset="0" stop-color="var(--primary-color-high)" stop-opacity="0.85"/>
+						<stop offset="0.5" stop-color="var(--primary-color-high)" stop-opacity="0.4"/>
+						<stop offset="1" stop-color="var(--primary-color-low)" stop-opacity="0.92"/>
+					</linearGradient>
+				</defs>
+				<path d="M32 3 C46 20 57 30 57 42 a25 25 0 0 1 -50 0 C7 30 18 20 32 3 Z" fill="url(#liquid-lg-top)" stroke="rgba(255,255,255,0.7)" stroke-width="1.5"/>
+				<ellipse cx="23" cy="39" rx="9.5" ry="6" fill="#ffffff" opacity="0.6"/>
+			</svg>
+		</div>
+		<h4>{{ _('Authorization Required') }}</h4>
+		<form method="post" action="/cgi-bin/luci/" class="cbi-map">
+			<div class="cbi-section">
+				<div class="cbi-section-node">
 					<div class="cbi-value">
-						{{ auth_html }}
+						<label class="cbi-value-title" for="luci_username">{{ _('Username') }}</label>
+						<div class="cbi-value-field">
+							<input class="cbi-input-user" name="luci_username" id="luci_username" type="text" autocomplete="username" value="{{ entityencode(duser, true) }}">
+						</div>
 					</div>
-				{% endif %}
-				{% if (auth_assets): %}
-					{% for (let asset in auth_assets): %}
-						{% if (asset.type == 'script'): %}
-							<script src="{{ asset.src }}"></script>
-						{% endif %}
-					{% endfor %}
-				{% endif %}
-				<hr>
-				<div class="cbi-value">
-					<div class="cbi-value-field">
-						<button type="submit" class="btn cbi-button-positive important">{{ _('Log in') }}</button>
+					<div class="cbi-value">
+						<label class="cbi-value-title" for="luci_password">{{ _('Password') }}</label>
+						<div class="cbi-value-field">
+							<input class="cbi-input-password" name="luci_password" id="luci_password" type="password" autocomplete="current-password">
+						</div>
+					</div>
+					{% if (auth_fields): %}
+						{% for (let field in auth_fields): %}
+							<div class="cbi-value">
+								<label class="cbi-value-title" for="{{ field.name }}">{{ _(field.label ?? field.name) }}</label>
+								<div class="cbi-value-field">
+									<input
+										name="{{ field.name }}"
+										id="{{ field.name }}"
+										type="{{ field.type ?? 'text' }}"
+										{% if (field.placeholder): %}placeholder="{{ field.placeholder }}"{% endif %}
+										{% if (field.inputmode): %}inputmode="{{ field.inputmode }}"{% endif %}
+										{% if (field.pattern): %}pattern="{{ field.pattern }}"{% endif %}
+										{% if (field.maxlength): %}maxlength="{{ field.maxlength }}"{% endif %}
+										{% if (field.autocomplete): %}autocomplete="{{ field.autocomplete }}"{% endif %}
+										{% if (field.required): %}required{% endif %}
+									>
+								</div>
+							</div>
+						{% endfor %}
+					{% endif %}
+					{% if (auth_html): %}
+						<div class="cbi-value">
+							{{ auth_html }}
+						</div>
+					{% endif %}
+					{% if (auth_assets): %}
+						{% for (let asset in auth_assets): %}
+							{% if (asset.type == 'script'): %}
+								<script src="{{ asset.src }}"></script>
+							{% endif %}
+						{% endfor %}
+					{% endif %}
+					<hr>
+					<div class="cbi-value">
+						<div class="cbi-value-field">
+							<button type="submit" class="btn cbi-button-positive important">{{ _('Log in') }}</button>
+						</div>
 					</div>
 				</div>
 			</div>
-		</div>
-	</form>
+		</form>
 
-	{% if (auth_message): %}
-	<div class="alert-message{% if (auth_plugin): %} warning{% endif %}">
-		{{ auth_message }}
+		{% if (auth_message): %}
+		<div class="alert-message{% if (auth_plugin): %} warning{% endif %}">
+			{{ auth_message }}
+		</div>
+		{% elif (fuser): %}
+		<div class="alert-message error">
+			{{ _('Invalid username and/or password! Please try again.') }}
+		</div>
+		{% endif %}
 	</div>
-	{% elif (fuser): %}
-	<div class="alert-message error">
-		{{ _('Invalid username and/or password! Please try again.') }}
-	</div>
-	{% endif %}
-</section>
+</div>
 
 <div id="view">
 	<div class="spinning">{{ _('Loading view…') }}</div>
