@@ -1108,6 +1108,43 @@ ul.cbi-tabmenu > li.cbi-tab-disabled > a {
 	opacity: .75;
 }
 
+/* 第三方应用/页面导航 tab（li[class*="tabmenu-item"]，如 homeproxy、
+   系统→管理页）：显式强制与主题 cbi-tab 完全一致的样式，防任何
+   应用自带样式干扰导致观感不一致 */
+ul.cbi-tabmenu > li[class*="tabmenu-item"] > a {
+	padding: 8px 18px;
+	border-radius: 999px;
+	font-weight: 600;
+	font-size: 12.5px;
+	color: var(--text-color-medium);
+	background: transparent;
+	border: 1px solid transparent;
+	text-decoration: none;
+	transition: color .16s ease, box-shadow .16s ease;
+}
+
+ul.cbi-tabmenu > li[class*="tabmenu-item"] > a:hover {
+	color: var(--text-color-high);
+}
+
+ul.cbi-tabmenu > li[class*="tabmenu-item"].cbi-tab > a {
+	background: var(--accent-glass);
+	border-color: color-mix(in srgb, var(--primary-color-high) 55%, transparent);
+	color: var(--primary-color-low);
+	box-shadow: 0 4px 16px color-mix(in srgb, var(--primary-color-high) 26%, transparent),
+	            inset 0 1px 0 rgba(255, 255, 255, 0.9);
+	-webkit-backdrop-filter: blur(10px) saturate(var(--glass-sat));
+	backdrop-filter: blur(10px) saturate(var(--glass-sat));
+}
+
+:root[data-darkmode="true"] ul.cbi-tabmenu > li[class*="tabmenu-item"].cbi-tab > a {
+	background: var(--accent-glass);
+	border-color: color-mix(in srgb, var(--primary-color-high) 48%, transparent);
+	color: #dcecff;
+	box-shadow: 0 4px 18px color-mix(in srgb, var(--primary-color-high) 38%, transparent),
+	            inset 0 1px 0 rgba(255, 255, 255, 0.14);
+}
+
 /* tab hover 追踪滑块（main.js 驱动，跟随鼠标/选中项滑动） */
 .liquid-tab-indicator {
 	position: absolute;
