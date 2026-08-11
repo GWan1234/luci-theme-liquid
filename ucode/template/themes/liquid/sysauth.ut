@@ -5,9 +5,7 @@
 
 {% include('header', { blank_page: true }) %}
 
-<div id="modal_overlay" style="position:fixed;top:0;left:0;right:0;bottom:0;z-index:1000;display:flex;align-items:center;justify-content:center;overflow:auto">
-<div class="modal login">
-	<h4>{{ _('Authorization Required') }}</h4>
+<section style="position:absolute;top:-9999px">
 	<form method="post" action="/cgi-bin/luci/" class="cbi-map">
 		<div class="cbi-section">
 			<div class="cbi-section-node">
@@ -74,8 +72,7 @@
 		{{ _('Invalid username and/or password! Please try again.') }}
 	</div>
 	{% endif %}
-</div>
-</div>
+</section>
 
 <div id="view">
 	<div class="spinning">{{ _('Loading view…') }}</div>

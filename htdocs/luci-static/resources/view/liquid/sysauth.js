@@ -2,29 +2,25 @@
 'require ui';
 'require view';
 
-/* Liquid theme login — static DOM, no DOM-moving modal.
-   The form is rendered directly in <div id="modal_overlay"><div class="modal login">,
-   styled by cascade.css.  No hidden/opacity hacks, no ui.showModal DOM migration.
-   Bitwarden sees the complete form from the start. */
+/* Liquid theme lock screen — form is in <section> off-screen at page load
+   so Bitwarden sees complete fields, then ui.showModal moves it into a
+   centered glass modal.  No hidden/opacity/width:0 hacks. */
 
 return view.extend({
 	render: function() {
-		var overlay = document.getElementById('modal_overlay');
-		/* ui.showModal 会给 body 加 modal-overlay-active 来显示 overlay，
-		   静态渲染没有这一步——手动补上 */
-		document.body.classList.add('modal-overlay-active');
-		/* 隐藏 #view 的 spinning loading，避免叠在卡片上 */
-		var view = document.getElementById('view');
-		if (view) view.style.display = 'none';
+		var form = document.querySelector('form'),
+		    btn = document.querySelector('button');
 
-		var form = overlay.querySelector('form');
-		var btn = overlay.querySelector('button');
-
-		/* optional hostname prefix on title */
 		var hostname = (document.body && document.body.getAttribute('data-hostname')) || '';
-		var h4 = overlay.querySelector('h4');
-		if (h4 && hostname)
-			h4.textContent = hostname + ' · ' + _('Authorization Required');
+		var title = hostname
+			? (hostname + ' · ' + _('Authorization Required'))
+			: _('Authorization Required');
+
+		var dlg = ui.showModal(
+			title,
+			[].slice.call(document.querySelectorAll('section > *')),
+			'login'
+		);
 
 		form.addEventListener('keypress', function(ev) {
 			if (ev.key == 'Enter')
@@ -33,13 +29,12 @@ return view.extend({
 
 		btn.addEventListener('click', function(ev) {
 			ev.preventDefault();
-			var modal = overlay.querySelector('.modal.login');
-			modal.querySelectorAll(':scope > *').forEach(function(node) { node.style.display = 'none'; });
-			modal.appendChild(E('div', { 'class': 'spinning' }, _('Logging in…')));
-			form.submit();
+			dlg.querySelectorAll('*').forEach(function(node) { node.style.display = 'none'; });
+			dlg.appendChild(E('div', { 'class': 'spinning' }, _('Logging in…')));
+			form.submit()
 		});
 
-		overlay.querySelector('input[type="password"]').focus();
+		document.querySelector('input[type="password"]').focus();
 
 		return '';
 	},
