@@ -13,6 +13,9 @@ return view.extend({
 		/* ui.showModal 会给 body 加 modal-overlay-active 来显示 overlay，
 		   静态渲染没有这一步——手动补上 */
 		document.body.classList.add('modal-overlay-active');
+		/* 隐藏 #view 的 spinning loading，避免叠在卡片上 */
+		var view = document.getElementById('view');
+		if (view) view.style.display = 'none';
 
 		var form = overlay.querySelector('form');
 		var btn = overlay.querySelector('button');
