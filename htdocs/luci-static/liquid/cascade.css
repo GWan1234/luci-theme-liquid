@@ -3422,6 +3422,13 @@ pre {
 	#maincontent {
 		padding: 0 16px 64px;
 		margin-left: 0;
+		/* 移动端页面滚动必须留在 #maincontainer：若 #maincontent 因
+		   overflow-x:auto（overflow-y 计算为 auto + min-height 归零）
+		   收缩成滚动容器，下拉打开时 :has(.cbi-dropdown[open]) 把它
+		   的 overflow 改回 visible 会直接丢弃滚动位置——首屏以下的
+		   下拉一点就跳回页顶。flex-shrink:0 让它不收缩，纵向滚动
+		   始终由 #maincontainer 承担（其 overflow 从不被翻转）。 */
+		flex-shrink: 0;
 	}
 
 	body:not(.liquid-login) p.luci {
@@ -3533,7 +3540,9 @@ pre {
    2) 含"打开"下拉的卡片提升 z-index：突破 backdrop-filter 形成的
       stacking context，避免被相邻卡片盖住；
    3) 移动端滚动容器（.cbi-section-node / #maincontent）：两轴 visible，
-      不再横向裁剪弹出列表 */
+      不再裁剪弹出列表。页面纵向滚动由 #maincontainer 承担（移动端
+      #maincontent 已 flex-shrink:0 不收缩成滚动容器），此翻转不会
+      丢弃滚动位置 */
 /* 只在"打开"时解除裁剪（加载/闭合时保持原样，不影响胶囊尺寸） */
 .cbi-section-table:has(.cbi-dropdown[open]) {
 	overflow: visible !important;
