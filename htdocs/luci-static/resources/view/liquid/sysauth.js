@@ -10,6 +10,10 @@
 return view.extend({
 	render: function() {
 		var overlay = document.getElementById('modal_overlay');
+		/* ui.showModal 会给 body 加 modal-overlay-active 来显示 overlay，
+		   静态渲染没有这一步——手动补上 */
+		document.body.classList.add('modal-overlay-active');
+
 		var form = overlay.querySelector('form');
 		var btn = overlay.querySelector('button');
 
