@@ -1128,21 +1128,21 @@ ul.cbi-tabmenu > li[class*="tabmenu-item"] > a:hover {
 }
 
 ul.cbi-tabmenu > li[class*="tabmenu-item"].cbi-tab > a {
-	background: var(--accent-glass);
-	border-color: color-mix(in srgb, var(--primary-color-high) 55%, transparent);
-	color: var(--primary-color-low);
+	background: var(--accent-glass) !important;
+	border-color: color-mix(in srgb, var(--primary-color-high) 55%, transparent) !important;
+	color: var(--primary-color-low) !important;
 	box-shadow: 0 4px 16px color-mix(in srgb, var(--primary-color-high) 26%, transparent),
-	            inset 0 1px 0 rgba(255, 255, 255, 0.9);
-	-webkit-backdrop-filter: blur(10px) saturate(var(--glass-sat));
-	backdrop-filter: blur(10px) saturate(var(--glass-sat));
+	            inset 0 1px 0 rgba(255, 255, 255, 0.9) !important;
+	-webkit-backdrop-filter: blur(10px) saturate(var(--glass-sat)) !important;
+	backdrop-filter: blur(10px) saturate(var(--glass-sat)) !important;
 }
 
 :root[data-darkmode="true"] ul.cbi-tabmenu > li[class*="tabmenu-item"].cbi-tab > a {
-	background: var(--accent-glass);
-	border-color: color-mix(in srgb, var(--primary-color-high) 48%, transparent);
-	color: #dcecff;
+	background: var(--accent-glass) !important;
+	border-color: color-mix(in srgb, var(--primary-color-high) 48%, transparent) !important;
+	color: #dcecff !important;
 	box-shadow: 0 4px 18px color-mix(in srgb, var(--primary-color-high) 38%, transparent),
-	            inset 0 1px 0 rgba(255, 255, 255, 0.14);
+	            inset 0 1px 0 rgba(255, 255, 255, 0.14) !important;
 }
 
 /* tab hover 追踪滑块（main.js 驱动，跟随鼠标/选中项滑动） */
