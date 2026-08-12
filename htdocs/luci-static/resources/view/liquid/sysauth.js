@@ -2,25 +2,22 @@
 'require ui';
 'require view';
 
-/* Liquid theme lock screen view, based on luci-theme-bootstrap's
- * view/bootstrap/sysauth.js (Apache 2.0). Puts the login form into a
- * centered modal styled as a macOS-like lock screen. */
+/* Liquid theme login — fully static DOM.  The form is rendered directly in
+   <div id="liquid-login"><div class="modal login"> by the ucode template;
+   CSS centers it and adds the glass card.  No ui.showModal, no DOM moving —
+   password managers (Bitwarden etc.) always see the complete form. */
 
 return view.extend({
 	render: function() {
-		var form = document.querySelector('form'),
-		    btn = document.querySelector('button');
+		var card = document.getElementById('liquid-login');
+		var form = card.querySelector('form'),
+		    btn = card.querySelector('button');
 
+		/* optional hostname prefix on title */
 		var hostname = (document.body && document.body.getAttribute('data-hostname')) || '';
-		var title = hostname
-			? (hostname + ' · ' + _('Authorization Required'))
-			: _('Authorization Required');
-
-		var dlg = ui.showModal(
-			title,
-			[].slice.call(document.querySelectorAll('section > *')),
-			'login'
-		);
+		var h4 = card.querySelector('h4');
+		if (h4 && hostname)
+			h4.textContent = hostname + ' · ' + _('Authorization Required');
 
 		form.addEventListener('keypress', function(ev) {
 			if (ev.key == 'Enter')
@@ -29,13 +26,12 @@ return view.extend({
 
 		btn.addEventListener('click', function(ev) {
 			ev.preventDefault();
-			dlg.querySelectorAll('*').forEach(function(node) { node.style.display = 'none' });
-			dlg.appendChild(E('div', { 'class': 'spinning' }, _('Logging in…')));
-
+			card.querySelectorAll('.modal.login > *').forEach(function(node) { node.style.display = 'none'; });
+			card.querySelector('.modal.login').appendChild(E('div', { 'class': 'spinning' }, _('Logging in…')));
 			form.submit()
 		});
 
-		document.querySelector('input[type="password"]').focus();
+		card.querySelector('input[type="password"]').focus();
 
 		return '';
 	},
