@@ -2273,6 +2273,45 @@ input[type="radio"] {
 	box-shadow: 0 0 10px var(--accent-glow);
 }
 
+/* status-page (overview) memory/storage bars: taller, with used/total
+   text rendered inside the bar by liquid's main.js */
+.cbi-section .cbi-progressbar {
+	height: 22px;
+	display: flex;
+	align-items: center;
+}
+
+.cbi-section .cbi-progressbar > div {
+	/* fill: sub-menu glass gradient (blue → white), theme color ~90%,
+	   NO border/ring, NO outer drop shadow (it would bleed onto the
+	   row separator on mobile) — edge implied by inner top highlight */
+	background: linear-gradient(135deg,
+	            color-mix(in srgb, var(--primary-color-high) 90%, transparent),
+	            rgba(255, 255, 255, 0.72));
+	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8),
+	            inset 0 -1px 0 rgba(0, 0, 0, 0.06);
+}
+
+:root[data-darkmode="true"] .cbi-section .cbi-progressbar > div {
+	background: linear-gradient(135deg,
+	            color-mix(in srgb, var(--primary-color-high) 88%, transparent),
+	            rgba(46, 58, 84, 0.45));
+	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.cbi-section .cbi-progressbar > span.liquid-bar-label {
+	position: relative;
+	z-index: 2;
+	margin: 0 auto;
+	font-size: 11px;
+	font-weight: 700;
+	line-height: 22px;
+	color: var(--text-color-highest);
+	text-shadow: 0 1px 2px rgba(255, 255, 255, 0.45);
+	white-space: nowrap;
+	pointer-events: none;
+}
+
 /* ==========================================================================
    13. Dashboard cards
    ========================================================================== */
@@ -3491,19 +3530,48 @@ pre {
 		overflow-x: auto;
 	}
 
-	/* 行内单元格同行排列（!important 防覆盖），标题列紧凑、值列占剩余宽度 */
+	/* 移动端：tr 转 flex。分隔线画在 tr 底部（而非各 td）——
+	   行内 td 高度不同（标题行矮、进度条行高），td 级 border-bottom
+	   会左右错位；tr 级 border-bottom 只有一条边，横贯整行天然一致。
+	   （斑马纹/hover 本就画在 tr 上，故左右始终对齐） */
 	.cbi-section-table tr,
 	.table tr {
 		display: flex !important;
-		align-items: center;
+		align-items: stretch;
 		white-space: nowrap;
+		border-bottom: 1px solid var(--border-color-low);
 	}
 
 	.cbi-section-table tr > td,
 	.cbi-section-table tr > th,
+	.cbi-section-table tr > .td,
+	.cbi-section-table tr > .th,
 	.table tr > td,
-	.table tr > th {
+	.table tr > th,
+	.table tr > .td,
+	.table tr > .th {
 		flex: 0 1 auto;
+		display: flex;
+		align-items: center;
+		/* 基础规则用类选择器(.table .td)，特异性更高，必须 !important
+		   才能移除 td 级分隔线（分隔线统一画在 tr 底部） */
+		border-bottom: 0 !important;
+	}
+
+	.cbi-section-table tr:last-child,
+	.table tr:last-child {
+		border-bottom: 0;
+	}
+
+	/* 移动端：进度条行（22px 高）与文字行高度差会让分隔线节奏不均，
+	   收紧进度条行的上下 padding，让行高与文字行一致，横线间距均匀。
+	   同时给该行 td 显式 min-height（22px 进度条 + 4px*2 padding），
+	   兜底 stretch 未拉高左侧标题 td 的情况 → 左右 border-bottom 对齐 */
+	.cbi-section-table tr:has(.cbi-progressbar) > td,
+	.table tr:has(.cbi-progressbar) > td {
+		padding-top: 4px;
+		padding-bottom: 4px;
+		min-height: 30px;
 	}
 
 	.cbi-section-table tr > td:last-child,

@@ -1040,4 +1040,48 @@
 			attributeFilter: ['open']
 		});
 	}
+
+	/* ── Overview page memory/storage bars: render used/total text inside
+	   the taller progress bar. LuCI's status include renders
+	   <div class="cbi-progressbar" title="used / total (pc%)"><div style="width:N%"></div></div>
+	   — we inject a centered label from the title attribute and keep it
+	   in sync when LuCI re-renders (poll updates). ── */
+	function syncBarLabels() {
+		document.querySelectorAll('.cbi-section .cbi-progressbar').forEach(function (bar) {
+			var label = bar.querySelector('span.liquid-bar-label');
+			if (!label) {
+				label = document.createElement('span');
+				label.className = 'liquid-bar-label';
+				bar.appendChild(label);
+			}
+			/* keep in sync with LuCI's poll updates (title attribute) */
+			var txt = bar.title || '';
+			if (label.textContent !== txt)
+				label.textContent = txt;
+		});
+	}
+
+	/* overview renders its includes after the view instantiates; poll
+	   both the DOM (async view load) and the title updates */
+	if (window.MutationObserver) {
+		var barObserver = new MutationObserver(function (muts) {
+			var need = false;
+			muts.forEach(function (m) {
+				if (m.type === 'childList' && m.addedNodes && m.addedNodes.length)
+					need = true;
+				if (m.type === 'attributes' && m.attributeName === 'title')
+					need = true;
+			});
+			if (need)
+				syncBarLabels();
+		});
+		barObserver.observe(document.body, {
+			childList: true,
+			subtree: true,
+			attributes: true,
+			attributeFilter: ['title']
+		});
+	}
+	setTimeout(syncBarLabels, 500);
+	setTimeout(syncBarLabels, 1500);
 })();
