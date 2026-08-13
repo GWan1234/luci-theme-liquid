@@ -2669,6 +2669,8 @@ body.liquid-login p.luci a:hover {
 #modal_overlay {
 	position: fixed;
 	top: 0;
+	left: 0;
+	right: 0;
 	bottom: 0;
 	z-index: 2000;
 	overflow: auto;
@@ -2678,6 +2680,12 @@ body.liquid-login p.luci a:hover {
 	opacity: 0;
 	visibility: hidden;
 	transition: opacity .18s ease, visibility .18s ease;
+	/* flex 容器：普通 modal 顶部对齐（margin 5em auto），
+	   应用提示(.alert-message)用 margin:auto 全屏居中。
+	   超高 modal 由本容器 overflow:auto 滚动（不锁定、不脱离文档流） */
+	display: flex;
+	align-items: flex-start;
+	justify-content: center;
 }
 
 body.modal-overlay-active {
@@ -2706,6 +2714,49 @@ body.modal-overlay-active #modal_overlay {
 	backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
 	border: 1px solid var(--glass-border);
 	box-shadow: var(--glass-shadow), inset 0 1px 0 var(--glass-inset);
+}
+
+/* ── 应用配置流程提示（正在等待/应用完成/无待应用配置等）──
+   背景：LuCI 的 displayStatus(type) 会把 type 字符串（如 'notice
+   spinning'）作为 class 直接加到 modal 元素上，而主题的 .notice /
+   .spinning 是为按钮/文档流元素设计的（margin/padding/border、
+   inline-block/relative/padding-left），作用到 modal 自身会把布局
+   挤偏（spinning 的 position:relative 在 flex 中 margin:auto 垂直
+   居中行为异常，是安卓上"正在等待"偏右下的根因）。
+   修复：modal 上下文完整重置这些污染，恢复纯 static + flex 居中。 */
+#modal_overlay > .modal.alert-message,
+#modal_overlay > .modal.alert-message.notice,
+#modal_overlay > .modal.alert-message.spinning {
+	/* 重置 .notice 污染（文档流内联提示样式） */
+	margin: auto !important;
+	padding: 20px 28px !important;
+	border-radius: 18px !important;
+	font-size: 13px !important;
+	background: var(--glass-bg-strong) !important;
+	border: 1px solid var(--glass-border) !important;
+	/* 重置 .spinning 污染（按钮的 inline-block/relative/padding-left）。
+	   注意 position 不用 !important —— JS 强制居中器(visualViewport)
+	   需用 inline style 覆盖为 fixed，!important 会压死它 */
+	position: static;
+	display: block !important;
+	text-align: center !important;
+	width: min(420px, 90vw) !important;
+	max-width: 90vw !important;
+	max-height: 80vh !important;
+	overflow: auto !important;
+	z-index: 2100 !important;
+}
+
+#modal_overlay > .modal.alert-message h4:empty {
+	display: none;
+}
+
+/* spinner 图标作为行内元素与文字同行，参与整体居中 */
+#modal_overlay > .modal.alert-message.spinning::before {
+	position: static;
+	display: inline-block;
+	vertical-align: middle;
+	margin: 0 8px 0 0;
 }
 
 #modal_overlay > .modal > * {

@@ -1,8 +1,8 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=luci-theme-liquid
-PKG_VERSION:=0.4
-PKG_RELEASE:=23
+PKG_VERSION:=0.5
+PKG_RELEASE:=1
 
 PKG_MAINTAINER:=然后七年 <z@7ze.top>
 PKG_LICENSE:=Apache-2.0
@@ -38,8 +38,16 @@ define Package/$(PKG_NAME)/postrm
 exit 0
 endef
 
-# 版本迭代：改 PKG_RELEASE（r 值）时，同步更新
-# ucode/template/themes/liquid/VERSION（模板用它做 foot 显示与 ?v= 缓存破坏）。
+# 版本迭代：改 PKG_RELEASE（r 值）时无需再手动同步 VERSION 文件。
+# Build/Prepare 阶段用 $(VERSION) 动态写入 PKG_BUILD_DIR 中的
+# VERSION 文件（覆盖仓库内静态占位），随后 luci.mk 默认 install
+# 将其复制进包 —— 与 Makefile 的 PKG_VERSION/PKG_RELEASE 永远一致。
+# （header.ut/footer.ut 用它做 foot 显示与 ?v= 缓存破坏）
+define Build/Prepare/luci-theme-liquid
+	$(call Build/Prepare/Default)
+	echo '$(VERSION)' > $(PKG_BUILD_DIR)/ucode/template/themes/liquid/VERSION
+endef
+
 include $(TOPDIR)/feeds/luci/luci.mk
 
 # call BuildPackage - OpenWrt buildroot signature

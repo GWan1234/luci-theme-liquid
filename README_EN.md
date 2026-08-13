@@ -67,6 +67,9 @@ Supports **light / dark / auto** modes, **5 accent colors + a custom color picke
 
 ## Changelog
 
+- **2026-08-13 · v0.5**: centered modals + status-bar style polish
+  - **Centered modals**: apply-progress toasts (applying / applied / nothing to apply) and the pending-changes dialog are now properly centered on mobile; tall form modals (e.g. add DHCP) keep normal scrolling
+  - **Status bars**: disk / memory usage bars get a deeper accent color with a glass gradient, showing used / total inline
 - **2026-08-08 · v0.3**: custom accent color + color-switch polish + mobile / dark-mode improvements
   - **Custom accent color**: beyond the 5 presets — click the rainbow dot to drop a hex input (`#RRGGBB`); leaving the field saves and applies instantly; invalid values fall back to default blue (custom mode stays enabled); persisted via uci across clients
   - **Color switch**: pill fixed at 35px; a selected custom dot shows its color inside with a rainbow ring for instant recognition; the Bing wallpaper button gets a square outline hugging its icon and a single white ring when active
