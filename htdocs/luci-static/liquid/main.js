@@ -1084,4 +1084,63 @@
 	}
 	setTimeout(syncBarLabels, 500);
 	setTimeout(syncBarLabels, 1500);
+
+	/* ── 矮弹窗居中器（限定范围：仅应用提示/待应用等矮弹窗）──
+	   安卓浏览器布局视口(innerHeight) 含地址栏区域，与真实可视区
+	   不一致（如 811 vs 695），且地址栏展开/收起时动态变化，纯 CSS
+	   无法感知 —— 这是 visualViewport API 存在的原因。
+	   用法：仅当弹窗内容高度 < 可视区（矮弹窗，居中是刚需）时用
+	   visualViewport 像素级居中；超高弹窗（表单类如添加 DHCP）
+	   绝不锁定，保持文档流 + overlay 滚动，不影响桌面端功能。 */
+	function centerModals() {
+		var vv = window.visualViewport;
+		var overlay = document.getElementById('modal_overlay');
+		var modal = overlay ? overlay.firstElementChild : null;
+		if (!modal || document.body.classList.contains('liquid-login'))
+			return;
+		var vh = vv ? vv.height : window.innerHeight;
+		var mh = modal.offsetHeight || 0;
+		if (!mh)
+			return;
+		/* 超高弹窗：不锁定，恢复文档流（margin 顶部对齐 + overlay 滚动） */
+		if (mh >= vh - 24) {
+			modal.style.position = '';
+			modal.style.top = '';
+			modal.style.left = '';
+			modal.style.margin = '';
+			modal.style.transform = '';
+			return;
+		}
+		/* 矮弹窗：visualViewport 像素级精确居中 */
+		var vw = vv ? vv.width : window.innerWidth;
+		var vx = vv ? vv.offsetLeft : 0;
+		var vy = vv ? vv.offsetTop : 0;
+		var mw = modal.offsetWidth || 0;
+		modal.style.position = 'fixed';
+		modal.style.top = Math.round(vy + (vh - mh) / 2) + 'px';
+		modal.style.left = Math.round(vx + (vw - mw) / 2) + 'px';
+		modal.style.margin = '0';
+		modal.style.transform = 'none';
+	}
+
+	/* 监听弹窗出现/内容变化（应用提示每秒重建；表单弹窗内容逐步渲染） */
+	var modalTimer = null;
+	function watchModals() {
+		if (document.body.classList.contains('modal-overlay-active')) {
+			if (!modalTimer) {
+				centerModals();
+				modalTimer = setInterval(centerModals, 200);
+			}
+		} else if (modalTimer) {
+			clearInterval(modalTimer);
+			modalTimer = null;
+		}
+	}
+	new MutationObserver(watchModals).observe(document.body, {
+		attributes: true,
+		attributeFilter: ['class']
+	});
+	window.addEventListener('resize', centerModals);
+	if (window.visualViewport)
+		window.visualViewport.addEventListener('resize', centerModals);
 })();
