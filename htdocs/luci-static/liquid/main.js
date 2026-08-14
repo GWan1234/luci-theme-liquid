@@ -555,13 +555,16 @@
 	   使其始终完整落在屏幕内（超出部分出滚动条，不再被屏幕边缘裁掉） */
 	function adjustDropdownDirection() {
 		document.querySelectorAll('.cbi-dropdown').forEach(function (dd) {
-			var ul = dd.querySelector('ul.dropdown') || dd.querySelector('ul');
+			var ul = dd.querySelector('ul.dropdown') || dd.querySelector('ul:not(.preview)');
 			if (!ul)
 				return;
-			var open = dd.classList.contains('open') || dd.hasAttribute('open');
+			/* 打开判定：优先 dd 的 open 状态；部分第三方渲染（如
+			   OpenClash）不设 open 属性，改判 ul 是否带 dropdown class */
+			var open = dd.classList.contains('open') || dd.hasAttribute('open')
+			        || ul.classList.contains('dropdown');
 
 			if (!open) {
-				/* 关闭后清理 luci 开合流程残留的 inline 定位（触屏分支的
+				/* 关闭：清理 luci 开合流程残留的 inline 定位（触屏分支的
 				   left/right 会把闭合胶囊横向拉长）并恢复 fit 宽度
 				   （luci closeDropdown 会清 dd.style.width） */
 				ul.style.left = '';
@@ -569,10 +572,18 @@
 				ul.style.top = '';
 				ul.style.bottom = '';
 				ul.style.maxHeight = '';
+				releaseCardBlur();
 				if (dd.dataset.liquidW)
 					dd.style.width = dd.dataset.liquidW + 'px';
 				return;
 			}
+
+			/* 打开时暂时解除卡片链的 backdrop-filter：玻璃卡片形成
+			   stacking context + containing block，内部 z-index 9999
+			   出不去、fixed/absolute 被限制在卡片内（下拉被遮挡的根因）。
+			   移除后下拉 z-index 可盖住后续卡片；关闭时 releaseCardBlur
+			   恢复玻璃。 */
+			holdCardBlur(dd);
 
 			/* 清掉 luci 触屏分支残留的 left/right inline 定位：否则选项
 			   列表可能被压成短短一横条/错位（F12 触发 resize 重算才恢复） */
@@ -620,6 +631,31 @@
 			else
 				ul.style.maxHeight = '';
 		});
+	}
+
+	/* ── 卡片 backdrop-filter 临时解除（下拉不被遮挡的关键）──
+	   玻璃卡片 backdrop-filter 创建 stacking context + containing
+	   block：内部下拉 z-index 9999 出不去、被后续卡片盖住。打开下拉
+	   时给带 backdrop-filter 的祖先加 .liquid-dd-bf-off（CSS 置
+	   backdrop-filter:none），关闭时移除。 */
+	var _bfChain = [];
+	function holdCardBlur(dd) {
+		releaseCardBlur();
+		var el = dd.parentElement;
+		while (el && el !== document.body) {
+			if (getComputedStyle(el).backdropFilter !== 'none' ||
+			    getComputedStyle(el).webkitBackdropFilter !== 'none') {
+				el.classList.add('liquid-dd-bf-off');
+				_bfChain.push(el);
+			}
+			el = el.parentElement;
+		}
+	}
+	function releaseCardBlur() {
+		_bfChain.forEach(function (el) {
+			el.classList.remove('liquid-dd-bf-off');
+		});
+		_bfChain = [];
 	}
 
 	/* cbi-dropdown：选择后确保 li[display] 跟随选中项（当前值显示兜底） */

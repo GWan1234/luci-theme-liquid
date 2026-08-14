@@ -2032,6 +2032,15 @@ input[type="radio"] {
 	display: flex;
 }
 
+/* 下拉打开时临时解除卡片链 backdrop-filter（JS holdCardBlur 加类）：
+   玻璃卡片的 backdrop-filter 创建 stacking context + containing
+   block，内部下拉 z-index 出不去会被遮挡；解除后下拉可盖住后续卡片 */
+.liquid-dd-bf-off,
+.liquid-dd-bf-off * {
+	-webkit-backdrop-filter: none !important;
+	backdrop-filter: none !important;
+}
+
 .cbi-dropdown[open] > ul.dropdown {
 	display: block;
 	position: absolute;
