@@ -488,10 +488,15 @@ header [data-indicator],
 	letter-spacing: .4px;
 	text-transform: uppercase;
 	color: var(--text-color-medium);
-	background: var(--glass-bg);
-	border: 1px solid var(--glass-border);
+	/* 淡化半透明玻璃质感（与二级菜单选中项同源） */
+	background: color-mix(in srgb, var(--accent-glass-soft) 55%, transparent);
+	border: 1px solid color-mix(in srgb, var(--primary-color-high) 22%, transparent);
 	border-radius: 999px;
 	white-space: nowrap;
+	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5);
+	-webkit-backdrop-filter: blur(8px);
+	backdrop-filter: blur(8px);
+	transition: background .18s ease, color .18s ease, border-color .18s ease;
 }
 
 header [data-indicator][data-clickable],
@@ -499,11 +504,20 @@ header [data-indicator][data-clickable],
 	cursor: pointer;
 }
 
+header [data-indicator][data-clickable]:hover,
+#menubar [data-indicator][data-clickable]:hover {
+	background: var(--accent-glass-soft);
+	border-color: color-mix(in srgb, var(--primary-color-high) 38%, transparent);
+	color: var(--text-color-highest);
+}
+
 header [data-indicator][data-style="active"],
 #menubar [data-indicator][data-style="active"] {
-	color: var(--on-primary-color);
-	background: var(--accent-grad);
-	border-color: transparent;
+	color: var(--text-color-highest);
+	background: var(--accent-glass-soft);
+	border-color: color-mix(in srgb, var(--primary-color-high) 38%, transparent);
+	box-shadow: 0 2px 10px color-mix(in srgb, var(--primary-color-high) 20%, transparent),
+	            inset 0 1px 0 rgba(255, 255, 255, 0.8);
 }
 
 header [data-indicator][data-style="inactive"],
