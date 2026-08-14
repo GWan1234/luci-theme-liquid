@@ -1179,4 +1179,31 @@
 	window.addEventListener('resize', centerModals);
 	if (window.visualViewport)
 		window.visualViewport.addEventListener('resize', centerModals);
+
+	/* ── 多实例 section 子卡片（Dropbear 实例等）──────────
+	   同一 .cbi-section 内有多个平级 .cbi-section-node 时，给每个
+	   节点加 liquid-multi-node（CSS 渲染为独立子卡片+间隔），
+	   同时给外层 section 加 liquid-multi-sec（删除按钮收边等）。
+	   MutationObserver 覆盖动态增删实例（点击"添加实例"）。 */
+	function styleMultiSections() {
+		document.querySelectorAll('.cbi-section').forEach(function (sec) {
+			var nodes = sec.querySelectorAll(':scope > .cbi-section-node');
+			if (nodes.length > 1) {
+				nodes.forEach(function (n) {
+					n.classList.add('liquid-multi-node');
+				});
+				sec.classList.add('liquid-multi-sec');
+			}
+			else {
+				sec.classList.remove('liquid-multi-sec');
+			}
+		});
+	}
+	styleMultiSections();
+	if (window.MutationObserver) {
+		var msObs = new MutationObserver(function () {
+			styleMultiSections();
+		});
+		msObs.observe(document.body, { childList: true, subtree: true });
+	}
 })();
