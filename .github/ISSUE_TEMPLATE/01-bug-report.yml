@@ -28,8 +28,8 @@ body:
     id: firmware_source
     attributes:
       label: "📦 固件仓库来源（可选）"
-      description: "固件是从哪个源构建/下载的，如 OpenWrt 官方、immortalwrt、自编译"
-      placeholder: "例如：immortalwrt 24.10 或 自编译"
+      description: "固件来源：官方发行版填版本（如 OpenWrt 23.05 / immortalwrt 24.10）；自编译请填 OpenWrt 源码仓库（如 github.com/coolsnowwolf/lede）"
+      placeholder: "例如：immortalwrt 24.10 或 源码仓库 https://github.com/xxx/op"
     validations:
       required: false
   - type: input
