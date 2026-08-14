@@ -107,12 +107,23 @@ return baseclass.extend({
 
 	handleMenuExpand(ev) {
 		const a = ev.target;
-		const ul1 = a.parentNode.parentNode;
+		const li = a.parentNode;
+		const ul1 = li.parentNode;
 		const ul2 = a.nextElementSibling;
 
-		document.querySelectorAll('ul.mainmenu.l1 > li.active').forEach(li => {
-			if (li !== a.parentNode)
-				li.classList.remove('active');
+		/* 点击已展开的一级菜单 → 折叠（收起其子菜单） */
+		if (li.classList.contains('active') && ul2 && ul2.children.length > 0) {
+			li.classList.remove('active');
+			a.blur();
+			ev.preventDefault();
+			ev.stopPropagation();
+			return;
+		}
+
+		/* 未展开：收起其他已展开的一级菜单，再展开当前 */
+		document.querySelectorAll('ul.mainmenu.l1 > li.active').forEach(other => {
+			if (other !== li)
+				other.classList.remove('active');
 		});
 
 		if (!ul2)
@@ -122,7 +133,7 @@ return baseclass.extend({
 			ul2.classList.add('align-left');
 
 		ul1.classList.add('active');
-		a.parentNode.classList.add('active');
+		li.classList.add('active');
 		a.blur();
 
 		ev.preventDefault();
