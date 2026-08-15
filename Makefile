@@ -2,7 +2,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=luci-theme-liquid
 PKG_VERSION:=0.6
-PKG_RELEASE:=7
+PKG_RELEASE:=8
 
 PKG_MAINTAINER:=然后七年 <z@7ze.top>
 PKG_LICENSE:=Apache-2.0
@@ -38,12 +38,10 @@ define Package/$(PKG_NAME)/postinst
 	echo '$(VERSION)' > /usr/share/ucode/luci/template/themes/liquid/VERSION
 
 	# 23.05 opkg 不执行 uci-defaults，必须在 postinst 中设置主题配置。
-	# 首次安装（非升级）时确保 mediaurlbase 指向 liquid，否则 fallback 到 null。
-	if [ "$${PKG_UPGRADE}" != "1" ]; then
-		if [ "$$(uci -q get luci.main.mediaurlbase)" != "/luci-static/liquid" ]; then
-			uci set luci.main.mediaurlbase=/luci-static/liquid
-			uci commit luci
-		fi
+	# 确保 mediaurlbase 指向 liquid，否则 fallback 到 null。
+	if [ "$$(uci -q get luci.main.mediaurlbase)" != "/luci-static/liquid" ]; then
+		uci set luci.main.mediaurlbase=/luci-static/liquid
+		uci commit luci
 	fi
 
 	rm -f /tmp/luci-indexcache.*
