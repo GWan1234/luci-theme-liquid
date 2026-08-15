@@ -69,7 +69,7 @@ Supports **light / dark / auto** modes, **5 accent colors + a custom color picke
 
 - **2026-08-15 · v0.6**: menu search + UX polish
   - **Menu search**: new search entry in the color area — opens a search box that filters menu items in real time, matching Chinese and English titles
-  - **UX polish**: multi-instance configs (e.g. Dropbear) show as separate cards; refresh button gets a frosted glass look
+  - **UX polish**: multi-instance configs (e.g. Dropbear) show as separate cards; refresh button gets a frosted glass look; iStoreOS page tabs adopt the theme tab style
 - **2026-08-13 · v0.5**: centered modals + status-bar style polish
   - **Centered modals**: apply-progress toasts (applying / applied / nothing to apply) and the pending-changes dialog are now properly centered on mobile; tall form modals (e.g. add DHCP) keep normal scrolling
   - **Status bars**: disk / memory usage bars get a deeper accent color with a glass gradient, showing used / total inline
