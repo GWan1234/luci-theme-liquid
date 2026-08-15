@@ -1959,6 +1959,8 @@ input[type="radio"] {
 	color: var(--text-color-medium);
 	background: var(--glass-bg);
 	border-bottom: 1px solid var(--border-color-low);
+	display: table-cell;
+	float: none;
 }
 
 .table td,
@@ -1970,6 +1972,18 @@ input[type="radio"] {
 	vertical-align: middle;
 	border-bottom: 1px solid var(--border-color-low);
 	background: transparent;
+	display: table-cell;
+	float: none;
+}
+
+/* LuCI 新版用 .tr .td 类模拟表格，需要显式设置 display */
+.tr {
+	display: table-row;
+}
+
+.td {
+	display: table-cell;
+	float: none;
 }
 
 .table tr:last-child td,
