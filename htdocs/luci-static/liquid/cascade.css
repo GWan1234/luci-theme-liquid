@@ -1959,6 +1959,8 @@ input[type="radio"] {
 	color: var(--text-color-medium);
 	background: var(--glass-bg);
 	border-bottom: 1px solid var(--border-color-low);
+	display: table-cell;
+	float: none;
 }
 
 .table td,
