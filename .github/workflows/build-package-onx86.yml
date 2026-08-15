@@ -34,6 +34,8 @@ on:
 
 permissions:
   contents: write
+  # 删除 workflow runs 需要 actions: write（GitRML/delete-workflow-runs 依赖）
+  actions: write
 
 env:
   UPLOAD_PACKAGE: true
