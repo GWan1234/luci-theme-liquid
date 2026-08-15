@@ -7,10 +7,17 @@ if ! uci -q get "luci.themes.Liquid" 2>/dev/null; then
 	changed=1
 fi
 
-if [ "$PKG_UPGRADE" != 1 ] && [ $changed = 1 ]; then
-	if ! uci -q get "luci.main.mediaurlbase" 2>/dev/null; then
-		uci set "luci.main.mediaurlbase=/luci-static/liquid"
-	fi
+# 首次安装（非升级）时无条件将默认主题设为 liquid：
+# 固件编译场景下 luci.main.mediaurlbase 可能已被 luci-base 的
+# uci-defaults 预设为 /luci-static/bootstrap（或用户 sed 改的集合
+# 默认），若不覆盖，首次进入 LuCI 会 fallback 到 themes/null。
+# 单独判断 PKG_UPGRADE，不依赖 themes.Liquid 是否已注册
+# （固件可能已预置注册但 mediaurlbase 未指向 liquid）；
+# 若已是 liquid 则跳过（避免无谓 commit）。
+if [ "$PKG_UPGRADE" != 1 ] && \
+   [ "$(uci -q get luci.main.mediaurlbase)" != "/luci-static/liquid" ]; then
+	uci set "luci.main.mediaurlbase=/luci-static/liquid"
+	changed=1
 fi
 
 if [ $changed = 1 ]; then
