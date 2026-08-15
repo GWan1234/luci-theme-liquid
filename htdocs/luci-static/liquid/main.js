@@ -280,6 +280,20 @@
 		customBtn.setAttribute('aria-label', 'Custom color');
 		wrap.appendChild(customBtn);
 
+		/* 菜单搜索按钮（Bing 之后）：点击下推抽屉式搜索框，实时过滤
+		   菜单项（支持中英文标题），再点或点外部收回 */
+		var searchBtn = document.createElement('button');
+		searchBtn.type = 'button';
+		searchBtn.className = 'liquid-color-btn liquid-search-btn';
+		searchBtn.title = 'Search menu';
+		searchBtn.setAttribute('aria-label', 'Search menu');
+		searchBtn.innerHTML = '<svg viewBox="0 0 24 24" width="12" height="12" aria-hidden="true"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2.4"/><line x1="16.5" y1="16.5" x2="21" y2="21" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>';
+		searchBtn.addEventListener('click', function (e) {
+			e.stopPropagation();
+			toggleMenuSearch(e.currentTarget);
+		});
+		wrap.appendChild(searchBtn);
+
 		var pop = document.createElement('div');
 		pop.id = 'liquid-custom-pop';
 		pop.className = 'liquid-custom-pop';
@@ -343,6 +357,202 @@
 
 		updateColorSwitch();
 	}
+
+	/* ── 菜单搜索（抽屉式下推）────────────────────────────
+	   搜索按钮点击：在 #mainmenu 顶部下推一个圆角矩形搜索框，
+	   下面的菜单整体被往下推（抽屉式，非悬浮）。输入时实时过滤
+	   菜单项（匹配显示文本 + 英文原题 data-title）。再次点按钮
+	   或点击菜单外区域收回。 */
+	var menuSearchOpen = false;
+	var menuSearchBox = null;
+	var menuSearchInput = null;
+
+	function buildMenuSearchBox() {
+		menuSearchBox = document.createElement('div');
+		menuSearchBox.id = 'liquid-menu-search';
+		menuSearchBox.className = 'liquid-menu-search';
+
+		var icon = document.createElement('span');
+		icon.className = 'liquid-menu-search-icon';
+		icon.innerHTML = '<svg viewBox="0 0 24 24" width="12" height="12" aria-hidden="true"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2.4"/><line x1="16.5" y1="16.5" x2="21" y2="21" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>';
+
+		menuSearchInput = document.createElement('input');
+		menuSearchInput.type = 'text';
+		menuSearchInput.className = 'liquid-menu-search-input';
+		menuSearchInput.placeholder = '搜索 / Search';
+		menuSearchInput.setAttribute('spellcheck', 'false');
+		menuSearchInput.addEventListener('input', function () {
+			filterMenuItems();
+			updateClearBtn();
+		});
+
+		var clearBtn = document.createElement('button');
+		clearBtn.type = 'button';
+		clearBtn.className = 'liquid-menu-search-clear';
+		clearBtn.innerHTML = '&times;';
+		clearBtn.title = 'Clear';
+		clearBtn.addEventListener('click', function () {
+			menuSearchInput.value = '';
+			filterMenuItems();
+			updateClearBtn();
+			menuSearchInput.focus();
+		});
+
+		function updateClearBtn() {
+			clearBtn.style.display = menuSearchInput.value ? 'inline-flex' : 'none';
+		}
+		updateClearBtn();
+
+		menuSearchBox.appendChild(icon);
+		menuSearchBox.appendChild(menuSearchInput);
+		menuSearchBox.appendChild(clearBtn);
+
+		var menu = document.getElementById('mainmenu');
+		if (menu) {
+			/* 插在颜色胶囊之后（本功能区不动，搜索框从其下方推出） */
+			var sw = menu.querySelector('.liquid-color-switch');
+			if (sw && sw.nextSibling)
+				menu.insertBefore(menuSearchBox, sw.nextSibling);
+			else
+				menu.insertBefore(menuSearchBox, menu.firstChild);
+		}
+		else
+			document.body.appendChild(menuSearchBox);
+
+		return menuSearchBox;
+	}
+
+	function filterMenuItems() {
+		var q = (menuSearchInput.value || '').trim().toLowerCase();
+		var menu = document.getElementById('mainmenu');
+		if (!menu)
+			return;
+
+		/* 收集所有菜单项（一级/二级，含中英文标题） */
+		var items = [];
+		menu.querySelectorAll('ul.mainmenu li').forEach(function (li) {
+			var a = li.querySelector(':scope > a');
+			if (!a)
+				return;
+			var isL1 = li.parentElement && li.parentElement.classList.contains('l1');
+			items.push({
+				li: li,
+				text: (a.textContent || '').trim().toLowerCase(),
+				en: ((a.getAttribute('data-title') || '')).toLowerCase(),
+				isL1: isL1
+			});
+		});
+
+		/* 清空：恢复全部显示 + 还原展开状态（只留当前页所在菜单） */
+		if (!q) {
+			items.forEach(function (it) {
+				it.li.classList.remove('liquid-menu-hidden');
+			});
+			menu.querySelectorAll('ul.mainmenu.l1 > li').forEach(function (li) {
+				if (!li.classList.contains('selected'))
+					li.classList.remove('active');
+			});
+			return;
+		}
+
+		/* 匹配判断 */
+		items.forEach(function (it) {
+			it.match = (it.text.indexOf(q) != -1 || it.en.indexOf(q) != -1);
+		});
+
+		/* 按一级菜单分组处理：
+		   一级匹配 → 展开并显示其全部二级项；
+		   二级匹配 → 展开所属一级，显示匹配的二级项；
+		   均不匹配 → 整组隐藏 */
+		menu.querySelectorAll('ul.mainmenu.l1 > li').forEach(function (li) {
+			var l1 = null, l2s = [];
+			items.forEach(function (it) {
+				if (it.li === li)
+					l1 = it;
+				else if (!it.isL1 && li.contains(it.li))
+					l2s.push(it);
+			});
+			var l1Match = l1 && l1.match;
+			var hasL2Match = l2s.some(function (it) { return it.match; });
+
+			if (l1Match || hasL2Match) {
+				li.classList.remove('liquid-menu-hidden');
+				li.classList.add('active'); /* 展开二级菜单 */
+				l2s.forEach(function (it) {
+					if (l1Match || it.match)
+						it.li.classList.remove('liquid-menu-hidden');
+					else
+						it.li.classList.add('liquid-menu-hidden');
+				});
+			}
+			else {
+				li.classList.add('liquid-menu-hidden');
+			}
+		});
+	}
+
+	function toggleMenuSearch(btn) {
+		if (menuSearchOpen) {
+			closeMenuSearch();
+			return;
+		}
+
+		if (!menuSearchBox)
+			buildMenuSearchBox();
+
+		menuSearchBox.classList.add('open');
+		menuSearchOpen = true;
+		var menu = document.getElementById('mainmenu');
+		if (menu)
+			menu.classList.add('liquid-search-open');
+		/* 搜索按钮与其他圆点一致的 active 高亮（用事件源按钮，可靠） */
+		if (btn)
+			btn.classList.add('active');
+		else {
+			var b = document.querySelector('.liquid-search-btn');
+			if (b)
+				b.classList.add('active');
+		}
+		setTimeout(function () { menuSearchInput.focus(); }, 50);
+	}
+
+	function closeMenuSearch() {
+		if (!menuSearchOpen)
+			return;
+		menuSearchOpen = false;
+		if (menuSearchBox)
+			menuSearchBox.classList.remove('open'); /* height/opacity transition 平滑收回 */
+		var menu = document.getElementById('mainmenu');
+		if (menu)
+			menu.classList.remove('liquid-search-open');
+		/* 搜索按钮还原 */
+		var btn = document.querySelector('.liquid-search-btn');
+		if (btn)
+			btn.classList.remove('active');
+		/* 清空过滤，恢复全部菜单 */
+		if (menuSearchInput) {
+			menuSearchInput.value = '';
+			filterMenuItems();
+		}
+		/* 还原菜单展开状态：只保留当前页所在的一级菜单展开 */
+		if (menu) {
+			menu.querySelectorAll('ul.mainmenu.l1 > li').forEach(function (li) {
+				if (!li.classList.contains('selected'))
+					li.classList.remove('active');
+			});
+		}
+	}
+
+	/* 点击菜单外区域收回（document 捕获阶段，排除搜索框/按钮自身） */
+	document.addEventListener('click', function (e) {
+		if (!menuSearchOpen)
+			return;
+		if (menuSearchBox && menuSearchBox.contains(e.target))
+			return;
+		if (e.target.closest && e.target.closest('.liquid-search-btn'))
+			return;
+		closeMenuSearch();
+	}, true);
 
 	function initSwitch() {
 		if (document.getElementById('liquid-mode-switch'))

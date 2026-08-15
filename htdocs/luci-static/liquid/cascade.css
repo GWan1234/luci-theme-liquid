@@ -596,18 +596,20 @@ header [data-indicator][data-style="inactive"],
 }
 
 /* 菜单栏顶部颜色胶囊（水平居中）。胶囊宽度 min(216px, 100%)（侧栏
-   胶囊宽度 = 内容宽度(max-content)：7 个圆点（Bing + 5 色 + 自定义）
+   胶囊宽度 = 内容宽度(max-content)：8 个圆点（Bing + 5 色 + 自定义 + 占位）
    永远排在同一行，宽度随内容自适应，任何侧栏宽度都不会换行、不会
    超出胶囊；margin auto 居中保证左右两侧间距一致；圆点 flex:none
    固定 18px 正圆不压缩、不缩小。 */
 #mainmenu > .liquid-color-switch {
 	display: flex;
 	justify-content: center;
+	align-items: center;
 	flex-wrap: nowrap;
-	width: max-content;
-	max-width: 100%;
-	margin: 0 auto 12px;
+	width: calc(100% + 8px);
+	max-width: calc(100% + 8px);
+	margin: 0 -4px 12px;
 	flex-shrink: 0;
+	box-sizing: border-box;
 }
 
 /* accent color switch */
@@ -617,9 +619,9 @@ header [data-indicator][data-style="inactive"],
 	box-sizing: border-box;
 	display: inline-flex;
 	align-items: center;
-	gap: 2px;
+	gap: 0;
 	margin-left: 6px;
-	padding: 0 14px;
+	padding: 0 18px;
 	border-radius: 999px;
 	background: var(--glass-bg);
 	border: 1px solid var(--glass-border);
@@ -709,6 +711,179 @@ header [data-indicator][data-style="inactive"],
 	border: 3px solid transparent;
 	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
 	opacity: 1;
+}
+
+/* 菜单搜索按钮：与颜色圆点完全同步的交互设计（白描边、hover
+   放大、启用黑圈），仅形状为圆角方框 + 浅灰底 + 白色放大镜。
+   所有状态显式声明，覆盖 .liquid-color-btn 的继承干扰 */
+.liquid-search-btn {
+	position: relative;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 18px;
+	height: 18px;
+	padding: 0;
+	background: rgba(148, 163, 184, 0.55); /* 浅灰底（明亮模式） */
+	border-radius: 5px; /* 方框 */
+	border: 2px solid rgba(255, 255, 255, 0.85); /* 与其他圆点一致白描边 */
+	color: #ffffff !important; /* 白色放大镜，任何状态不变黑 */
+	cursor: pointer;
+	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.28);
+	opacity: .95;
+	transition: transform .15s ease, box-shadow .15s ease, opacity .15s ease;
+}
+.liquid-search-btn svg {
+	width: 12px;
+	height: 12px;
+	display: block;
+}
+.liquid-search-btn:hover {
+	transform: scale(1.15); /* 描边一起放大，同其他圆点 */
+	background: rgba(148, 163, 184, 0.65);
+	opacity: 1;
+}
+.liquid-search-btn.active {
+	transform: scale(1.15);
+	background: rgba(148, 163, 184, 0.65);
+	box-shadow: 0 0 0 2px var(--text-color-high), /* 黑圈同其他圆点 */
+	            0 2px 6px rgba(0, 0, 0, 0.3);
+	opacity: 1;
+}
+
+/* 暗黑模式：白色方框底（用户指定），深色放大镜 */
+:root[data-darkmode="true"] .liquid-search-btn {
+	background: rgba(255, 255, 255, 0.92);
+	color: #334155 !important;
+	border-color: rgba(255, 255, 255, 0.85);
+}
+:root[data-darkmode="true"] .liquid-search-btn:hover {
+	background: #ffffff;
+}
+:root[data-darkmode="true"] .liquid-search-btn.active {
+	background: #ffffff;
+	box-shadow: 0 0 0 2px var(--text-color-high),
+	            0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+/* ── 菜单搜索框（抽屉式下推，圆角矩形）──────────────
+   与颜色胶囊同源玻璃设计，但圆角矩形（10px 非胶囊），
+   插在颜色胶囊下方，菜单被往下推（非悬浮）。
+   放大镜/清除图标绝对定位在输入框内部（不隔离） */
+.liquid-menu-search {
+	display: flex;
+	position: relative;
+	align-items: center;
+	margin: 0 auto 12px;
+	height: 0; /* 默认收起：0 高不占位 */
+	padding: 0;
+	opacity: 0;
+	overflow: hidden; /* 圆角裁剪子元素（input 撑满后不露直角） */
+	border-radius: 10px;
+	border-width: 0; /* 收起时无边框 */
+	background: var(--glass-bg);
+	border: 1px solid var(--glass-border);
+	box-shadow: 0 4px 14px rgba(31, 45, 70, 0.16),
+	            inset 0 1px 0 rgba(255, 255, 255, 0.6);
+	color: var(--text-color-medium);
+	-webkit-backdrop-filter: blur(10px) saturate(var(--glass-sat));
+	backdrop-filter: blur(10px) saturate(var(--glass-sat));
+	box-sizing: border-box;
+	transition: height .16s ease, opacity .16s ease, padding .16s ease, margin .16s ease;
+}
+.liquid-menu-search.open {
+	height: 34px;
+	padding: 0;
+	opacity: 1;
+	border-width: 1px;
+	animation: none;
+}
+
+/* 收回：过渡动画由 height/opacity transition 处理（.open 移除即触发） */
+
+@keyframes liquid-search-drop {
+	from { opacity: 0; transform: translateY(-8px); }
+	to   { opacity: 1; transform: translateY(0); }
+}
+
+.liquid-menu-search-icon {
+	position: absolute;
+	left: 8px;
+	top: 50%;
+	transform: translateY(-50%);
+	display: inline-flex;
+	color: var(--text-color-medium);
+	pointer-events: none;
+}
+
+.liquid-menu-search-input {
+	flex: 1;
+	width: 100%;
+	height: 100%; /* 撑满容器高度，避免露出容器/页面背景色差 */
+	min-width: 0;
+	/* 用 !important 压掉 LuCI 全局 input[type="text"] 的 padding/背景/边框：
+	   28px = 图标(8px 左偏移+12px 宽) + 8px 间距，文字贴图标右侧 */
+	padding: 4px 30px 4px 28px !important;
+	border: none !important;
+	outline: none;
+	background: transparent !important; /* 压掉 --field-bg 底色，融入容器 */
+	/* 圆角跟随容器（容器 10px + 1px 边框 → input 内缩用 9px），
+	   避免撑满后直角盖掉容器圆角 */
+	border-radius: 9px !important;
+	display: block;
+	color: var(--text-color-high);
+	font-size: 12px;
+	box-sizing: border-box;
+}
+/* 聚焦时：恢复主题色高亮边框（用户要求），但保持透明底不破坏玻璃。
+   用容器 :focus-within 让整个搜索框显示主题色描边 + 淡光晕 */
+.liquid-menu-search:focus-within {
+	border-color: var(--primary-color-high) !important;
+	box-shadow: 0 0 0 3px var(--accent-glow), 0 4px 14px rgba(31, 45, 70, 0.16) !important;
+}
+.liquid-menu-search-input:focus {
+	background: transparent !important;
+	border-color: transparent !important;
+	box-shadow: none !important;
+}
+/* 浏览器 autofill 会强加黄/白底，压掉保持玻璃透明 */
+.liquid-menu-search-input:-webkit-autofill {
+	-webkit-box-shadow: 0 0 0 1000px transparent inset !important;
+	-webkit-text-fill-color: var(--text-color-high) !important;
+	transition: background-color 9999s ease-out !important;
+}
+.liquid-menu-search-input::placeholder {
+	color: var(--text-color-medium);
+	opacity: .7;
+}
+
+.liquid-menu-search-clear {
+	position: absolute;
+	right: 8px;
+	top: 50%;
+	transform: translateY(-50%);
+	width: 18px;
+	height: 18px;
+	padding: 0;
+	border: none;
+	border-radius: 50%;
+	background: rgba(148, 163, 184, 0.35);
+	color: var(--text-color-medium);
+	font-size: 13px;
+	line-height: 1;
+	cursor: pointer;
+	display: none; /* 默认隐藏，有输入时 JS 显示 */
+	align-items: center;
+	justify-content: center;
+	opacity: .75;
+}
+.liquid-menu-search-clear:hover {
+	opacity: 1;
+}
+
+/* 搜索过滤：不匹配的菜单项隐藏 */
+#mainmenu li.liquid-menu-hidden {
+	display: none !important;
 }
 
 /* 自定义颜色输入面板（点击彩虹圆点下拉） */

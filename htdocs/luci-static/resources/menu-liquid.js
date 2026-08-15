@@ -158,6 +158,7 @@ return baseclass.extend({
 			ul.appendChild(E('li', { 'class': activeClass }, [
 				E('a', {
 					'href': L.url(url, child.name),
+					'data-title': child.title,
 					'click': (l == 1) ? ui.createHandlerFn(this, 'handleMenuExpand') : ''
 				}, [
 					_(child.title)
