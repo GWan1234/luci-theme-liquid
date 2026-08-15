@@ -351,8 +351,15 @@
 		}
 		else {
 			/* lock screen / pages without a menubar */
-			wrap.classList.add('liquid-color-switch-fixed');
-			document.body.appendChild(wrap);
+			var capsules = document.getElementById('liquid-login-capsules');
+			if (capsules) {
+				/* 登录页：插入胶囊容器，不加 fixed 定位 */
+				capsules.appendChild(wrap);
+			}
+			else {
+				wrap.classList.add('liquid-color-switch-fixed');
+				document.body.appendChild(wrap);
+			}
 		}
 
 		updateColorSwitch();
@@ -588,8 +595,15 @@
 		}
 		else {
 			/* lock screen / pages without a menubar */
-			wrap.classList.add('liquid-mode-switch-fixed');
-			document.body.appendChild(wrap);
+			var capsules = document.getElementById('liquid-login-capsules');
+			if (capsules) {
+				/* 登录页：插入胶囊容器，不加 fixed 定位 */
+				capsules.appendChild(wrap);
+			}
+			else {
+				wrap.classList.add('liquid-mode-switch-fixed');
+				document.body.appendChild(wrap);
+			}
 		}
 
 		updateSwitch();
