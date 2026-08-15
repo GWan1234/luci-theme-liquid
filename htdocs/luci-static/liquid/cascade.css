@@ -1066,7 +1066,7 @@ ul.mainmenu.l2.liquid-sub-hovering .liquid-sub-indicator {
 /* 通用 tab 按钮组（页面级 #tabmenu 与 cbi 表单内 tab 共用样式）。
    胶囊形状保留；未选中项透明交给追踪滑块，选中项用菜单区
    selected 同款 accent 渐变高亮。 */
-ul.cbi-tabmenu {
+:is(ul.cbi-tabmenu, ul.tabs) {
 	position: relative;
 	display: flex;
 	flex-wrap: wrap;
@@ -1075,14 +1075,14 @@ ul.cbi-tabmenu {
 	padding: 0;
 }
 
-ul.cbi-tabmenu > li {
+:is(ul.cbi-tabmenu, ul.tabs) > li {
 	display: inline-block;
 	position: relative;
 	z-index: 1;
 	margin: 0;
 }
 
-ul.cbi-tabmenu > li > a {
+:is(ul.cbi-tabmenu, ul.tabs) > li > a {
 	display: inline-block;
 	padding: 8px 18px;
 	border-radius: 999px;
@@ -1095,12 +1095,12 @@ ul.cbi-tabmenu > li > a {
 	transition: color .16s ease, box-shadow .16s ease;
 }
 
-ul.cbi-tabmenu > li > a:hover {
+:is(ul.cbi-tabmenu, ul.tabs) > li > a:hover {
 	color: var(--text-color-high);
 }
 
 /* 选中项与左侧菜单 selected 同款玻璃质感高亮 */
-ul.cbi-tabmenu > li.cbi-tab > a {
+:is(ul.cbi-tabmenu, ul.tabs) > li.cbi-tab > a {
 	background: var(--accent-glass);
 	border-color: color-mix(in srgb, var(--primary-color-high) 55%, transparent);
 	color: var(--primary-color-low);
@@ -1110,7 +1110,21 @@ ul.cbi-tabmenu > li.cbi-tab > a {
 	backdrop-filter: blur(10px) saturate(var(--glass-sat));
 }
 
-:root[data-darkmode="true"] ul.cbi-tabmenu > li.cbi-tab > a {
+/* iStoreOS tabs 选中项：Vue scoped 样式（li.active a { color:... }）特异性高，
+   !important 强制主题玻璃样式（与 tabmenu-item 同策略） */
+:is(ul.cbi-tabmenu, ul.tabs) > li.cbi-tab > a {
+	background: var(--accent-glass) !important;
+	border-color: color-mix(in srgb, var(--primary-color-high) 55%, transparent) !important;
+	color: var(--primary-color-low) !important;
+}
+
+/* iStoreOS ul.tabs 的 Vue scoped 滑动条（div.auto）在 flex 容器内占位，
+   隐藏它避免干扰 tab 布局（主题自带 .liquid-tab-indicator 追踪滑块） */
+ul.tabs > div.auto {
+	display: none !important;
+}
+
+:is(:root[data-darkmode="true"] ul.cbi-tabmenu, :root[data-darkmode="true"] ul.tabs) > li.cbi-tab > a {
 	background: var(--accent-glass);
 	border-color: color-mix(in srgb, var(--primary-color-high) 48%, transparent);
 	color: #dcecff;
@@ -1118,14 +1132,14 @@ ul.cbi-tabmenu > li.cbi-tab > a {
 	            inset 0 1px 0 rgba(255, 255, 255, 0.14);
 }
 
-ul.cbi-tabmenu > li.cbi-tab-disabled > a {
+:is(ul.cbi-tabmenu, ul.tabs) > li.cbi-tab-disabled > a {
 	opacity: .75;
 }
 
 /* 第三方应用/页面导航 tab（li[class*="tabmenu-item"]，如 homeproxy、
    系统→管理页）：显式强制与主题 cbi-tab 完全一致的样式，防任何
    应用自带样式干扰导致观感不一致 */
-ul.cbi-tabmenu > li[class*="tabmenu-item"] > a {
+:is(ul.cbi-tabmenu, ul.tabs) > li[class*="tabmenu-item"] > a {
 	padding: 8px 18px;
 	border-radius: 999px;
 	font-weight: 600;
@@ -1137,11 +1151,11 @@ ul.cbi-tabmenu > li[class*="tabmenu-item"] > a {
 	transition: color .16s ease, box-shadow .16s ease;
 }
 
-ul.cbi-tabmenu > li[class*="tabmenu-item"] > a:hover {
+:is(ul.cbi-tabmenu, ul.tabs) > li[class*="tabmenu-item"] > a:hover {
 	color: var(--text-color-high);
 }
 
-ul.cbi-tabmenu > li[class*="tabmenu-item"].cbi-tab > a {
+:is(ul.cbi-tabmenu, ul.tabs) > li[class*="tabmenu-item"].cbi-tab > a {
 	background: var(--accent-glass) !important;
 	border-color: color-mix(in srgb, var(--primary-color-high) 55%, transparent) !important;
 	color: var(--primary-color-low) !important;
@@ -1151,7 +1165,7 @@ ul.cbi-tabmenu > li[class*="tabmenu-item"].cbi-tab > a {
 	backdrop-filter: blur(10px) saturate(var(--glass-sat)) !important;
 }
 
-:root[data-darkmode="true"] ul.cbi-tabmenu > li[class*="tabmenu-item"].cbi-tab > a {
+:is(:root[data-darkmode="true"] ul.cbi-tabmenu, :root[data-darkmode="true"] ul.tabs) > li[class*="tabmenu-item"].cbi-tab > a {
 	background: var(--accent-glass) !important;
 	border-color: color-mix(in srgb, var(--primary-color-high) 48%, transparent) !important;
 	color: #dcecff !important;
