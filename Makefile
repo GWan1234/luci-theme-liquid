@@ -2,7 +2,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=luci-theme-liquid
 PKG_VERSION:=0.6
-PKG_RELEASE:=1
+PKG_RELEASE:=2
 
 PKG_MAINTAINER:=然后七年 <z@7ze.top>
 PKG_LICENSE:=Apache-2.0
@@ -27,6 +27,28 @@ PKG_PO_VERSION:=$(PKG_VERSION)-r$(PKG_RELEASE)
 # 导致移动端断点样式全部失效；本主题关闭 CSS 压缩，样式原样打包。
 CONFIG_LUCI_CSSTIDY:=
 
+define Package/$(PKG_NAME)/postinst
+#!/bin/sh
+[ -n "$${IPKG_INSTROOT}" ] || {
+	# 动态写入 VERSION（构建时展开 $(VERSION)，footer 显示与 ?v= 缓存破坏）。
+	# 用 postinst 而非 Build/Prepare 钩子：23.05 的 luci.mk 不调用
+	# Build/Prepare/<pkg> 钩子且 Build/Prepare/Default 覆盖无效，
+	# postinst 在安装时必然执行且 $(VERSION) 定义时已展开。
+	mkdir -p /usr/share/ucode/luci/template/themes/liquid
+	echo '$(VERSION)' > /usr/share/ucode/luci/template/themes/liquid/VERSION
+	rm -f /tmp/luci-indexcache.*
+	rm -rf /tmp/luci-modulecache/
+	/etc/init.d/rpcd reload 2>/dev/null
+	exit 0
+}
+exit 0
+endef
+
+# 版本迭代：改 PKG_RELEASE（r 值）时无需手动同步 VERSION。
+# VERSION 由 postinst 在安装时动态写入（构建时展开 $(VERSION)），
+# 兼容 23.05/25.12/lede 各版本 luci.mk（Build/Prepare 钩子在 23.05
+# 不生效，postinst 是唯一三端一致的纯动态方案）。
+
 define Package/$(PKG_NAME)/postrm
 #!/bin/sh
 [ -n "$${IPKG_INSTROOT}" ] || {
@@ -36,16 +58,6 @@ define Package/$(PKG_NAME)/postrm
 	uci commit luci
 }
 exit 0
-endef
-
-# 版本迭代：改 PKG_RELEASE（r 值）时无需再手动同步 VERSION 文件。
-# Build/Prepare 阶段用 $(VERSION) 动态写入 PKG_BUILD_DIR 中的
-# VERSION 文件（覆盖仓库内静态占位），随后 luci.mk 默认 install
-# 将其复制进包 —— 与 Makefile 的 PKG_VERSION/PKG_RELEASE 永远一致。
-# （header.ut/footer.ut 用它做 foot 显示与 ?v= 缓存破坏）
-define Build/Prepare/luci-theme-liquid
-	$(call Build/Prepare/Default)
-	echo '$(VERSION)' > $(PKG_BUILD_DIR)/ucode/template/themes/liquid/VERSION
 endef
 
 include $(TOPDIR)/feeds/luci/luci.mk
