@@ -11,6 +11,7 @@
    都能看到完整字段，无竞态。 #}
 
 <div id="liquid-login">
+	<div id="liquid-login-capsules"></div>
 	<div class="modal login">
 		<div class="liquid-logo">
 			<svg viewBox="0 0 64 68" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">

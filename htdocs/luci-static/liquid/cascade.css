@@ -2766,6 +2766,28 @@ body.liquid-login #liquid-login {
 	backdrop-filter: blur(10px);
 }
 
+/* 登录页胶囊容器：absolute 定位在登录卡片上方，不影响卡片居中 */
+body.liquid-login #liquid-login-capsules {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, calc(-50% - 240px));
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
+	gap: 10px;
+	flex-wrap: nowrap;
+	z-index: 1001;
+}
+
+/* 登录页胶囊取消 fixed 定位，改为 static 跟随 flex 布局 */
+body.liquid-login .liquid-mode-switch,
+body.liquid-login .liquid-color-switch {
+	position: static !important;
+	margin: 0 !important;
+}
+
 body.liquid-login #liquid-login > .modal.login {
 	width: 392px;
 	max-width: calc(100vw - 40px);
@@ -2867,10 +2889,11 @@ body.liquid-login #liquid-login > .modal.login hr {
 
 body.liquid-login p.luci {
 	position: fixed;
-	bottom: 12px;
+	bottom: 4px;
 	left: 0;
 	width: 100%;
 	margin: 0;
+	padding: 8px 22px 4px;
 	z-index: 2001;
 	display: flex;
 	align-items: center;
@@ -3774,6 +3797,7 @@ pre {
 	body.liquid-login p.luci {
 		flex-wrap: wrap;
 		gap: 2px 10px;
+		bottom: 2px;
 	}
 
 	/* 移动端 foot 横幅只保留固件版本 */
