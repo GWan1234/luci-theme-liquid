@@ -10,13 +10,35 @@
 
 	const boardinfo = ubus.call('system', 'board') ?? {};
 	
-	/* 从包数据库读取版本号（支持 apk 和 opkg） */
+	/* 从包数据库读取版本号（支持 apk 和 opkg）。
+	   优化：mtime 校验 + /tmp 缓存，避免每次渲染 fork awk。
+	   包安装/卸载/升级会更新 db mtime → 缓存自动失效重建，版本零滞后。 */
 	let theme_ver = '';
-	let f = popen("awk '/^P:luci-theme-liquid$/{f=1;next} f&&/^V:/{print substr($0,3);exit}' /lib/apk/db/installed 2>/dev/null", "r");
-	if (f) { theme_ver = replace(f.read("all"), /\s+/, ""); f.close(); }
+	let db_file = '/lib/apk/db/installed';
+	let db_mtime = 0;
+	let st = fs.stat(db_file);
+	if (st && st.type == 'file') {
+		db_mtime = st.mtime;
+	} else {
+		db_file = '/usr/lib/opkg/status';
+		st = fs.stat(db_file);
+		if (st && st.type == 'file')
+			db_mtime = st.mtime;
+	}
+	if (db_mtime > 0) {
+		let cm = match(fs.readfile('/tmp/liquid-version.cache') ?? '', /^(\d+) (.*)$/);
+		if (cm !== null && sprintf('%d', db_mtime) == cm[1])
+			theme_ver = cm[2];
+	}
 	if (theme_ver == '') {
-		f = popen("awk '/^Package: luci-theme-liquid$/{f=1;next} f&&/^Version:/{print $2;exit}' /usr/lib/opkg/status 2>/dev/null", "r");
+		let f = popen("awk '/^P:luci-theme-liquid$/{f=1;next} f&&/^V:/{print substr($0,3);exit}' " + db_file + " 2>/dev/null", "r");
 		if (f) { theme_ver = replace(f.read("all"), /\s+/, ""); f.close(); }
+		if (theme_ver == '') {
+			f = popen("awk '/^Package: luci-theme-liquid$/{f=1;next} f&&/^Version:/{print $2;exit}' /usr/lib/opkg/status 2>/dev/null", "r");
+			if (f) { theme_ver = replace(f.read("all"), /\s+/, ""); f.close(); }
+		}
+		if (theme_ver != '' && db_mtime > 0)
+			fs.writefile('/tmp/liquid-version.cache', sprintf('%d %s', db_mtime, theme_ver));
 	}
 	if (theme_ver == '') theme_ver = '?';
 
