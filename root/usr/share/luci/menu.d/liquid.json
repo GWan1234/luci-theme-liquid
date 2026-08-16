@@ -7,5 +7,14 @@
 			"module": "luci.controller.liquid",
 			"function": "act_save_config"
 		}
+	},
+	"admin/system/liquid/version": {
+		"title": "Liquid Version",
+		"order": 101,
+		"action": {
+			"type": "function",
+			"module": "luci.controller.liquid",
+			"function": "act_version"
+		}
 	}
 }

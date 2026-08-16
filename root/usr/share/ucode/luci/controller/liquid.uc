@@ -6,8 +6,44 @@
    (system()/uci CLI are not available in the ucode dispatcher sandbox). */
 
 import * as fs from 'fs';
+import { popen } from 'fs';
 
 return {
+	act_version: function() {
+		let ver = "";
+		/* mtime 校验 + /tmp 缓存（与 header/footer 模板同一套机制），避免每次 fork */
+		let db_file = '/lib/apk/db/installed';
+		let db_mtime = 0;
+		let st = fs.stat(db_file);
+		if (st && st.type == 'file') {
+			db_mtime = st.mtime;
+		} else {
+			db_file = '/usr/lib/opkg/status';
+			st = fs.stat(db_file);
+			if (st && st.type == 'file')
+				db_mtime = st.mtime;
+		}
+		if (db_mtime > 0) {
+			let cm = match(fs.readfile('/tmp/liquid-version.cache') ?? '', /^(\d+) (.*)$/);
+			if (cm !== null && sprintf('%d', db_mtime) == cm[1])
+				ver = cm[2];
+		}
+		if (ver == "") {
+			/* apk (OpenWrt 24.10+): /lib/apk/db/installed */
+			let f = popen("awk '/^P:luci-theme-liquid$/{f=1;next} f&&/^V:/{print substr($0,3);exit}' " + db_file + " 2>/dev/null", "r");
+			if (f) { ver = replace(f.read("all"), /\s+/, ""); f.close(); }
+			/* opkg (legacy): /usr/lib/opkg/status */
+			if (ver == "") {
+				f = popen("awk '/^Package: luci-theme-liquid$/{f=1;next} f&&/^Version:/{print $2;exit}' /usr/lib/opkg/status 2>/dev/null", "r");
+				if (f) { ver = replace(f.read("all"), /\s+/, ""); f.close(); }
+			}
+			if (ver != "" && db_mtime > 0)
+				fs.writefile('/tmp/liquid-version.cache', sprintf('%d %s', db_mtime, ver));
+		}
+		http.prepare_content("application/json");
+		http.write_json({ version: ver });
+	},
+
 	act_save_config: function() {
 		http.prepare_content("application/json");
 

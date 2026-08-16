@@ -5,6 +5,7 @@
 
 {%
 	import * as fs from 'fs';
+	import { popen } from 'fs';
 %}
 
 {%
@@ -12,8 +13,37 @@
 %}
 
 {%
-	/* 主题版本（0.1-rN），由构建期 VERSION 文件提供 */
-	let theme_ver = trim(fs.readfile('/usr/share/ucode/luci/template/themes/liquid/VERSION') ?? '?', '"\n\r');
+	/* 从包数据库读取版本号（支持 apk 和 opkg）。
+	   优化：mtime 校验 + /tmp 缓存，避免每次渲染 fork awk。
+	   包安装/卸载/升级会更新 db mtime → 缓存自动失效重建，版本零滞后。 */
+	let theme_ver = '';
+	let db_file = '/lib/apk/db/installed';
+	let db_mtime = 0;
+	let st = fs.stat(db_file);
+	if (st && st.type == 'file') {
+		db_mtime = st.mtime;
+	} else {
+		db_file = '/usr/lib/opkg/status';
+		st = fs.stat(db_file);
+		if (st && st.type == 'file')
+			db_mtime = st.mtime;
+	}
+	if (db_mtime > 0) {
+		let cm = match(fs.readfile('/tmp/liquid-version.cache') ?? '', /^(\d+) (.*)$/);
+		if (cm !== null && sprintf('%d', db_mtime) == cm[1])
+			theme_ver = cm[2];
+	}
+	if (theme_ver == '') {
+		let _vf = popen("awk '/^P:luci-theme-liquid$/{f=1;next} f&&/^V:/{print substr($0,3);exit}' " + db_file + " 2>/dev/null", "r");
+		if (_vf) { theme_ver = replace(_vf.read("all"), /\s+/, ""); _vf.close(); }
+		if (theme_ver == '') {
+			_vf = popen("awk '/^Package: luci-theme-liquid$/{f=1;next} f&&/^Version:/{print $2;exit}' /usr/lib/opkg/status 2>/dev/null", "r");
+			if (_vf) { theme_ver = replace(_vf.read("all"), /\s+/, ""); _vf.close(); }
+		}
+		if (theme_ver != '' && db_mtime > 0)
+			fs.writefile('/tmp/liquid-version.cache', sprintf('%d %s', db_mtime, theme_ver));
+	}
+	if (theme_ver == '') theme_ver = '?';
 
 	/* 固件信息：优先读 /etc/os-release 的 FIRMWARE_URL（固件 release 链接）
 	   与 OPENWRT_RELEASE（固件版本文本），读不到时回退动态构造。

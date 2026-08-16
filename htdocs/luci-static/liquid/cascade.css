@@ -2802,6 +2802,11 @@ body.liquid-login .liquid-color-switch {
 	margin: 0 !important;
 }
 
+/* 登录页隐藏搜索按钮（无意义） */
+body.liquid-login .liquid-search-btn {
+	display: none !important;
+}
+
 body.liquid-login #liquid-login > .modal.login {
 	width: 392px;
 	max-width: calc(100vw - 40px);
