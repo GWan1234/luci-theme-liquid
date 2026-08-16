@@ -2,7 +2,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=luci-theme-liquid
 PKG_VERSION:=0.6
-PKG_RELEASE:=11
+PKG_RELEASE:=12
 
 PKG_MAINTAINER:=然后七年 <z@7ze.top>
 PKG_LICENSE:=Apache-2.0
@@ -30,13 +30,6 @@ CONFIG_LUCI_CSSTIDY:=
 define Package/$(PKG_NAME)/postinst
 #!/bin/sh
 [ -n "$${IPKG_INSTROOT}" ] || {
-	# 动态写入 VERSION（构建时展开 $(VERSION)，footer 显示与 ?v= 缓存破坏）。
-	# 用 postinst 而非 Build/Prepare 钩子：23.05 的 luci.mk 不调用
-	# Build/Prepare/<pkg> 钩子且 Build/Prepare/Default 覆盖无效，
-	# postinst 在安装时必然执行且 $(VERSION) 定义时已展开。
-	mkdir -p /usr/share/ucode/luci/template/themes/liquid
-	echo '$(VERSION)' > /usr/share/ucode/luci/template/themes/liquid/VERSION
-
 	# 23.05 opkg 不执行 uci-defaults，必须在 postinst 中设置主题配置。
 	# 确保 mediaurlbase 指向 liquid，否则 fallback 到 null。
 	if [ "$$(uci -q get luci.main.mediaurlbase)" != "/luci-static/liquid" ]; then
@@ -51,11 +44,6 @@ define Package/$(PKG_NAME)/postinst
 }
 exit 0
 endef
-
-# 版本迭代：改 PKG_RELEASE（r 值）时无需手动同步 VERSION。
-# VERSION 由 postinst 在安装时动态写入（构建时展开 $(VERSION)），
-# 兼容 23.05/25.12/lede 各版本 luci.mk（Build/Prepare 钩子在 23.05
-# 不生效，postinst 是唯一三端一致的纯动态方案）。
 
 define Package/$(PKG_NAME)/postrm
 #!/bin/sh

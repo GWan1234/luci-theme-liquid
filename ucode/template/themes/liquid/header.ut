@@ -5,10 +5,20 @@
 
 {%
 	import * as fs from 'fs';
+	import { popen } from 'fs';
 	import { getuid, getspnam } from 'luci.core';
 
 	const boardinfo = ubus.call('system', 'board') ?? {};
-	let theme_ver = trim(fs.readfile('/usr/share/ucode/luci/template/themes/liquid/VERSION') ?? '?', '"\n\r');
+	
+	/* 从包数据库读取版本号（支持 apk 和 opkg） */
+	let theme_ver = '';
+	let f = popen("awk '/^P:luci-theme-liquid$/{f=1;next} f&&/^V:/{print substr($0,3);exit}' /lib/apk/db/installed 2>/dev/null", "r");
+	if (f) { theme_ver = replace(f.read("all"), /\s+/, ""); f.close(); }
+	if (theme_ver == '') {
+		f = popen("awk '/^Package: luci-theme-liquid$/{f=1;next} f&&/^Version:/{print $2;exit}' /usr/lib/opkg/status 2>/dev/null", "r");
+		if (f) { theme_ver = replace(f.read("all"), /\s+/, ""); f.close(); }
+	}
+	if (theme_ver == '') theme_ver = '?';
 
 	http.prepare_content('text/html; charset=UTF-8');
 

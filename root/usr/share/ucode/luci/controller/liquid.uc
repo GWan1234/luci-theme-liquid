@@ -6,8 +6,23 @@
    (system()/uci CLI are not available in the ucode dispatcher sandbox). */
 
 import * as fs from 'fs';
+import { popen } from 'fs';
 
 return {
+	act_version: function() {
+		let ver = "";
+		/* apk (OpenWrt 24.10+): /lib/apk/db/installed */
+		let f = popen("awk '/^P:luci-theme-liquid$/{f=1;next} f&&/^V:/{print substr($0,3);exit}' /lib/apk/db/installed 2>/dev/null", "r");
+		if (f) { ver = replace(f.read("all"), /\s+/, ""); f.close(); }
+		/* opkg (legacy): /usr/lib/opkg/status */
+		if (ver == "") {
+			f = popen("awk '/^Package: luci-theme-liquid$/{f=1;next} f&&/^Version:/{print $2;exit}' /usr/lib/opkg/status 2>/dev/null", "r");
+			if (f) { ver = replace(f.read("all"), /\s+/, ""); f.close(); }
+		}
+		http.prepare_content("application/json");
+		http.write_json({ version: ver });
+	},
+
 	act_save_config: function() {
 		http.prepare_content("application/json");
 
