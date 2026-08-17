@@ -194,7 +194,7 @@ luci-theme-liquid/
 - dashboard module icons (router / internet / wireless / devices): from official OpenWrt [luci-mod-dashboard](https://github.com/openwrt/luci/tree/master/modules/luci-mod-dashboard).
 - Menu rendering logic references [luci-theme-openwrt-2020](https://github.com/openwrt/luci/tree/master/themes/luci-theme-openwrt-2020), lock screen view references [luci-theme-bootstrap](https://github.com/openwrt/luci/tree/master/themes/luci-theme-bootstrap) (Apache-2.0).
 
-## Buy me a cup of TOKEN 😜
+## 🍡 Buy me a cup of TOKEN 😜
 **Appreciate Your Like!**
 ![Awards](https://raw.githubusercontent.com/zzsj0928/ReadmeContents/master/general/donate-zed.jpg)
 
