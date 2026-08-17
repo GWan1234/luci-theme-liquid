@@ -122,6 +122,11 @@
 	   仅当 uci 未配置时回退 localStorage。锁屏页同样按 uci 显示（只读）。 */
 	(function () {
 		try {
+			/* 文档级滚动配套（r22）：关闭浏览器滚动位置恢复——刷新/前进后退
+			   一律从顶部开始，避免安卓落入"初始滚动非零须先回顶才收缩
+			   地址栏"的状态 */
+			if ('scrollRestoration' in history)
+				history.scrollRestoration = 'manual';
 			var m = "{{ cfg_mode }}";
 			var a = "{{ cfg_accent }}";
 			if (!m)

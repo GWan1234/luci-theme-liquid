@@ -3716,9 +3716,14 @@ pre {
 	}
 
 	/* 移动端所有表格按内容宽度排布（列不压缩，MAC/MTU 等不重叠），
-	   超出视口时允许横向滚动 */
+	   超出视口时允许横向滚动。
+	   注意：横向滚动只放在表格的直接容器（.cbi-section-node 包裹式 /
+	   .cbi-tblsection 直挂式，form.js 的两种渲染路径），不再放在
+	   #maincontent——#maincontent 一旦带 overflow-x:auto 就成了嵌套滚动
+	   容器，安卓 Chrome 对其上的纵向手势路由比 iOS 严格，会拖慢/拦掉
+	   文档级滚动从而挡住地址栏收缩；宽表格在自己的容器内横滚即可 */
 	.cbi-section-node,
-	#maincontent {
+	.cbi-tblsection {
 		overflow-x: auto;
 	}
 

@@ -1120,6 +1120,46 @@
 		});
 	}
 
+	/* 文档级滚动配套（r22）：LuCI SPA 切页（菜单/面包屑/标签链接 → XHR
+	   换 #view 内容）不重置文档滚动位置，新页面会停在旧深度；安卓对
+	   "初始滚动非零"的页面要先把滚到顶再下滑才肯收缩地址栏。这里在
+	   点击站内导航链接后监听 #view 直接子节点变化（= 切页渲染完成；
+	   深层的自动刷新/控件更新不触发，避免误回顶），一旦换页立即把
+	   文档滚回顶部——每个页面都从顶开始，首次下滑即可收缩工具栏。
+	   整页跳转时观察器随页面销毁，无副作用；5 秒兜底自动撤防 */
+	function initNavScrollTop() {
+		if (typeof MutationObserver == 'undefined')
+			return;
+		var mo = null, timer = 0;
+		function disarm() {
+			if (timer) { clearTimeout(timer); timer = 0; }
+			if (mo) { mo.disconnect(); mo = null; }
+		}
+		document.addEventListener('click', function (ev) {
+			if (ev.button !== 0)
+				return;
+			var a = (ev.target && ev.target.closest) ? ev.target.closest('a[href]') : null;
+			if (!a)
+				return;
+			var href = a.getAttribute('href') || '';
+			/* 只处理站内导航：排除纯锚点、外部链接、javascript 伪协议 */
+			if (!href || href.charAt(0) == '#' ||
+			    /^(?:[a-z][a-z0-9+.-]*)?\/\//i.test(href) ||
+			    href.toLowerCase().indexOf('javascript:') === 0)
+				return;
+			var view = document.getElementById('view');
+			if (!view)
+				return;
+			disarm();
+			mo = new MutationObserver(function () {
+				disarm();
+				window.scrollTo(0, 0);
+			});
+			mo.observe(view, { childList: true });
+			timer = setTimeout(disarm, 5000);
+		}, true);
+	}
+
 	/* 登录页 logo：luci 的 modal.login 是 JS 渲染的，注入内联 SVG
 	   （跟随主题色 + 玻璃水滴感），替换原 CSS 背景图 */
 	function injectLoginLogo() {
@@ -1171,6 +1211,7 @@
 			fitDropdownWidths();
 			portalTooltips();
 			portalFixedModals();
+			initNavScrollTop();
 			injectLoginLogo();
 			setTimeout(syncMenuTop, 300);
 			setTimeout(initTabSliders, 300);
@@ -1186,6 +1227,7 @@
 		fitDropdownWidths();
 		portalTooltips();
 		portalFixedModals();
+		initNavScrollTop();
 		injectLoginLogo();
 		setTimeout(syncMenuTop, 300);
 		setTimeout(initTabSliders, 300);
