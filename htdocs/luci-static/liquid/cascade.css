@@ -1833,8 +1833,11 @@ input[type="radio"] {
 	border: 1px solid var(--glass-border);
 	border-radius: 10px;
 	cursor: pointer;
-	-webkit-backdrop-filter: blur(8px);
-	backdrop-filter: blur(8px);
+	/* 按钮不用 backdrop-filter：WebKit/老内核里它的滤镜区域是矩形、
+	   不跟 border-radius 裁剪，圆角按钮左右缘会露出方形剪裁的
+	   深/浅竖缝，四角也不跟弧度。按钮面积小、模糊收益低，
+	   玻璃感靠半透明底+边框+阴影即可（下拉胶囊同理，见
+	   .cbi-dropdown.cbi-button-apply / -negative 的覆盖） */
 	box-shadow: var(--glass-shadow-soft), inset 0 1px 0 var(--glass-inset);
 	transition: transform .12s ease, box-shadow .15s ease,
 	            background .15s ease, color .15s ease, opacity .15s ease;
@@ -2187,6 +2190,10 @@ input[type="radio"] {
 	border-color: transparent;
 	color: var(--on-primary-color);
 	box-shadow: 0 6px 16px var(--accent-glow), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+	/* 与 .cbi-button 同理：不透明渐变底本就用不上模糊，去掉继承来的
+	   backdrop-filter，避免 WebKit 矩形滤镜区域在圆角缘露缝 */
+	-webkit-backdrop-filter: none;
+	backdrop-filter: none;
 	/* 保存并应用：宽度只匹配文字，不继承普通下拉框的 min-width */
 	min-width: auto;
 }
@@ -2201,6 +2208,9 @@ input[type="radio"] {
 	border-color: transparent;
 	color: var(--on-error-color);
 	box-shadow: 0 6px 16px rgba(var(--error-color-high-rgb), 0.35);
+	/* 与 apply 同理：不透明渐变底用不上模糊，去掉以免矩形滤镜缝 */
+	-webkit-backdrop-filter: none;
+	backdrop-filter: none;
 	min-width: auto;
 }
 
