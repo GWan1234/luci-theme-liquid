@@ -2195,7 +2195,11 @@ input[type="radio"] {
    样式（而非普通下拉框），右侧竖线分割下拉图标区 */
 .cbi-dropdown.cbi-button-apply {
 	background: var(--accent-grad);
-	border-color: transparent;
+	/* 与 .cbi-button 同理：废弃 border（透明边框也是独立绘制层，
+	   引擎分层栅格化时不跟 border-radius，露出两层/方剪裁描边）。
+	   padding 各边 +1px 补偿边框厚度（基础 8px 34px 8px 12px），尺寸不变 */
+	border: none;
+	padding: 9px 35px 9px 13px;
 	color: var(--on-primary-color);
 	box-shadow: 0 6px 16px var(--accent-glow), inset 0 1px 0 rgba(255, 255, 255, 0.35);
 	/* 与 .cbi-button 同理：不透明渐变底本就用不上模糊，去掉继承来的
@@ -2213,7 +2217,9 @@ input[type="radio"] {
 
 .cbi-dropdown.cbi-button-negative {
 	background: linear-gradient(135deg, #f06767, var(--error-color-high));
-	border-color: transparent;
+	/* 与 apply 同理：废弃 border 以免独立绘制层不跟圆角；padding +1px 补偿 */
+	border: none;
+	padding: 9px 35px 9px 13px;
 	color: var(--on-error-color);
 	box-shadow: 0 6px 16px rgba(var(--error-color-high-rgb), 0.35);
 	/* 与 apply 同理：不透明渐变底用不上模糊，去掉以免矩形滤镜缝 */
