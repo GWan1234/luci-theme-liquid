@@ -193,6 +193,10 @@ luci-theme-liquid/
 - dashboard 模块图标（router / internet / wireless / devices）：来自 OpenWrt 官方 [luci-mod-dashboard](https://github.com/openwrt/luci/tree/master/modules/luci-mod-dashboard)。
 - 菜单渲染逻辑参考 [luci-theme-openwrt-2020](https://github.com/openwrt/luci/tree/master/themes/luci-theme-openwrt-2020)，锁屏视图参考 [luci-theme-bootstrap](https://github.com/openwrt/luci/tree/master/themes/luci-theme-bootstrap)（Apache-2.0）。
 
+## 赏我一把 Token
+**制作不易，感谢支持**
+![赞赠](https://raw.githubusercontent.com/zzsj0928/ReadmeContents/master/general/donate-zed.png)
+
 ## License
 
 Apache-2.0
