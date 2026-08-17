@@ -1820,7 +1820,8 @@ input[type="radio"] {
 .btn,
 .cbi-button {
 	display: inline-block;
-	padding: 9px 18px;
+	/* 原 9px 18px + 1px border；border 移除后各补 1px，整体尺寸不变 */
+	padding: 10px 19px;
 	font-family: inherit;
 	font-size: 12.5px;
 	font-weight: 600;
@@ -1829,16 +1830,25 @@ input[type="radio"] {
 	color: var(--text-color-high);
 	text-align: center;
 	text-decoration: none;
+	/* 去浏览器原生按钮外观：WebKit 等会叠加一层原生矩形描边，
+	   不跟 border-radius，出现"两层按钮"的错觉 */
+	appearance: none;
+	-webkit-appearance: none;
 	background: var(--glass-bg);
-	border: 1px solid var(--glass-border);
+	/* 不用 border：部分引擎里 border 绘制层会与背景分层栅格化，
+	   不跟 border-radius 的弧度——圆角处缺描边、左右缘露出方剪裁
+	   竖缝/下层按钮。改用同色 inset box-shadow 描边：与背景同层绘制，
+	   永远贴合圆角（各变体的 border-color 规则随之废弃） */
+	border: none;
 	border-radius: 10px;
 	cursor: pointer;
 	/* 按钮不用 backdrop-filter：WebKit/老内核里它的滤镜区域是矩形、
 	   不跟 border-radius 裁剪，圆角按钮左右缘会露出方形剪裁的
 	   深/浅竖缝，四角也不跟弧度。按钮面积小、模糊收益低，
-	   玻璃感靠半透明底+边框+阴影即可（下拉胶囊同理，见
+	   玻璃感靠半透明底+描边阴影即可（下拉胶囊同理，见
 	   .cbi-dropdown.cbi-button-apply / -negative 的覆盖） */
-	box-shadow: var(--glass-shadow-soft), inset 0 1px 0 var(--glass-inset);
+	box-shadow: var(--glass-shadow-soft), inset 0 0 0 1px var(--glass-border),
+	            inset 0 1px 0 var(--glass-inset);
 	transition: transform .12s ease, box-shadow .15s ease,
 	            background .15s ease, color .15s ease, opacity .15s ease;
 }
@@ -1887,7 +1897,6 @@ input[type="radio"] {
 .cbi-button-save {
 	color: var(--on-primary-color);
 	background: var(--accent-grad);
-	border-color: transparent;
 	box-shadow: 0 6px 16px var(--accent-glow), inset 0 1px 0 rgba(255, 255, 255, 0.35);
 }
 
@@ -1897,7 +1906,6 @@ input[type="radio"] {
 .cbi-section-remove .cbi-button {
 	color: var(--on-error-color);
 	background: linear-gradient(135deg, #f06767, var(--error-color-high));
-	border-color: transparent;
 	box-shadow: 0 6px 16px rgba(var(--error-color-high-rgb), 0.35);
 }
 
@@ -1917,7 +1925,7 @@ input[type="radio"] {
 .cbi-button-pause {
 	color: var(--text-color-high);
 	background: var(--glass-bg);
-	border-color: var(--glass-border);
+	/* 描边由基础规则的 inset 环形阴影提供（原 border-color 已废弃） */
 }
 
 /* page actions */
