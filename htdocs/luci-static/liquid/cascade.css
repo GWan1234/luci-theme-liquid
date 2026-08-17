@@ -2247,10 +2247,12 @@ input[type="radio"] {
 	display: inline-flex;
 	align-items: center;
 	min-width: 140px;
-	padding: 8px 34px 8px 12px;
+	/* 与按钮族同理：废弃透明 border（独立绘制层不跟圆角），
+	   padding 各边 +1px 补偿（原 8px 34px 8px 12px），尺寸不变 */
+	padding: 9px 35px 9px 13px;
 	/* 与 cbi-dropdown 统一的渐变按钮风格 */
 	background: var(--accent-grad);
-	border: 1px solid transparent;
+	border: none;
 	border-radius: 10px;
 	box-shadow: 0 6px 16px var(--accent-glow), inset 0 1px 0 rgba(255, 255, 255, 0.35);
 	cursor: pointer;
