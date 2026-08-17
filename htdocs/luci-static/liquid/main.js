@@ -1068,6 +1068,21 @@
 		});
 	}
 
+	/* 第三方插件的 fixed 弹窗（easytier .version-modal：刷新版本/重启服务
+	   确认框）：弹窗自身 position:fixed + inset:0 + flex 居中，本应相对
+	   视口居中，但插在玻璃卡片内时，卡片的 backdrop-filter 会成为 fixed
+	   的包含块，弹窗变成相对整张卡片居中——卡片很高时弹窗落在当前屏幕
+	   之外（移动端要下划才能看到）。移到 body 下即恢复视口居中。
+	   与 portalTooltips 同思路；easytier 用 getElementById + classList
+	   切换 .show 显隐，移动节点不影响其逻辑。弹窗依赖的 --card-bg 等
+	   变量定义在 :root，移出卡片不失效 */
+	function portalFixedModals() {
+		document.querySelectorAll('.version-modal').forEach(function (m) {
+			if (m.parentNode !== document.body)
+				document.body.appendChild(m);
+		});
+	}
+
 	/* 登录页 logo：luci 的 modal.login 是 JS 渲染的，注入内联 SVG
 	   （跟随主题色 + 玻璃水滴感），替换原 CSS 背景图 */
 	function injectLoginLogo() {
@@ -1117,6 +1132,7 @@
 			syncDropdownValues();
 			fitDropdownWidths();
 			portalTooltips();
+			portalFixedModals();
 			injectLoginLogo();
 			setTimeout(syncMenuTop, 300);
 			setTimeout(initTabSliders, 300);
@@ -1131,6 +1147,7 @@
 		syncDropdownValues();
 		fitDropdownWidths();
 		portalTooltips();
+		portalFixedModals();
 		injectLoginLogo();
 		setTimeout(syncMenuTop, 300);
 		setTimeout(initTabSliders, 300);
