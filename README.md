@@ -195,7 +195,7 @@ luci-theme-liquid/
 
 ## 赏我一把 Token
 **制作不易，感谢支持**
-![赞赠](https://raw.githubusercontent.com/zzsj0928/ReadmeContents/master/general/donate-zed.png)
+![赞赠](https://raw.githubusercontent.com/zzsj0928/ReadmeContents/master/general/donate-zed.jpg)
 
 ## License
 
