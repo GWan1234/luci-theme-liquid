@@ -1512,7 +1512,8 @@ body:not(.liquid-login) p.luci {
 	left: 236px;
 	right: 0;
 	margin: 0;
-	padding: 9px 22px;
+	/* 桌面 foot 与移动端同步加高 4px（上下 padding 各 +2px） */
+	padding: 11px 22px;
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -3925,7 +3926,9 @@ pre {
 	}
 
 	body:not(.liquid-login) p.luci {
-		padding: 6px 22px;
+		/* 移动端 foot 加高 4px（上下 padding 各 +2px），与浏览器底部
+		   工具栏衔接更饱满 */
+		padding: 8px 22px;
 	}
 
 	.luci-foot-spacer {
