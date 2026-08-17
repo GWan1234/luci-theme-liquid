@@ -3825,13 +3825,38 @@ pre {
 	#maincontent {
 		padding: 0 16px 64px;
 		margin-left: 0;
-		/* 移动端页面滚动必须留在 #maincontainer：若 #maincontent 因
-		   overflow-x:auto（overflow-y 计算为 auto + min-height 归零）
-		   收缩成滚动容器，下拉打开时 :has(.cbi-dropdown[open]) 把它
-		   的 overflow 改回 visible 会直接丢弃滚动位置——首屏以下的
-		   下拉一点就跳回页顶。flex-shrink:0 让它不收缩，纵向滚动
-		   始终由 #maincontainer 承担（其 overflow 从不被翻转）。 */
+		/* r19 起移动端页面纵向滚动由文档承担（见下方「文档级滚动」块，
+		   为了让安卓浏览器地址栏随滚动收缩）。此处 flex-shrink:0 保证
+		   #maincontent 不被压缩成滚动容器；overflow-x:auto 只负责宽表格
+		   横向滚动。下拉打开时 :has(.cbi-dropdown[open]) 把 overflow 翻回
+		   visible 不再影响文档滚动位置（滚动位置在文档上，与此处无关） */
 		flex-shrink: 0;
+	}
+
+	/* ===== 文档级滚动：让安卓 Chrome/Edge 地址栏随滚动收缩（r19）=====
+	   安卓只在「文档级滚动」时才收缩工具栏/地址栏。此前纵向滚动锁在
+	   #maincontainer（body{overflow:hidden} + #maincontainer{overflow-y:auto}）
+	   这个嵌套滚动容器里，浏览器检测不到文档滚动，地址栏固定占高。
+	   现改为文档自然滚动：body 放开 overflow、#maincontainer 去掉固定高度
+	   与内层滚动、#menubar 靠 sticky 吸顶。仅登录后长页面生效，登录页
+	   （body.liquid-login）保持原固定布局。宽表格横向滚动仍由
+	   #maincontent{overflow-x:auto} 承担，不会外溢成文档横向滚动。 */
+	html {
+		overflow: visible;
+		height: auto;
+	}
+
+	body:not(.liquid-login) {
+		overflow: visible;
+		height: auto;
+		min-height: 100vh;
+		min-height: 100dvh;
+	}
+
+	body:not(.liquid-login) #maincontainer {
+		height: auto;
+		min-height: 0;
+		overflow: visible;
 	}
 
 	body:not(.liquid-login) p.luci {
@@ -3862,8 +3887,12 @@ pre {
 		display: none;
 	}
 
+	/* 文档级滚动后 modemenu（面包屑）需 sticky 吸顶在菜单栏下方，
+	   否则会被当普通内容随文档滚走（内层滚动时期它是 static，因为在
+	   滚动容器外、天然不动；改文档滚动后必须显式吸顶） */
 	#modemenu {
-		position: static;
+		position: sticky;
+		top: 56px;
 	}
 
 	.cbi-value {
@@ -3973,9 +4002,8 @@ pre {
    2) 含"打开"下拉的卡片提升 z-index：突破 backdrop-filter 形成的
       stacking context，避免被相邻卡片盖住；
    3) 移动端滚动容器（.cbi-section-node / #maincontent）：两轴 visible，
-      不再裁剪弹出列表。页面纵向滚动由 #maincontainer 承担（移动端
-      #maincontent 已 flex-shrink:0 不收缩成滚动容器），此翻转不会
-      丢弃滚动位置 */
+      不再裁剪弹出列表。r19 起页面纵向滚动由文档承担（#maincontent 仅
+      overflow-x:auto 负责宽表格横滚），此翻转不影响文档滚动位置 */
 /* 只在"打开"时解除裁剪（加载/闭合时保持原样，不影响胶囊尺寸） */
 .cbi-section-table:has(.cbi-dropdown[open]) {
 	overflow: visible !important;
