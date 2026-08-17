@@ -160,8 +160,45 @@
 			var m = document.querySelector('meta[name="color-scheme"]');
 			if (m && m.content !== (want == 'true' ? 'dark' : 'light'))
 				m.content = (want == 'true' ? 'dark' : 'light');
+			syncThemeColor();
 		});
 		obs.observe(root, { attributes: true, attributeFilter: ['data-darkmode'] });
+	}
+
+	/* 浏览器工具栏配色（meta theme-color）：取底部 foot 玻璃横幅（p.luci）
+	   的真实渲染色，移动端浏览器工具栏才能与页面上下玻璃栏融为一体。
+	   foot = --glass-bg-strong 半透明玻璃叠在 body 底色 --background-color-medium
+	   上；theme-color 要不透明值，用 1x1 canvas 做真实叠加合成（canvas
+	   原生解析 CSS 色值并完成 alpha 混合），随明暗/配色变量自动跟随，
+	   不硬编码色值。顶栏 #menubar 与 foot 同为 --glass-bg-strong，
+	   故该色同时贴合顶部地址栏区域。 */
+	function syncThemeColor() {
+		var meta = document.querySelector('meta[name="theme-color"]');
+		if (!meta)
+			return;
+		try {
+			var cs = getComputedStyle(document.documentElement);
+			var bg = (cs.getPropertyValue('--background-color-medium') || '').trim();
+			var glass = (cs.getPropertyValue('--glass-bg-strong') || '').trim();
+			if (!bg || !glass)
+				return;
+			var c = document.createElement('canvas');
+			c.width = 1;
+			c.height = 1;
+			var ctx = c.getContext('2d');
+			if (!ctx)
+				return;
+			ctx.fillStyle = bg;
+			ctx.fillRect(0, 0, 1, 1);
+			ctx.fillStyle = glass;
+			ctx.fillRect(0, 0, 1, 1);
+			var d = ctx.getImageData(0, 0, 1, 1).data;
+			var hex = '#';
+			for (var i = 0; i < 3; i++)
+				hex += ('0' + d[i].toString(16)).slice(-2);
+			if (meta.content !== hex)
+				meta.content = hex;
+		} catch (e) {}
 	}
 
 	function updateSwitch() {
@@ -1121,6 +1158,7 @@
 
 	applyCustomAccent(getAccentCustom());
 	guardDarkmode();
+	syncThemeColor();
 
 	if (document.readyState == 'loading')
 		document.addEventListener('DOMContentLoaded', function () {
