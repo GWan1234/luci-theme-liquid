@@ -3849,8 +3849,15 @@ pre {
 	body:not(.liquid-login) {
 		overflow: visible;
 		height: auto;
+		/* 用 svh（小视口=工具栏全展开的高度）而非 dvh：dvh 会随工具栏
+		   收缩动画实时变化，导致 body 高度回流、与收缩手势互相干扰
+		   （症状：须先回顶才肯收缩）。svh 恒定，背景经 canvas 铺满全屏 */
 		min-height: 100vh;
-		min-height: 100dvh;
+		min-height: 100svh;
+		/* 安卓 Chrome/Edge 会禁用 background-attachment:fixed 页面的
+		   地址栏收缩（fixed 背景需整幅重绘，浏览器直接关掉收缩动画）。
+		   移动端改 scroll：渐变沿整个文档铺开，视觉无断层 */
+		background-attachment: scroll;
 	}
 
 	body:not(.liquid-login) #maincontainer {
