@@ -160,8 +160,45 @@
 			var m = document.querySelector('meta[name="color-scheme"]');
 			if (m && m.content !== (want == 'true' ? 'dark' : 'light'))
 				m.content = (want == 'true' ? 'dark' : 'light');
+			syncThemeColor();
 		});
 		obs.observe(root, { attributes: true, attributeFilter: ['data-darkmode'] });
+	}
+
+	/* 浏览器工具栏配色（meta theme-color）：取底部 foot 玻璃横幅（p.luci）
+	   的真实渲染色，移动端浏览器工具栏才能与页面上下玻璃栏融为一体。
+	   foot = --glass-bg-strong 半透明玻璃叠在 body 底色 --background-color-medium
+	   上；theme-color 要不透明值，用 1x1 canvas 做真实叠加合成（canvas
+	   原生解析 CSS 色值并完成 alpha 混合），随明暗/配色变量自动跟随，
+	   不硬编码色值。顶栏 #menubar 与 foot 同为 --glass-bg-strong，
+	   故该色同时贴合顶部地址栏区域。 */
+	function syncThemeColor() {
+		var meta = document.querySelector('meta[name="theme-color"]');
+		if (!meta)
+			return;
+		try {
+			var cs = getComputedStyle(document.documentElement);
+			var bg = (cs.getPropertyValue('--background-color-medium') || '').trim();
+			var glass = (cs.getPropertyValue('--glass-bg-strong') || '').trim();
+			if (!bg || !glass)
+				return;
+			var c = document.createElement('canvas');
+			c.width = 1;
+			c.height = 1;
+			var ctx = c.getContext('2d');
+			if (!ctx)
+				return;
+			ctx.fillStyle = bg;
+			ctx.fillRect(0, 0, 1, 1);
+			ctx.fillStyle = glass;
+			ctx.fillRect(0, 0, 1, 1);
+			var d = ctx.getImageData(0, 0, 1, 1).data;
+			var hex = '#';
+			for (var i = 0; i < 3; i++)
+				hex += ('0' + d[i].toString(16)).slice(-2);
+			if (meta.content !== hex)
+				meta.content = hex;
+		} catch (e) {}
 	}
 
 	function updateSwitch() {
@@ -1083,6 +1120,46 @@
 		});
 	}
 
+	/* 文档级滚动配套（r22）：LuCI SPA 切页（菜单/面包屑/标签链接 → XHR
+	   换 #view 内容）不重置文档滚动位置，新页面会停在旧深度；安卓对
+	   "初始滚动非零"的页面要先把滚到顶再下滑才肯收缩地址栏。这里在
+	   点击站内导航链接后监听 #view 直接子节点变化（= 切页渲染完成；
+	   深层的自动刷新/控件更新不触发，避免误回顶），一旦换页立即把
+	   文档滚回顶部——每个页面都从顶开始，首次下滑即可收缩工具栏。
+	   整页跳转时观察器随页面销毁，无副作用；5 秒兜底自动撤防 */
+	function initNavScrollTop() {
+		if (typeof MutationObserver == 'undefined')
+			return;
+		var mo = null, timer = 0;
+		function disarm() {
+			if (timer) { clearTimeout(timer); timer = 0; }
+			if (mo) { mo.disconnect(); mo = null; }
+		}
+		document.addEventListener('click', function (ev) {
+			if (ev.button !== 0)
+				return;
+			var a = (ev.target && ev.target.closest) ? ev.target.closest('a[href]') : null;
+			if (!a)
+				return;
+			var href = a.getAttribute('href') || '';
+			/* 只处理站内导航：排除纯锚点、外部链接、javascript 伪协议 */
+			if (!href || href.charAt(0) == '#' ||
+			    /^(?:[a-z][a-z0-9+.-]*)?\/\//i.test(href) ||
+			    href.toLowerCase().indexOf('javascript:') === 0)
+				return;
+			var view = document.getElementById('view');
+			if (!view)
+				return;
+			disarm();
+			mo = new MutationObserver(function () {
+				disarm();
+				window.scrollTo(0, 0);
+			});
+			mo.observe(view, { childList: true });
+			timer = setTimeout(disarm, 5000);
+		}, true);
+	}
+
 	/* 登录页 logo：luci 的 modal.login 是 JS 渲染的，注入内联 SVG
 	   （跟随主题色 + 玻璃水滴感），替换原 CSS 背景图 */
 	function injectLoginLogo() {
@@ -1121,6 +1198,7 @@
 
 	applyCustomAccent(getAccentCustom());
 	guardDarkmode();
+	syncThemeColor();
 
 	if (document.readyState == 'loading')
 		document.addEventListener('DOMContentLoaded', function () {
@@ -1133,6 +1211,7 @@
 			fitDropdownWidths();
 			portalTooltips();
 			portalFixedModals();
+			initNavScrollTop();
 			injectLoginLogo();
 			setTimeout(syncMenuTop, 300);
 			setTimeout(initTabSliders, 300);
@@ -1148,6 +1227,7 @@
 		fitDropdownWidths();
 		portalTooltips();
 		portalFixedModals();
+		initNavScrollTop();
 		injectLoginLogo();
 		setTimeout(syncMenuTop, 300);
 		setTimeout(initTabSliders, 300);

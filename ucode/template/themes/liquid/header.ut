@@ -109,6 +109,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="darkreader-lock">
+<!-- 浏览器工具栏配色：初值=底部 foot 玻璃横幅的渲染实色（亮 #f8f9fb /
+     暗 #151c2b，即 --glass-bg-strong 叠 --background-color-medium 的合成色），
+     让移动端浏览器工具栏与页面上下玻璃栏融为一体。首绘后由 main.js
+     syncThemeColor() 用 canvas 实时合成精确值并跟随明暗切换 -->
+<meta name="theme-color" content="#f8f9fb" />
 {% if (bing_style != ''): %}<style>{{ bing_style }}</style>{% endif %}
 {% if (accent_custom_style != ''): %}<style>{{ accent_custom_style }}</style>{% endif %}
 <script>
@@ -117,6 +122,11 @@
 	   仅当 uci 未配置时回退 localStorage。锁屏页同样按 uci 显示（只读）。 */
 	(function () {
 		try {
+			/* 文档级滚动配套（r22）：关闭浏览器滚动位置恢复——刷新/前进后退
+			   一律从顶部开始，避免安卓落入"初始滚动非零须先回顶才收缩
+			   地址栏"的状态 */
+			if ('scrollRestoration' in history)
+				history.scrollRestoration = 'manual';
 			var m = "{{ cfg_mode }}";
 			var a = "{{ cfg_accent }}";
 			if (!m)
@@ -127,6 +137,11 @@
 			document.documentElement.setAttribute('data-darkmode', dark ? 'true' : 'false');
 			document.documentElement.setAttribute('data-liquid-mode', m);
 			document.documentElement.setAttribute('data-accent', a);
+			/* 工具栏色随明暗：foot 玻璃渲染实色（亮/暗两套），main.js 之后会
+			   用 canvas 合成精确值覆盖，此处只给首绘一个接近值避免闪默认色 */
+			var tc = document.querySelector('meta[name="theme-color"]');
+			if (tc)
+				tc.setAttribute('content', dark ? '#151c2b' : '#f8f9fb');
 		} catch (e) {}
 	})();
 </script>
