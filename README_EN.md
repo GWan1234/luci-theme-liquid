@@ -67,6 +67,13 @@ Supports **light / dark / auto** modes, **5 accent colors + a custom color picke
 
 ## Changelog
 
+- **2026-08-18 · v0.7**: mobile UX polish + general UX polish
+  - **Mobile**
+    - Toolbar / address bar auto-collapses on scroll, giving a larger view on phones
+    - Bottom banner clears the fullscreen gesture bar
+    - EasyTier restart / refresh-version dialogs center on mobile
+  - **General**
+    - Fixed button borders not hugging rounded corners / edge seams (plain buttons, Save & Apply, split-select)
 - **2026-08-15 · v0.6**: menu search + UX polish
   - **Menu search**: new search entry in the color area — opens a search box that filters menu items in real time, matching Chinese and English titles
   - **UX polish**: multi-instance configs (e.g. Dropbear) show as separate cards; refresh button gets a frosted glass look; iStoreOS page tabs adopt the theme tab style
