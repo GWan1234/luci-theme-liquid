@@ -2818,19 +2818,28 @@ body.liquid-login #liquid-login {
 	backdrop-filter: blur(10px);
 }
 
-/* 登录页胶囊容器：absolute 定位在登录卡片上方，不影响卡片居中 */
+/* 登录页纵向 stack：胶囊与登录卡片同处一个 flex 列，胶囊在卡片正上方
+   随卡片高度联动——输错密码出现错误提示使卡片变高时，胶囊自动上移，
+   不再与卡片重叠（此前胶囊 absolute 定位在中心上方固定 240px，
+   卡片变高不会带动它）。此布局同时天然兼容移动端。 */
+body.liquid-login #liquid-login .liquid-login-stack {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 16px;
+	max-width: calc(100vw - 40px);
+}
+
+/* 登录页胶囊容器：static 跟随 stack 流式布局（不再 absolute 偏移） */
 body.liquid-login #liquid-login-capsules {
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, calc(-50% - 240px));
+	position: static;
+	transform: none;
 	display: flex;
 	flex-direction: row;
 	align-items: center;
 	justify-content: center;
 	gap: 10px;
 	flex-wrap: nowrap;
-	z-index: 1001;
 }
 
 /* 登录页胶囊取消 fixed 定位，改为 static 跟随 flex 布局 */
