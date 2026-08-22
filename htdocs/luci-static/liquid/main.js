@@ -148,9 +148,8 @@
 		root.setAttribute('data-liquid-guard', '1');
 		if (typeof MutationObserver == 'undefined')
 			return;
-		var obs = new MutationObserver(function () {
-			if (_liquidGuardSelf)
-				return;
+		/* 还原逻辑：把 data-darkmode / color-scheme 拉回主题有效模式 */
+		function enforce() {
 			var want = isDark(getMode()) ? 'true' : 'false';
 			if (root.getAttribute('data-darkmode') !== want) {
 				_liquidGuardSelf = true;
@@ -161,8 +160,20 @@
 			if (m && m.content !== (want == 'true' ? 'dark' : 'light'))
 				m.content = (want == 'true' ? 'dark' : 'light');
 			syncThemeColor();
+		}
+		var obs = new MutationObserver(function () {
+			if (_liquidGuardSelf)
+				return;
+			enforce();
 		});
 		obs.observe(root, { attributes: true, attributeFilter: ['data-darkmode'] });
+		/* 关键：安装监视器时立即校正一次当前状态。OpenClash 的 common.js
+		   常在 main.js（footer 加载）之前执行，auto 模式下按 body 背景
+		   亮度误判成 dark 并已写入 data-darkmode；若只监视后续变化，
+		   从 main.js 加载到 OpenClash 下次重算之间页面会一直保持暗黑，
+		   形成"进 OpenClash 先闪暗再纠正"的窗口。footer 脚本在首帧绘制
+		   前执行，此刻校正可在用户看到任何暗色之前完成还原。 */
+		enforce();
 	}
 
 	/* 浏览器工具栏配色（meta theme-color）：取底部 foot 玻璃横幅（p.luci）
