@@ -142,6 +142,36 @@
 			var tc = document.querySelector('meta[name="theme-color"]');
 			if (tc)
 				tc.setAttribute('content', dark ? '#151c2b' : '#f8f9fb');
+			/* 明暗守护（head 阶段即安装）：OpenClash 等第三方脚本会在 body
+			   解析期间覆写 <html data-darkmode>（其 common.js 按背景亮度
+			   判定，加载早期 body 背景未算出时误判为暗色），而主题 main.js
+			   在 footer 才加载，浏览器可能在解析到 footer 前就绘制出暗色帧
+			   ——表现为"进 OpenClash 先闪暗再纠正"。此处在 head 就装
+			   监视器：任何与主题有效模式不符的外部写入都在微任务里立即
+			   还原（同步 data-darkmode 与 color-scheme），首帧绘制前完成，
+			   彻底杜绝闪暗。 */
+			if (window.MutationObserver) {
+				var _gRoot = document.documentElement;
+				var _gMql = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null;
+				var _gMeta = document.querySelector('meta[name="color-scheme"]');
+				var _gSelf = false;
+				function _gWant() {
+					var mm = _gRoot.getAttribute('data-liquid-mode') || m;
+					return ((mm == 'dark') || ((mm != 'light') && _gMql && _gMql.matches)) ? 'true' : 'false';
+				}
+				new MutationObserver(function () {
+					if (_gSelf)
+						return;
+					var want = _gWant();
+					if (_gRoot.getAttribute('data-darkmode') !== want) {
+						_gSelf = true;
+						_gRoot.setAttribute('data-darkmode', want);
+						_gSelf = false;
+					}
+					if (_gMeta && _gMeta.content !== (want == 'true' ? 'dark' : 'light'))
+						_gMeta.content = (want == 'true' ? 'dark' : 'light');
+				}).observe(_gRoot, { attributes: true, attributeFilter: ['data-darkmode'] });
+			}
 		} catch (e) {}
 	})();
 </script>
