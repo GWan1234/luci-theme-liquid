@@ -94,6 +94,9 @@
 						if (fs.stat(bing_file)) {
 							bing_style = sprintf(":root{--liquid-bing:url('/liquid-cache/bing-%s.jpg');}", today);
 							bing_ok = '1';
+							/* 新壁纸下载成功后清理 /tmp/liquid/ 下所有旧壁纸，
+							   只保留今天的文件，防止壁纸随时间堆积占满 /tmp */
+							system(sprintf('ls /tmp/liquid/bing-*.jpg 2>/dev/null | grep -v "bing-%s.jpg" | xargs rm -f 2>/dev/null', today));
 						}
 					}
 				}
