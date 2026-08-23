@@ -83,6 +83,9 @@
 			if (fs.stat(bing_file)) {
 				bing_style = sprintf(":root{--liquid-bing:url('/liquid-cache/bing-%s.jpg');}", today);
 				bing_ok = '1';
+				/* 无论今天壁纸是新下载还是已缓存，只要确认存在，
+				   就清理 /tmp/liquid/ 下所有历史壁纸，只保留今天的 */
+				system(sprintf('ls /tmp/liquid/bing-*.jpg 2>/dev/null | grep -v "bing-%s.jpg" | xargs rm -f 2>/dev/null', today));
 			} else {
 				system('wget -qO /tmp/liquid-bing-api.json -T 8 "https://www.bing.com/HPImageArchive.aspx?format=js&idx=0&n=1&mkt=zh-CN"');
 				let api = fs.readfile('/tmp/liquid-bing-api.json') ?? '';
@@ -94,6 +97,9 @@
 						if (fs.stat(bing_file)) {
 							bing_style = sprintf(":root{--liquid-bing:url('/liquid-cache/bing-%s.jpg');}", today);
 							bing_ok = '1';
+							/* 新壁纸下载成功后清理 /tmp/liquid/ 下所有旧壁纸，
+							   只保留今天的文件，防止壁纸随时间堆积占满 /tmp */
+							system(sprintf('ls /tmp/liquid/bing-*.jpg 2>/dev/null | grep -v "bing-%s.jpg" | xargs rm -f 2>/dev/null', today));
 						}
 					}
 				}
