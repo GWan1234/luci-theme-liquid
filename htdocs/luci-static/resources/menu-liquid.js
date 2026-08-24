@@ -46,6 +46,18 @@ return baseclass.extend({
 
 		const items = menu.querySelectorAll('ul.mainmenu.l1 > li');
 
+		/* 追踪鼠标位置，供 handleMenuExpand 展开/折叠后重新定位滑块 */
+		var self = this;
+		self._menu = menu;
+		self._indicator = indicator;
+		self._lastX = 0;
+		self._lastY = 0;
+
+		menu.addEventListener('mousemove', function (ev) {
+			self._lastX = ev.clientX;
+			self._lastY = ev.clientY;
+		});
+
 		menu.addEventListener('mouseleave', function () {
 			menu.classList.remove('liquid-menu-hovering');
 		});
@@ -105,6 +117,37 @@ return baseclass.extend({
 		});
 	},
 
+	/* 展开/折叠后，用当前鼠标位置重新定位一级滑块。
+	   点击切换分类时菜单项垂直位移，但鼠标未离开——mouseenter
+	   不触发，滑块停留在旧位置。此处用最近的鼠标坐标查出
+	   当前悬停的 li 并重算 translateY。 */
+	_repositionMenuIndicator() {
+		var menu = this._menu;
+		var indicator = this._indicator;
+		if (!menu || !indicator || !menu.classList.contains('liquid-menu-hovering'))
+			return;
+
+		var hovered = document.elementFromPoint(this._lastX, this._lastY);
+		if (!hovered)
+			return;
+
+		var li = hovered.closest('ul.mainmenu.l1 > li');
+		if (!li || li.classList.contains('selected')) {
+			menu.classList.remove('liquid-menu-hovering');
+			return;
+		}
+
+		var a = li.querySelector(':scope > a');
+		if (!a)
+			return;
+
+		var menuRect = menu.getBoundingClientRect();
+		var aRect = a.getBoundingClientRect();
+		indicator.style.transform =
+			'translateY(%dpx)'.format(aRect.top - menuRect.top + menu.scrollTop);
+		indicator.style.height = '%dpx'.format(aRect.height);
+	},
+
 	handleMenuExpand(ev) {
 		const a = ev.target;
 		const li = a.parentNode;
@@ -115,6 +158,7 @@ return baseclass.extend({
 		if (li.classList.contains('active') && ul2 && ul2.children.length > 0) {
 			li.classList.remove('active');
 			a.blur();
+			this._repositionMenuIndicator();
 			ev.preventDefault();
 			ev.stopPropagation();
 			return;
@@ -135,6 +179,9 @@ return baseclass.extend({
 		ul1.classList.add('active');
 		li.classList.add('active');
 		a.blur();
+
+		/* 展开/折叠后菜单项垂直位移，滑块位置需跟着更新 */
+		this._repositionMenuIndicator();
 
 		ev.preventDefault();
 		ev.stopPropagation();
