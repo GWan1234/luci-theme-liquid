@@ -1276,6 +1276,13 @@
 				return;
 			if (sel.closest('.cbi-select'))
 				return;
+			/* 只替换标准 CBI 表单下拉（.cbi-value-field 内），
+			   排除 LuCI 自定义 widget（如无线设置的 mode/band/channel/htmode
+			   select）——它们的联动逻辑（toggleWifiMode → querySelector('.mode')
+			   → formvalue）依赖原始 select DOM 节点，替换后 querySelector
+			   失败导致整个无线设置页 JavaScript 报错。 */
+			if (!sel.closest('.cbi-value-field'))
+				return;
 			if (sel.offsetParent === null && getComputedStyle(sel).display === 'none')
 				return;
 			todo.push(sel);
