@@ -1262,87 +1262,13 @@
 	   自行升级）、size>1（多行列表）；保存并应用是 div.cbi-button-apply
 	   非 select，天然排除。替换保留 name，change 转发给原 select 让
 	   LuCI 依赖联动/校验继续工作。 */
-	function initSelectCombos() {
-		if (typeof L == 'undefined' || typeof L.require != 'function')
-			return;
-		/* 无线设置页整体跳过 Combobox 替换：wireless.js 的加密/模式/信道/
-		   HT模式 select 联动链深度依赖原生 select DOM 接口（formvalue
-		   返回 3 元素数组 → isDependencySatisfied 的 indexOf 单值匹配
-		   永远不匹配 → 跟随选项被隐藏）。替换会破坏整条链，且无法通过
-		   排除单个 select 修复（问题是 formvalue 返回格式而非 DOM 查找）。
-		   该页面保留原生 select + cascade.css 玻璃美化，与 Argon 行为
-		   一致，功能完全正常。 */
-		var dp = document.body && document.body.getAttribute('data-page');
-		if (dp && dp.indexOf('wireless') !== -1)
-			return;
-		/* 触屏设备跳过替换：LuCI 移动端分支打开下拉时会把页面滚动到
-		   视口中央，下拉靠近页面顶部时直接闪回顶部，无法使用；移动端
-		   保留原生 select，用系统滚动选择器 */
-		if ('ontouchstart' in window)
-			return;
-		var todo = [];
-		[].forEach.call(document.querySelectorAll('select:not([multiple])'), function (sel) {
-			if (sel.__liquidCombo || sel.disabled || sel.hasAttribute('data-choices') || sel.size > 1)
-				return;
-			if (sel.closest('.cbi-select'))
-				return;
-			/* 排除 LuCI 无线 widget 的自定义 select（.mode / .band /
-			   .channel / .htmode）：它们的联动逻辑（toggleWifiMode →
-			   querySelector('.mode') → formvalue）依赖原始 select DOM 节点，
-			   替换后 querySelector 失败 → null → 整个无线设置页联动报错。
-			   另外排除 .cbi-value-field 之外的任意自定义 widget select，
-			   防止其他 CBI 扩展出现同类问题。标准 CBI 表单 select 在
-			   .cbi-value-field 内（.closest 匹配），正常替换为 Combobox。 */
-			if (sel.classList.contains('mode') ||
-				sel.classList.contains('band') ||
-				sel.classList.contains('channel') ||
-				sel.classList.contains('htmode'))
-				return;
-			if (!sel.closest('.cbi-value-field'))
-				return;
-			if (sel.offsetParent === null && getComputedStyle(sel).display === 'none')
-				return;
-			todo.push(sel);
-		});
-		if (!todo.length)
-			return;
-		L.require('ui').then(function (ui) {
-			todo.forEach(function (sel) {
-				try {
-					var vals = [], labels = [], i, choices = {};
-					for (i = 0; i < sel.options.length; i++) {
-						vals.push(sel.options[i].value);
-						labels.push(sel.options[i].textContent);
-					}
-					for (i = 0; i < vals.length; i++)
-						choices[vals[i]] = labels[i];
-					var cb = new ui.Combobox(sel.value, choices, {
-						name: sel.getAttribute('name') || sel.id,
-						sort: false,
-						create: false,
-						optional: false
-					});
-					var node = cb.render();
-					node.classList.add('liquid-combo-pilot');
-					node.addEventListener('cbi-dropdown-change', function () {
-						try {
-							sel.value = cb.getValue();
-							sel.dispatchEvent(new Event('change', { bubbles: true }));
-						} catch (e) {}
-					});
-					sel.parentNode.replaceChild(node, sel);
-					sel.__liquidCombo = true;
-					/* Combobox 强制 create:true，但原生 select 没有自定义
-					   选项：移除多余的自定义输入行 */
-					[].forEach.call(node.querySelectorAll('li[data-value="-"]'), function (li) {
-						if (li.parentNode)
-							li.parentNode.removeChild(li);
-					});
-				} catch (e) {}
-			});
-			fixComboPillClick();
-		});
-	}
+	/* Combobox 替换已禁用（r14+）：用纯 CSS `select::picker(select)`
+	   美化原生 select 的折叠态和展开菜单，无需替换 DOM。
+	   - 消除 Combobox 带来的性能开销（所有页面下拉更流畅）
+	   - 彻底解决无线设置页 formvalue 返回格式与依赖链的结构性冲突
+	   - 依赖链（formvalue → isDependencySatisfied → checkDepends）
+	     始终操作原生 DOM，不会断裂 */
+	function initSelectCombos() {}
 
 	/* 点击内容区（当前值行）也能稳定展开：LuCI 的 handleClick 虽支持整块
 	   点击，但内容区 click 会冒泡到 window 的 closeAllDropdowns，导致
