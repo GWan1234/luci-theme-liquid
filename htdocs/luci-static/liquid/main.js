@@ -1215,7 +1215,6 @@
 		document.addEventListener('DOMContentLoaded', function () {
 			initSwitch();
 			initColorSwitch();
-			initSelectCombos();
 			syncMenuTop();
 			initTabSliders();
 			syncDropdownValues();
@@ -1231,7 +1230,6 @@
 	else {
 		initSwitch();
 		initColorSwitch();
-		initSelectCombos();
 		syncMenuTop();
 		initTabSliders();
 		syncDropdownValues();
@@ -1255,20 +1253,6 @@
 				el.style.opacity = '';
 		});
 	}, 600);
-
-	/* 单选原生 select → LuCI ui.Combobox（自绘玻璃下拉，弹出面板可
-	   完全定制、性能可接受）。范围：所有单选下拉；排除多选、disabled、
-	   隐藏、.cbi-select 内部（已有分割按钮结构）、data-choices（LuCI
-	   自行升级）、size>1（多行列表）；保存并应用是 div.cbi-button-apply
-	   非 select，天然排除。替换保留 name，change 转发给原 select 让
-	   LuCI 依赖联动/校验继续工作。 */
-	/* Combobox 替换已禁用（r14+）：用纯 CSS `select::picker(select)`
-	   美化原生 select 的折叠态和展开菜单，无需替换 DOM。
-	   - 消除 Combobox 带来的性能开销（所有页面下拉更流畅）
-	   - 彻底解决无线设置页 formvalue 返回格式与依赖链的结构性冲突
-	   - 依赖链（formvalue → isDependencySatisfied → checkDepends）
-	     始终操作原生 DOM，不会断裂 */
-	function initSelectCombos() {}
 
 	/* 点击内容区（当前值行）也能稳定展开：LuCI 的 handleClick 虽支持整块
 	   点击，但内容区 click 会冒泡到 window 的 closeAllDropdowns，导致
@@ -1299,7 +1283,6 @@
 			fitDropdownWidths();
 			portalTooltips();
 			injectLoginLogo();
-			initSelectCombos();
 			fixComboPillClick();
 		});
 		document.addEventListener('DOMContentLoaded', function () {
