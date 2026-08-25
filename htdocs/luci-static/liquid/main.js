@@ -1276,19 +1276,16 @@
 				return;
 			if (sel.closest('.cbi-select'))
 				return;
-			/* 只替换标准 CBI 表单下拉，排除 LuCI 无线 widget 的自定义
-			   select（.mode / .band / .channel / .htmode）：它们的联动逻辑
-			   （toggleWifiMode → querySelector('.mode') → formvalue）依赖
-			   原始 select DOM 节点，替换后 querySelector 找不到 → null →
-			   整个无线设置页（模式切换、信道联动、加密方式联动）全部报错。
-			   同时排除 .cbi-value-field 之外的任意自定义 widget select，
-			   防止其他 CBI 扩展出现同类问题。 */
-			if (sel.classList.contains('mode') ||
-				sel.classList.contains('band') ||
-				sel.classList.contains('channel') ||
-				sel.classList.contains('htmode'))
-				return;
-			if (!sel.closest('.cbi-value-field'))
+			/* 只替换直接位于 .cbi-value-field 下的标准 CBI 表单 select
+			   （form.ListValue / form.Value 渲染出的原生 select）。
+			   排除嵌套在其他 widget 结构内的 select（如无线设置页的
+			   mode/band/channel/htmode——它们在 label > widget-div >
+			   .cbi-value-field 层级中；替换会导致 wireless.js 的联动逻辑
+			   （querySelector('.mode') → formvalue）查不到原始节点）。
+			   排除标准 select 后，无线设置页保留原生下拉 + 玻璃样式
+			   （cascade.css 已有对应美化规则），功能与 Argon 一致。 */
+			if (!sel.parentElement ||
+			    !sel.parentElement.classList.contains('cbi-value-field'))
 				return;
 			if (sel.offsetParent === null && getComputedStyle(sel).display === 'none')
 				return;

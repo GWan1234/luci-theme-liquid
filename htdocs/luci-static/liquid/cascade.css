@@ -1955,6 +1955,32 @@ input[type="radio"] {
 	clear: both;
 }
 
+/* 原生 select 美化（无线设置等未被 Combobox 替换的 select）。
+   Combobox 已覆盖的 select 不受此影响（:not 排除 .cbi-dropdown /
+   .cbi-select 内部）；移动端 media query 内有更具体的规则，此处仅
+   影响桌面端残余的原生 select（主要是无线 widget 的 mode/band/channel/
+   htmode）。 */
+select:not([multiple]):not(.cbi-dropdown select):not(.cbi-select select) {
+	appearance: none;
+	-webkit-appearance: none;
+	background: var(--glass-bg);
+	border: 1px solid var(--glass-border);
+	border-radius: 8px;
+	padding: 6px 28px 6px 10px;
+	color: var(--text-color-high);
+	font-size: 13px;
+	cursor: pointer;
+	min-width: 100px;
+	transition: border-color .15s ease, box-shadow .15s ease;
+}
+select:not([multiple]):not(.cbi-dropdown select):not(.cbi-select select):hover {
+	border-color: var(--primary-color-high);
+}
+select:not([multiple]):not(.cbi-dropdown select):not(.cbi-select select):focus {
+	outline: none;
+	box-shadow: 0 0 0 2px var(--accent-glow);
+}
+
 /* ==========================================================================
    11. Tables
    ========================================================================== */
