@@ -1721,21 +1721,24 @@ textarea[disabled] {
 }
 
 /* 原生裸 select（.cbi-input-select 等）现代化：去浏览器原生外观，
-   主题圆角/边框/聚焦；不自绘箭头（避免在 pushbot 等第三方页面出现
-   重复箭头，桌面/移动统一简洁） */
+   主题圆角/边框/聚焦。此规则作为「不支持 base-select」内核的回退：
+   Chrome 135+/Edge 135+/Safari 27 会被下方更高特异性的 base-select
+   规则覆盖（从而启用 ::picker(select) 自绘下拉）；老内核/Firefox 则
+   保留 appearance:none（展开菜单退回系统原生，但折叠态仍是主题样式）。
+   不自绘箭头（避免在 pushbot 等第三方页面出现重复箭头）。 */
 select:not([multiple]) {
-	appearance: none !important;
-	-webkit-appearance: none !important;
-	padding: 8px 12px !important;
-	background-color: var(--field-bg) !important;
-	border: 1px solid var(--border-color-medium) !important;
-	border-radius: 12px !important;
+	appearance: none;
+	-webkit-appearance: none;
+	padding: 8px 12px;
+	background-color: var(--field-bg);
+	border: 1px solid var(--border-color-medium);
+	border-radius: 12px;
 	cursor: pointer;
 	transition: border-color .15s ease, box-shadow .15s ease;
 }
 
 select:not([multiple]):hover {
-	border-color: var(--primary-color-high) !important;
+	border-color: var(--primary-color-high);
 }
 
 /* .cbi-select（分割按钮风格）内部 select 由外层 ::after 提供箭头 */
@@ -1956,12 +1959,14 @@ input[type="radio"] {
 }
 
 /* 原生 select 美化（Combobox 替换已禁用，所有 select 保留原生 DOM）。
-   折叠态 + 展开菜单均通过 CSS 美化（select::picker(select)，Chrome 123+/
-   Edge 123+/Safari 15.4+ 支持），与 Combobox 视觉统一但无 DOM 替换开销。
+   折叠态 + 展开菜单均通过 CSS 美化（select::picker(select)，Chrome 135+/
+   Edge 135+/Safari 27 支持），与 Combobox 视觉统一但无 DOM 替换开销。
    无线设置页 formvalue 联动链因此完全正常。 */
 select:not([multiple]):not(.cbi-dropdown select):not(.cbi-select select) {
 	/* appearance: base-select 启用 select::picker(select) 自定义下拉菜单，
-	   不用 appearance: none（那会禁用 picker）。再用显式属性覆盖默认外观。 */
+	   不用 appearance: none（那会禁用 picker）。再用显式属性覆盖默认外观。
+	   支持 base-select 的浏览器此声明覆盖上方 appearance:none 回退；
+	   不支持的浏览器此声明被判无效丢弃，自动回退到 appearance:none。 */
 	appearance: base-select;
 	background: var(--glass-bg);
 	border: 1px solid var(--glass-border);
@@ -1985,7 +1990,7 @@ select:not([multiple]):not(.cbi-dropdown select):not(.cbi-select select):focus {
 	box-shadow: 0 0 0 2px var(--accent-glow);
 }
 
-/* select 下拉菜单美化（Chrome 123+ / Safari 15.4+ select::picker(select)） */
+/* select 下拉菜单美化（Chrome 135+/Edge 135+/Safari 27 的 select::picker(select)） */
 select:not([multiple]):not(.cbi-dropdown select):not(.cbi-select select)::picker(select) {
 	appearance: base-select;
 	background: var(--glass-bg-strong);
