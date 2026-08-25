@@ -1265,6 +1265,16 @@
 	function initSelectCombos() {
 		if (typeof L == 'undefined' || typeof L.require != 'function')
 			return;
+		/* 无线设置页整体跳过 Combobox 替换：wireless.js 的加密/模式/信道/
+		   HT模式 select 联动链深度依赖原生 select DOM 接口（formvalue
+		   返回 3 元素数组 → isDependencySatisfied 的 indexOf 单值匹配
+		   永远不匹配 → 跟随选项被隐藏）。替换会破坏整条链，且无法通过
+		   排除单个 select 修复（问题是 formvalue 返回格式而非 DOM 查找）。
+		   该页面保留原生 select + cascade.css 玻璃美化，与 Argon 行为
+		   一致，功能完全正常。 */
+		var dp = document.body && document.body.getAttribute('data-page');
+		if (dp && dp.indexOf('wireless') !== -1)
+			return;
 		/* 触屏设备跳过替换：LuCI 移动端分支打开下拉时会把页面滚动到
 		   视口中央，下拉靠近页面顶部时直接闪回顶部，无法使用；移动端
 		   保留原生 select，用系统滚动选择器 */
