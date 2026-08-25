@@ -1960,8 +1960,9 @@ input[type="radio"] {
    Edge 123+/Safari 15.4+ 支持），与 Combobox 视觉统一但无 DOM 替换开销。
    无线设置页 formvalue 联动链因此完全正常。 */
 select:not([multiple]):not(.cbi-dropdown select):not(.cbi-select select) {
-	appearance: none;
-	-webkit-appearance: none;
+	/* appearance: base-select 启用 select::picker(select) 自定义下拉菜单，
+	   不用 appearance: none（那会禁用 picker）。再用显式属性覆盖默认外观。 */
+	appearance: base-select;
 	background: var(--glass-bg);
 	border: 1px solid var(--glass-border);
 	border-radius: 10px;
