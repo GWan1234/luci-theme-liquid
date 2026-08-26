@@ -2008,25 +2008,19 @@ select:not([multiple]):not(.cbi-dropdown select):not(.cbi-select select)::picker
 	/* 覆盖浏览器默认 max-block-size: stretch（纵向撑满） */
 	max-block-size: auto;
 }
-select:not([multiple]):not(.cbi-dropdown select):not(.cbi-select select)::picker(select) option {
+/* picker 内选项的背景/文字色：Chrome 不支持 ::picker(select) option 选择器，
+   直接用 option 伪类在 picker 内生效的继承机制覆盖。 */
+select:not([multiple]):not(.cbi-dropdown select):not(.cbi-select select) option {
 	padding: 8px 12px;
-	border-radius: 0;
 	color: var(--text-color-high);
 	transition: background .12s ease;
 }
-select:not([multiple]):not(.cbi-dropdown select):not(.cbi-select select)::picker(select) option:checked {
+select:not([multiple]):not(.cbi-dropdown select):not(.cbi-select select) option:checked {
 	background: var(--glass-bg-hover);
 	color: var(--text-color-highest);
 }
-select:not([multiple]):not(.cbi-dropdown select):not(.cbi-select select)::picker(select) option:hover {
+select:not([multiple]):not(.cbi-dropdown select):not(.cbi-select select) option:hover {
 	background: var(--glass-bg-hover);
-}
-/* 首尾选项的高亮背景贴合 picker 圆角 */
-select:not([multiple]):not(.cbi-dropdown select):not(.cbi-select select)::picker(select) option:first-child {
-	margin-block-start: 4px;
-}
-select:not([multiple]):not(.cbi-dropdown select):not(.cbi-select select)::picker(select) option:last-child {
-	margin-block-end: 4px;
 }
 
 /* ==========================================================================
