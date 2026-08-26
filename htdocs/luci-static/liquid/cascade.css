@@ -1999,8 +1999,14 @@ select:not([multiple]):not(.cbi-dropdown select):not(.cbi-select select)::picker
 	box-shadow: var(--glass-shadow);
 	backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
 	padding: 4px;
-	width: max-content;
-	min-width: 100%;
+	/* 宽度：自适应最长选项内容 + 微余量；禁止撑满到窗口边缘 */
+	width: auto;
+	max-inline-size: calc(100vw - 20px);
+	overflow: auto;
+	/* 覆盖浏览器默认 span-inline-end（会横向撑满到右边缘） */
+	position-area: block-end;
+	/* 覆盖浏览器默认 max-block-size: stretch（纵向撑满） */
+	max-block-size: auto;
 }
 select:not([multiple]):not(.cbi-dropdown select):not(.cbi-select select)::picker(select) option {
 	padding: 8px 12px;
