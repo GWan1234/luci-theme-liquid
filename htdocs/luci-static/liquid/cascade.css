@@ -2010,7 +2010,7 @@ select:not([multiple]):not(.cbi-dropdown select):not(.cbi-select select)::picker
 }
 select:not([multiple]):not(.cbi-dropdown select):not(.cbi-select select)::picker(select) option {
 	padding: 8px 12px;
-	border-radius: 8px;
+	border-radius: 0;
 	color: var(--text-color-high);
 	transition: background .12s ease;
 }
@@ -2020,6 +2020,13 @@ select:not([multiple]):not(.cbi-dropdown select):not(.cbi-select select)::picker
 }
 select:not([multiple]):not(.cbi-dropdown select):not(.cbi-select select)::picker(select) option:hover {
 	background: var(--glass-bg-hover);
+}
+/* 首尾选项的高亮背景贴合 picker 圆角 */
+select:not([multiple]):not(.cbi-dropdown select):not(.cbi-select select)::picker(select) option:first-child {
+	margin-block-start: 4px;
+}
+select:not([multiple]):not(.cbi-dropdown select):not(.cbi-select select)::picker(select) option:last-child {
+	margin-block-end: 4px;
 }
 
 /* ==========================================================================
