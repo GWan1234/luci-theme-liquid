@@ -1145,7 +1145,7 @@ header [data-indicator][data-style="inactive"],
 	gap: 8px;
 }
 .liquid-pending-toast-btn {
-	flex: none;
+	flex-shrink: 0;
 	padding: 5px 14px;
 	border: none;
 	border-radius: 8px;
@@ -1153,6 +1153,22 @@ header [data-indicator][data-style="inactive"],
 	font-weight: 600;
 	cursor: pointer;
 	transition: box-shadow .15s ease, background .15s ease;
+}
+.liquid-pending-toast-btn[data-action="apply"] {
+	background: var(--accent-grad);
+	color: var(--on-primary-color, #fff);
+	box-shadow: 0 2px 8px var(--accent-glow);
+}
+.liquid-pending-toast-btn[data-action="apply"]:hover {
+	box-shadow: 0 4px 16px var(--accent-glow);
+}
+.liquid-pending-toast-btn[data-action="dismiss"] {
+	background: var(--glass-bg);
+	color: var(--text-color-medium);
+	border: 1px solid var(--glass-border);
+}
+.liquid-pending-toast-btn[data-action="dismiss"]:hover {
+	color: var(--text-color-high);
 }
 	min-width: 80px;
 }
