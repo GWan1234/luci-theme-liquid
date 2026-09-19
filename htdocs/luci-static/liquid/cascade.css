@@ -68,7 +68,7 @@
 	--glass-bg: rgba(255, 255, 255, calc(0.42 * var(--glass-opacity)));
 	--glass-bg-strong: rgba(255, 255, 255, calc(0.66 * var(--glass-opacity)));
 	/* 亮色 hover 背景用浅主题色 tint（纯白 hover 会发白、看不清字） */
-	--glass-bg-hover: color-mix(in srgb, var(--primary-color-high) 30%, #ffffff);
+	--glass-bg-hover: color-mix(in srgb, color-mix(in srgb, var(--primary-color-high) 30%, #ffffff) calc(100% * var(--glass-opacity)), transparent);
 	/* picker 选项高亮：沿用 glass-bg-hover 逻辑（亮底对比度已足够） */
 	--picker-option-hover: var(--glass-bg-hover);
 	--picker-option-checked: var(--glass-bg-hover);
