@@ -276,6 +276,58 @@
 		saveConfig({ bing: v });
 	}
 
+	/* ---- glass opacity slider ---- */
+
+	function getGlassOpacity() {
+		var d = document.body ? document.body.getAttribute('data-liquid-glass-opacity') : null;
+		if (d && d !== '')
+			return parseInt(d, 10);
+		try { return parseInt(localStorage.getItem('liquid-glass-opacity'), 10) || 100; } catch (e) { return 100; }
+	}
+
+	function setGlassOpacity(v) {
+		v = Math.max(0, Math.min(100, Math.round(v)));
+		try { localStorage.setItem('liquid-glass-opacity', String(v)); } catch (e) {}
+		if (document.body)
+			document.body.setAttribute('data-liquid-glass-opacity', String(v));
+		document.documentElement.style.setProperty('--glass-opacity', (v / 100).toFixed(2));
+	}
+
+	function updateGlassSlider() {
+		var s = document.querySelector('.liquid-glass-slider');
+		if (s)
+			s.value = getGlassOpacity();
+	}
+
+	function initGlassOpacitySlider() {
+		var sw = document.querySelector('.liquid-color-switch');
+		if (!sw || sw.querySelector('.liquid-glass-slider-wrap'))
+			return;
+
+		var wrap = document.createElement('div');
+		wrap.className = 'liquid-glass-slider-wrap';
+
+		var slider = document.createElement('input');
+		slider.type = 'range';
+		slider.className = 'liquid-glass-slider';
+		slider.min = '0';
+		slider.max = '100';
+		slider.step = '1';
+		slider.value = String(getGlassOpacity());
+		slider.title = 'Glass opacity';
+		slider.setAttribute('aria-label', 'Glass opacity');
+
+		slider.addEventListener('input', function () {
+			setGlassOpacity(parseInt(slider.value, 10));
+		});
+		slider.addEventListener('change', function () {
+			saveConfig({ glass_opacity: parseInt(slider.value, 10) });
+		});
+
+		wrap.appendChild(slider);
+		sw.appendChild(wrap);
+	}
+
 	function updateColorSwitch() {
 		var accent = getAccent();
 		[].forEach.call(document.querySelectorAll('.liquid-color-btn'), function (b) {
@@ -1215,6 +1267,7 @@
 		document.addEventListener('DOMContentLoaded', function () {
 			initSwitch();
 			initColorSwitch();
+			initGlassOpacitySlider();
 			syncMenuTop();
 			initTabSliders();
 			syncDropdownValues();
@@ -1230,6 +1283,7 @@
 	else {
 		initSwitch();
 		initColorSwitch();
+		initGlassOpacitySlider();
 		syncMenuTop();
 		initTabSliders();
 		syncDropdownValues();

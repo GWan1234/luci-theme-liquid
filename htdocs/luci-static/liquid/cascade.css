@@ -64,8 +64,9 @@
 	--glass-sat: 1.6;
 	--glass-radius: 18px;
 	--glass-radius-lg: 24px;
-	--glass-bg: rgba(255, 255, 255, 0.42);
-	--glass-bg-strong: rgba(255, 255, 255, 0.66);
+	--glass-opacity: 1;
+	--glass-bg: rgba(255, 255, 255, calc(0.42 * var(--glass-opacity)));
+	--glass-bg-strong: rgba(255, 255, 255, calc(0.66 * var(--glass-opacity)));
 	/* 亮色 hover 背景用浅主题色 tint（纯白 hover 会发白、看不清字） */
 	--glass-bg-hover: color-mix(in srgb, var(--primary-color-high) 30%, #ffffff);
 	/* picker 选项高亮：沿用 glass-bg-hover 逻辑（亮底对比度已足够） */
@@ -74,19 +75,19 @@
 	/* 表格隔行：不透明浅色（半透明玻璃隔行会让图标文字显得半透，
 	   误以为接口未连接） */
 	--table-stripe: #f4f6f9;
-	--glass-border: rgba(255, 255, 255, 0.8);
+	--glass-border: rgba(255, 255, 255, calc(0.8 * var(--glass-opacity)));
 	--glass-border-dark: rgba(23, 34, 52, 0.09);
-	--glass-inset: rgba(255, 255, 255, 0.95);
+	--glass-inset: rgba(255, 255, 255, calc(0.95 * var(--glass-opacity)));
 	--glass-shadow: 0 22px 54px rgba(31, 45, 70, 0.16), 0 2px 8px rgba(31, 45, 70, 0.06);
 	--glass-shadow-soft: 0 8px 24px rgba(31, 45, 70, 0.10);
 
-	--menu-bg: rgba(255, 255, 255, 0.36);
-	--field-bg: rgba(255, 255, 255, 0.56);
+	--menu-bg: rgba(255, 255, 255, calc(0.36 * var(--glass-opacity)));
+	--field-bg: rgba(255, 255, 255, calc(0.56 * var(--glass-opacity)));
 	--track-bg: rgba(23, 34, 52, 0.10);
 
 	--accent-grad: linear-gradient(135deg, #5aa8f7 0%, #2f7fe0 48%, #1a63c4 100%);
 	--accent-glow: rgba(47, 127, 224, 0.38);
-	--lock-card-bg: rgba(255, 255, 255, 0.5);
+	--lock-card-bg: rgba(255, 255, 255, calc(0.5 * var(--glass-opacity)));
 	--indicator-bg: var(--accent-glass-soft);
 	--indicator-border: color-mix(in srgb, var(--primary-color-high) 48%, transparent);
 	--indicator-shadow: 0 4px 16px color-mix(in srgb, var(--primary-color-high) 30%, transparent), inset 0 1px 0 rgba(255, 255, 255, 0.9);
@@ -148,21 +149,21 @@
 
 	color-scheme: dark;
 
-	--glass-bg: rgba(24, 32, 48, 0.4);
-	--glass-bg-strong: rgba(22, 29, 44, 0.74);
+	--glass-bg: rgba(24, 32, 48, calc(0.4 * var(--glass-opacity)));
+	--glass-bg-strong: rgba(22, 29, 44, calc(0.74 * var(--glass-opacity)));
 	--glass-bg-hover: rgba(42, 54, 78, 0.55);
 	/* picker 选项高亮：暗底需要更亮的选中/悬停色，否则看不清 */
 	--picker-option-hover: rgba(70, 100, 160, 0.55);
 	--picker-option-checked: rgba(60, 90, 150, 0.45);
 	--table-stripe: #1b2330;
-	--glass-border: rgba(255, 255, 255, 0.16);
+	--glass-border: rgba(255, 255, 255, calc(0.16 * var(--glass-opacity)));
 	--glass-border-dark: rgba(0, 0, 0, 0.42);
-	--glass-inset: rgba(255, 255, 255, 0.10);
+	--glass-inset: rgba(255, 255, 255, calc(0.10 * var(--glass-opacity)));
 	--glass-shadow: 0 26px 64px rgba(0, 0, 0, 0.6), 0 2px 10px rgba(0, 0, 0, 0.32);
 	--glass-shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.5);
 
-	--menu-bg: rgba(12, 17, 27, 0.52);
-	--field-bg: rgba(255, 255, 255, 0.07);
+	--menu-bg: rgba(12, 17, 27, calc(0.52 * var(--glass-opacity)));
+	--field-bg: rgba(255, 255, 255, calc(0.07 * var(--glass-opacity)));
 	--track-bg: rgba(255, 255, 255, 0.10);
 
 	/* 移动端 chrome 条实色等价（暗）：见亮色同名变量注释 */
@@ -171,7 +172,7 @@
 
 	--accent-grad: linear-gradient(135deg, #7cbcff 0%, #5da3f0 48%, #2f74cc 100%);
 	--accent-glow: rgba(93, 163, 240, 0.4);
-	--lock-card-bg: rgba(13, 18, 28, 0.55);
+	--lock-card-bg: rgba(13, 18, 28, calc(0.55 * var(--glass-opacity)));
 	--indicator-bg: var(--accent-glass-soft);
 	--indicator-border: rgba(255, 255, 255, 0.18);
 	--indicator-shadow: 0 4px 16px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
@@ -949,6 +950,77 @@ header [data-indicator][data-style="inactive"],
 	top: auto;
 	bottom: calc(100% + 8px);
 	transform-origin: bottom right;
+}
+
+/* ── 透明度滑杆（玻璃感，参考 iOS 26/macOS 26 slider）───────── */
+.liquid-glass-slider-wrap {
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: -22px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 22px;
+	pointer-events: none;
+}
+/* 主菜单（侧栏胶囊下方）：滑杆跟在胶囊下方，间距 2px */
+#mainmenu > .liquid-color-switch > .liquid-glass-slider-wrap {
+	position: relative;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	height: 14px;
+	margin: 2px 0 6px;
+}
+.liquid-glass-slider {
+	-webkit-appearance: none;
+	appearance: none;
+	width: 100%;
+	height: 4px;
+	border-radius: 4px;
+	outline: none;
+	cursor: pointer;
+	pointer-events: auto;
+	/* 轨道：毛玻璃半透明，下方内容微微可见 */
+	background: linear-gradient(to right, rgba(255,255,255,0.10), rgba(255,255,255,0.25));
+	backdrop-filter: blur(6px);
+	-webkit-backdrop-filter: blur(6px);
+	border: 1px solid rgba(255, 255, 255, 0.18);
+	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+.liquid-glass-slider::-webkit-slider-thumb {
+	-webkit-appearance: none;
+	width: 16px;
+	height: 16px;
+	border-radius: 50%;
+	background: linear-gradient(135deg, rgba(255,255,255,0.92), rgba(255,255,255,0.68));
+	border: 1px solid rgba(255, 255, 255, 0.95);
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2), 0 0 0 2px rgba(255, 255, 255, 0.15);
+	backdrop-filter: blur(8px);
+	-webkit-backdrop-filter: blur(8px);
+	cursor: pointer;
+}
+.liquid-glass-slider::-moz-range-thumb {
+	width: 16px;
+	height: 16px;
+	border-radius: 50%;
+	background: linear-gradient(135deg, rgba(255,255,255,0.92), rgba(255,255,255,0.68));
+	border: 1px solid rgba(255, 255, 255, 0.95);
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2), 0 0 0 2px rgba(255, 255, 255, 0.15);
+	cursor: pointer;
+}
+.liquid-glass-slider::-webkit-slider-thumb:hover {
+	background: linear-gradient(135deg, rgba(255,255,255,1), rgba(255,255,255,0.88));
+	box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25), 0 0 0 3px rgba(255, 255, 255, 0.2);
+}
+.liquid-glass-slider::-webkit-slider-thumb:active {
+	transform: scale(0.9);
+}
+/* 暗黑模式滑杆轨道稍微更亮 */
+:root[data-darkmode="true"] .liquid-glass-slider {
+	background: linear-gradient(to right, rgba(255,255,255,0.06), rgba(255,255,255,0.16));
+	border-color: rgba(255, 255, 255, 0.12);
 }
 
 /* ==========================================================================
