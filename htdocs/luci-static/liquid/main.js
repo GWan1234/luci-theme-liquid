@@ -276,15 +276,27 @@
 		saveConfig({ bing: v });
 	}
 
-	/* ---- glass opacity slider ---- */
+	/* ---- glass opacity slider ----
 
-	var GLASS_OPACITY_DEFAULT = 100;
+	   滑杆 0~100 → alpha 系数 0.00~1.00（0=全透，100=全不透）。
+	   默认值 = 现有设计参数值（亮/暗各不同），
+	   各变量 alpha = baseAlpha × (slider / default)，
+	   cap 到 [0, 1] 避免 RGBA 超值。
+	   竖线 tick 标记默认位置，点击即回到默认。 */
+
+	var GLASS_OPACITY_DEFAULT_LIGHT = 42;
+	var GLASS_OPACITY_DEFAULT_DARK  = 40;
+
+	function glassOpacityDefault() {
+		var dark = document.documentElement.getAttribute('data-darkmode') === 'true';
+		return dark ? GLASS_OPACITY_DEFAULT_DARK : GLASS_OPACITY_DEFAULT_LIGHT;
+	}
 
 	function getGlassOpacity() {
 		var d = document.body ? document.body.getAttribute('data-liquid-glass-opacity') : null;
 		if (d && d !== '')
 			return parseInt(d, 10);
-		try { return parseInt(localStorage.getItem('liquid-glass-opacity'), 10) || GLASS_OPACITY_DEFAULT; } catch (e) { return GLASS_OPACITY_DEFAULT; }
+		try { return parseInt(localStorage.getItem('liquid-glass-opacity'), 10) || glassOpacityDefault(); } catch (e) { return glassOpacityDefault(); }
 	}
 
 	function setGlassOpacity(v) {
@@ -292,7 +304,9 @@
 		try { localStorage.setItem('liquid-glass-opacity', String(v)); } catch (e) {}
 		if (document.body)
 			document.body.setAttribute('data-liquid-glass-opacity', String(v));
-		document.documentElement.style.setProperty('--glass-opacity', (v / 100).toFixed(2));
+		var def = glassOpacityDefault();
+		var factor = def > 0 ? Math.min(v / def, 100 / def) : 1;
+		document.documentElement.style.setProperty('--glass-opacity', factor.toFixed(2));
 	}
 
 	function updateGlassSlider() {
@@ -330,11 +344,12 @@
 		var tick = document.createElement('div');
 		tick.className = 'liquid-glass-slider-tick';
 		tick.title = 'Reset to default';
-		tick.style.left = GLASS_OPACITY_DEFAULT + '%';
+		tick.style.left = glassOpacityDefault() + '%';
 		tick.addEventListener('click', function () {
-			slider.value = String(GLASS_OPACITY_DEFAULT);
-			setGlassOpacity(GLASS_OPACITY_DEFAULT);
-			saveConfig({ glass_opacity: GLASS_OPACITY_DEFAULT });
+			var def = glassOpacityDefault();
+			slider.value = String(def);
+			setGlassOpacity(def);
+			saveConfig({ glass_opacity: def });
 		});
 
 		wrap.appendChild(slider);

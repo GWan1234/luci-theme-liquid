@@ -51,7 +51,7 @@
 	let cfg_accent = 'blue';
 	let cfg_accent_custom = '';
 	let cfg_bing = '0';
-	let cfg_glass_opacity = '100';
+	let cfg_glass_opacity = '';
 	let cfg = fs.readfile('/etc/config/liquid') ?? '';
 	let cm = match(cfg, /option[ \t]+mode[ \t]+'?([^' \t\n]+)'?/);
 	if (cm !== null)
@@ -79,12 +79,17 @@
 	let glass_opacity_style = '';
 	if (cfg_accent == 'custom' && cfg_accent_custom != '')
 		accent_custom_style = sprintf(':root{--accent-custom:%s;}', cfg_accent_custom);
-	if (cfg_glass_opacity != '100') {
+	if (cfg_glass_opacity != '') {
 		let op = int(cfg_glass_opacity, 10);
 		if (op < 0) op = 0;
 		if (op > 100) op = 100;
-		let f = op / 100;
-		glass_opacity_style = sprintf(':root[data-darkmode="false"]{--glass-opacity:%.2f;}:root[data-darkmode="true"]{--glass-opacity:%.2f;}', f, f);
+		/* 亮/暗参考 alpha 不同，JS 会根据 data-darkmode 动态修正，
+		   此处只注入 slider 值供 JS 首帧读取 */
+		let def_light = 42;
+		let def_dark  = 40;
+		let f_light = def_light > 0 ? sprintf('%.2f', op / def_light) : '1.00';
+		let f_dark  = def_dark  > 0 ? sprintf('%.2f', op / def_dark)  : '1.00';
+		glass_opacity_style = sprintf(':root[data-darkmode="false"]{--glass-opacity:%s;}:root[data-darkmode="true"]{--glass-opacity:%s;}', f_light, f_dark);
 	}
 
 	if (cfg_bing == '1') {
