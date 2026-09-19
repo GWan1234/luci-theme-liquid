@@ -626,7 +626,7 @@ header [data-indicator][data-style="inactive"],
 	flex-wrap: nowrap;
 	width: calc(100% + 8px);
 	max-width: calc(100% + 8px);
-	margin: 0 -4px 12px;
+	margin: 0 -4px 28px;
 	flex-shrink: 0;
 	box-sizing: border-box;
 }
