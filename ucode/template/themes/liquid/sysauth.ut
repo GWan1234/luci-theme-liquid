@@ -28,7 +28,7 @@
 			</svg>
 		</div>
 		<h4>{{ _('Authorization Required') }}</h4>
-		<form method="post" action="/cgi-bin/luci/" class="cbi-map">
+		<form method="post" action="/cgi-bin/luci/" class="cbi-map" onsubmit="if(!this.luci_password.value){this.luci_password.focus();return false;}">
 			<div class="cbi-section">
 				<div class="cbi-section-node">
 					<div class="cbi-value">
