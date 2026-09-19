@@ -979,12 +979,16 @@ header [data-indicator][data-style="inactive"],
 	outline: none;
 	cursor: pointer;
 	pointer-events: auto;
-	/* 轨道：毛玻璃半透明，下方内容微微可见 */
-	background: linear-gradient(to right, rgba(255,255,255,0.10), rgba(255,255,255,0.25));
+	/* 轨道：亮色用深色半透明，暗色用浅色半透明 */
+	background: linear-gradient(to right, rgba(0,0,0,0.12), rgba(0,0,0,0.22));
 	backdrop-filter: blur(6px);
 	-webkit-backdrop-filter: blur(6px);
 	border: none;
-	box-shadow: 0 0 0 1px rgba(255,255,255,0.18), 0 1px 4px rgba(0,0,0,0.08);
+	box-shadow: 0 0 0 1px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.08);
+}
+:root[data-darkmode="true"] .liquid-glass-slider {
+	background: linear-gradient(to right, rgba(255,255,255,0.06), rgba(255,255,255,0.16));
+	box-shadow: 0 0 0 1px rgba(255,255,255,0.12), 0 1px 4px rgba(0,0,0,0.08);
 }
 .liquid-glass-slider::-webkit-slider-thumb {
 	-webkit-appearance: none;
