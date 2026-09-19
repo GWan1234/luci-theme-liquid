@@ -373,22 +373,18 @@
 		slider.setAttribute('aria-label', 'Glass opacity');
 
 		var def = glassOpacityDefault();
-		var SNAP_RANGE = 6;
 
 		slider.addEventListener('input', function () {
-			var raw = parseInt(slider.value, 10);
-			/* 默认值附近 ±SNAP_RANGE 自动吸附到默认值 */
-			var snapped = (Math.abs(raw - def) <= SNAP_RANGE) ? def : raw;
-			setGlassOpacity(snapped);
+			setGlassOpacity(parseInt(slider.value, 10));
 		});
 		slider.addEventListener('change', function () {
 			saveConfig({ glass_opacity: parseInt(slider.value, 10) });
 		});
 
-		/* 默认值标记：更宽的可点击区域，方便精确点击回到默认 */
+		/* 默认值标记：点击回默认，双击快速回到默认并保存 */
 		var tick = document.createElement('div');
 		tick.className = 'liquid-glass-slider-tick';
-		tick.title = 'Reset to default';
+		tick.title = 'Default';
 		tick.style.left = def + '%';
 		tick.addEventListener('click', function () {
 			slider.value = String(def);
