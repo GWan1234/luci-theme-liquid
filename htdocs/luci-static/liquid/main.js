@@ -432,7 +432,15 @@
 
 		wrap.appendChild(slider);
 		wrap.appendChild(tick);
-		sw.appendChild(wrap);
+
+		/* 锁屏页：滑杆放在胶囊容器外部下方，宽度跟随胶囊总宽 */
+		var loginCapsules = document.getElementById('liquid-login-capsules');
+		if (loginCapsules) {
+			wrap.classList.add('liquid-glass-slider-login');
+			loginCapsules.parentNode.insertBefore(wrap, loginCapsules.nextSibling);
+		} else {
+			sw.appendChild(wrap);
+		}
 	}
 
 	function updateColorSwitch() {

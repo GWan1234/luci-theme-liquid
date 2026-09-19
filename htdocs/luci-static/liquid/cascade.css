@@ -3064,6 +3064,20 @@ body.liquid-login .liquid-color-switch {
 	position: static !important;
 	margin: 0 !important;
 }
+/* 登录页透明度滑杆：放在胶囊容器下方，宽度跟随胶囊总宽 */
+body.liquid-login .liquid-glass-slider-login {
+	position: relative;
+	left: 0;
+	right: 0;
+	top: 0;
+	display: flex;
+	align-items: center;
+	height: 14px;
+	margin-top: 8px;
+	pointer-events: none;
+	z-index: 2;
+	width: 100%;
+}
 
 /* 登录页隐藏搜索按钮（无意义） */
 body.liquid-login .liquid-search-btn {
