@@ -27,12 +27,20 @@
 	/* 一次 POST 全部 option（对象 {option: value}），后端一次写盘，
 	   避免多次请求并发时后写覆盖先写（accent 与 accent_custom 一起存） */
 	function saveConfig(opts) {
-		if (!document.body ||
-		    document.body.classList.contains('liquid-login'))
+		if (!document.body)
 			return;
-		/* 用主题自己的 ucode controller 保存（仿 luci-app-pushbot）：
-		   XHR POST 到 /cgi-bin/luci/admin/system/liquid/save_config，
-		   后端直接写 /etc/config/liquid，绕开跨版本不可靠的 uci rpc */
+		/* 登录页：暂存到 sessionStorage，不发任何请求 */
+		if (document.body.classList.contains('liquid-login')) {
+			try {
+				var prev = JSON.parse(sessionStorage.getItem('liquid-pending') || '{}');
+				var merged = {};
+				for (var k in prev) merged[k] = prev[k];
+				for (var k2 in opts) merged[k2] = opts[k2];
+				sessionStorage.setItem('liquid-pending', JSON.stringify(merged));
+			} catch (e) {}
+			return;
+		}
+		/* 正常页面：POST 到 ucode controller 持久化 */
 		try {
 			var base = (window.L && L.env && L.env.admin_path)
 				? L.env.admin_path : '/cgi-bin/luci/admin/';
@@ -40,6 +48,28 @@
 			xhr.open('POST', base + 'system/liquid/save_config');
 			xhr.setRequestHeader('Content-Type', 'application/json');
 			xhr.send(JSON.stringify(opts));
+		} catch (e) {}
+	}
+
+	/* 登录后提交暂存（DOMContentLoaded 后异步执行） */
+	function flushPending() {
+		try {
+			var raw = sessionStorage.getItem('liquid-pending');
+			if (!raw) return;
+			var data = JSON.parse(raw);
+			sessionStorage.removeItem('liquid-pending');
+			if (typeof data !== 'object' || data === null) return;
+			/* 异步 POST 持久化 */
+			setTimeout(function () {
+				try {
+					var base = (window.L && L.env && L.env.admin_path)
+						? L.env.admin_path : '/cgi-bin/luci/admin/';
+					var xhr = new XMLHttpRequest();
+					xhr.open('POST', base + 'system/liquid/save_config', true);
+					xhr.setRequestHeader('Content-Type', 'application/json');
+					xhr.send(JSON.stringify(data));
+				} catch (e) {}
+			}, 0);
 		} catch (e) {}
 	}
 	var mql = (typeof window.matchMedia == 'function')
@@ -1380,6 +1410,7 @@
 
 	if (document.readyState == 'loading')
 		document.addEventListener('DOMContentLoaded', function () {
+			flushPending();
 			initSwitch();
 			initColorSwitch();
 			initGlassOpacitySlider();
@@ -1396,6 +1427,7 @@
 			setTimeout(syncDropdownValues, 300);
 		});
 	else {
+		flushPending();
 		initSwitch();
 		initColorSwitch();
 		initGlassOpacitySlider();

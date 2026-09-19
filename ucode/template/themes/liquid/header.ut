@@ -143,12 +143,28 @@
 <script>
 	/* Liquid theme: apply uci-persisted light/dark/auto mode + accent before CSS paints.
 	   uci（服务端模板读取）优先：其他客户端修改后本机刷新即生效；
-	   仅当 uci 未配置时回退 localStorage。锁屏页同样按 uci 显示（只读）。 */
+	   仅当 uci 未配置时回退 localStorage。锁屏页同样按 uci 显示（只读）。
+	   登录前暂存：sessionStorage → localStorage（纯本地，零网络）。 */
 	(function () {
+		/* 暂存传递：锁屏页写入的 liquid-pending 同步到 localStorage，
+		   让首绘就用新值。网络 POST 交给 main.js 的 flushPending()。 */
+		var _hasPending = false;
 		try {
-			/* 文档级滚动配套（r22）：关闭浏览器滚动位置恢复——刷新/前进后退
-			   一律从顶部开始，避免安卓落入"初始滚动非零须先回顶才收缩
-			   地址栏"的状态 */
+			var _pending = sessionStorage.getItem('liquid-pending');
+			if (_pending) {
+				_hasPending = true;
+				var _data = JSON.parse(_pending);
+				if (_data && typeof _data === 'object') {
+					if (_data.mode) localStorage.setItem('liquid-theme-mode', _data.mode);
+					if (_data.accent) localStorage.setItem('liquid-accent', _data.accent);
+					if (_data.accent_custom) localStorage.setItem('liquid-accent-custom', _data.accent_custom);
+					if (_data.bing) localStorage.setItem('liquid-bing', _data.bing);
+					if (_data.glass_opacity != null) localStorage.setItem('liquid-glass-opacity', String(_data.glass_opacity));
+				}
+			}
+		} catch (e) {}
+
+		try {
 			if ('scrollRestoration' in history)
 				history.scrollRestoration = 'manual';
 			var m = "{{ cfg_mode }}";
@@ -157,6 +173,14 @@
 				m = localStorage.getItem('liquid-theme-mode') || 'auto';
 			if (!a)
 				a = localStorage.getItem('liquid-accent') || 'blue';
+			/* 暂存覆盖：localStorage 已在上面写入新值，但 uci 模板值是旧的。
+			   只在有暂存时让 localStorage 覆盖 uci（正常刷新 uci 优先） */
+			if (_hasPending) {
+				var _lm = localStorage.getItem('liquid-theme-mode');
+				var _la = localStorage.getItem('liquid-accent');
+				if (_lm) m = _lm;
+				if (_la) a = _la;
+			}
 			var dark = (m == 'dark') || ((m != 'light') && window.matchMedia('(prefers-color-scheme: dark)').matches);
 			document.documentElement.setAttribute('data-darkmode', dark ? 'true' : 'false');
 			document.documentElement.setAttribute('data-liquid-mode', m);
