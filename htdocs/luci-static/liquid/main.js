@@ -121,6 +121,8 @@
 			document.body.setAttribute('data-liquid-mode', mode);
 		applyMode(mode);
 		updateSwitch();
+		/* 明暗切换后 accent 背景的 RGB 需要用新模式的色值重写 */
+		setGlassOpacity(getGlassOpacity());
 		saveConfig({ mode: mode });
 	}
 
