@@ -88,14 +88,29 @@
 		/* 弹出玻璃 toast 提示 */
 		var toast = document.createElement('div');
 		toast.className = 'liquid-pending-toast';
-		toast.innerHTML = '<span class="liquid-pending-toast-text">登录前修改的主题设置已暂存，点击应用</span><button class="liquid-pending-toast-btn" type="button">应用</button>';
+		toast.innerHTML =
+			'<span class="liquid-pending-toast-text">登录前修改的主题设置已暂存</span>' +
+			'<span class="liquid-pending-toast-countdown"></span>' +
+			'<button class="liquid-pending-toast-btn" data-action="apply">应用</button>' +
+			'<button class="liquid-pending-toast-btn liquid-pending-toast-dismiss" data-action="dismiss">忽略</button>';
 		document.body.appendChild(toast);
-		/* 渐入 */
 		requestAnimationFrame(function () { toast.classList.add('show'); });
 
-		var btn = toast.querySelector('.liquid-pending-toast-btn');
-		btn.addEventListener('click', function () {
-			/* 先 POST 保存到 uci */
+		var countdownEl = toast.querySelector('.liquid-pending-toast-countdown');
+		var remaining = 30;
+		function tick() {
+			if (remaining <= 0) {
+				dismiss();
+				return;
+			}
+			countdownEl.textContent = remaining + 's';
+			remaining--;
+			countdownTimer = setTimeout(tick, 1000);
+		}
+		var countdownTimer = setTimeout(tick, 1000);
+
+		function applyPending() {
+			clearTimeout(countdownTimer);
 			try {
 				var raw = sessionStorage.getItem('liquid-pending');
 				if (raw) {
@@ -111,20 +126,18 @@
 					}
 				}
 			} catch (e) {}
-			/* 保存后刷新页面让设置生效 */
 			setTimeout(function () { location.reload(); }, 200);
-		});
+		}
 
-		/* 点 toast 外部也关闭 */
-		setTimeout(function () {
-			document.addEventListener('click', function dismiss(e) {
-				if (!toast.contains(e.target)) {
-					toast.classList.remove('show');
-					setTimeout(function () { toast.remove(); }, 300);
-					document.removeEventListener('click', dismiss);
-				}
-			});
-		}, 100);
+		function dismiss() {
+			clearTimeout(countdownTimer);
+			sessionStorage.removeItem('liquid-pending');
+			toast.classList.remove('show');
+			setTimeout(function () { toast.remove(); }, 300);
+		}
+
+		toast.querySelector('[data-action="apply"]').addEventListener('click', applyPending);
+		toast.querySelector('[data-action="dismiss"]').addEventListener('click', dismiss);
 	}
 
 	var mql = (typeof window.matchMedia == 'function')
