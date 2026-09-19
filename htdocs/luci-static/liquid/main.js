@@ -1453,7 +1453,6 @@
 
 	if (document.readyState == 'loading')
 		document.addEventListener('DOMContentLoaded', function () {
-			flushPending();
 			initSwitch();
 			initColorSwitch();
 			initGlassOpacitySlider();
@@ -1468,10 +1467,17 @@
 			setTimeout(syncMenuTop, 300);
 			setTimeout(initTabSliders, 300);
 			setTimeout(syncDropdownValues, 300);
+			/* 暂存属性覆盖延迟到所有资源加载完，避免暗黑切换与资源加载竞争 */
+			if (window.addEventListener)
+				window.addEventListener('load', flushPending);
+			else
+				setTimeout(flushPending, 500);
 		});
 	else {
-		flushPending();
 		initSwitch();
+		initColorSwitch();
+		initGlassOpacitySlider();
+		syncMenuTop();
 		initColorSwitch();
 		initGlassOpacitySlider();
 		syncMenuTop();
