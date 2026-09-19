@@ -374,6 +374,21 @@
 
 		var def = glassOpacityDefault();
 
+		/* 计算 slider thumb 中心相对于 wrap 左边缘的像素位置 */
+		function thumbLeftPx(value) {
+			var slRect = slider.getBoundingClientRect();
+			var wRect = wrap.getBoundingClientRect();
+			/* thumb 的中心偏移 = slider 内容区 left + border + thumb半径 + value比例 × 可用宽度 */
+			var cs = getComputedStyle(slider);
+			var padL = parseFloat(cs.paddingLeft) || 0;
+			var padR = parseFloat(cs.paddingRight) || 0;
+			var bw = parseFloat(cs.borderLeftWidth) || 0;
+			var trackW = slRect.width - padL - padR - bw * 2;
+			var thumbHalf = 8; /* thumb 宽 16px，半径 8 */
+			var px = (slRect.left - wRect.left) + bw + padL + thumbHalf + (value / 100) * (trackW - thumbHalf * 2);
+			return px;
+		}
+
 		/* 浮动数值气泡：拖动时跟随 thumb 实时显示当前值 */
 		var bubble = document.createElement('div');
 		bubble.className = 'liquid-glass-slider-bubble';
@@ -383,14 +398,7 @@
 		function updateBubble() {
 			var v = parseInt(slider.value, 10);
 			bubble.textContent = v;
-			/* 精确计算 thumb 中心相对于 wrap 的像素位置 */
-			var slRect = slider.getBoundingClientRect();
-			var wRect = wrap.getBoundingClientRect();
-			var thumbW = 16;
-			var border = 1;
-			var usable = slRect.width - thumbW - border * 2;
-			var px = (slRect.left - wRect.left) + border + thumbW / 2 + (v / 100) * usable;
-			bubble.style.left = px + 'px';
+			bubble.style.left = thumbLeftPx(v) + 'px';
 		}
 
 		slider.addEventListener('input', function () {
@@ -409,7 +417,7 @@
 			bubble.style.display = 'none';
 		});
 
-		/* 默认值标记：像素精确定位，跟 thumb 完全对齐 */
+		/* 默认值标记：点击回默认 */
 		var tick = document.createElement('div');
 		tick.className = 'liquid-glass-slider-tick';
 		tick.title = 'Default';
@@ -418,22 +426,13 @@
 			setGlassOpacity(def);
 			saveConfig({ glass_opacity: def });
 		});
-		function positionTick() {
-			var slRect = slider.getBoundingClientRect();
-			var wRect = wrap.getBoundingClientRect();
-			var thumbW = 16;
-			var border = 1;
-			var usable = slRect.width - thumbW - border * 2;
-			var px = (slRect.left - wRect.left) + border + thumbW / 2 + (def / 100) * usable;
-			tick.style.left = px + 'px';
-		}
 
 		wrap.appendChild(slider);
 		wrap.appendChild(tick);
 		sw.appendChild(wrap);
-		/* DOM 插入后才能拿到精确尺寸 */
-		requestAnimationFrame(positionTick);
-		window.addEventListener('resize', positionTick);
+		/* DOM 就绪后定位 tick（用同一套 thumbLeftPx） */
+		setTimeout(function () { tick.style.left = thumbLeftPx(def) + 'px'; }, 50);
+		window.addEventListener('resize', function () { tick.style.left = thumbLeftPx(def) + 'px'; });
 	}
 
 	function updateColorSwitch() {
