@@ -278,11 +278,13 @@
 
 	/* ---- glass opacity slider ---- */
 
+	var GLASS_OPACITY_DEFAULT = 100;
+
 	function getGlassOpacity() {
 		var d = document.body ? document.body.getAttribute('data-liquid-glass-opacity') : null;
 		if (d && d !== '')
 			return parseInt(d, 10);
-		try { return parseInt(localStorage.getItem('liquid-glass-opacity'), 10) || 100; } catch (e) { return 100; }
+		try { return parseInt(localStorage.getItem('liquid-glass-opacity'), 10) || GLASS_OPACITY_DEFAULT; } catch (e) { return GLASS_OPACITY_DEFAULT; }
 	}
 
 	function setGlassOpacity(v) {
@@ -301,7 +303,7 @@
 
 	function initGlassOpacitySlider() {
 		var sw = document.querySelector('.liquid-color-switch');
-		if (!sw || sw.parentNode.querySelector('.liquid-glass-slider-wrap'))
+		if (!sw || sw.querySelector('.liquid-glass-slider-wrap'))
 			return;
 
 		var wrap = document.createElement('div');
@@ -324,9 +326,20 @@
 			saveConfig({ glass_opacity: parseInt(slider.value, 10) });
 		});
 
+		/* 默认值竖线标记（叠加在轨道上，left 按比例定位） */
+		var tick = document.createElement('div');
+		tick.className = 'liquid-glass-slider-tick';
+		tick.title = 'Reset to default';
+		tick.style.left = GLASS_OPACITY_DEFAULT + '%';
+		tick.addEventListener('click', function () {
+			slider.value = String(GLASS_OPACITY_DEFAULT);
+			setGlassOpacity(GLASS_OPACITY_DEFAULT);
+			saveConfig({ glass_opacity: GLASS_OPACITY_DEFAULT });
+		});
+
 		wrap.appendChild(slider);
-		/* 插在颜色胶囊外部下方，而非胶囊内部（避免撑爆胶囊） */
-		sw.parentNode.insertBefore(wrap, sw.nextSibling);
+		wrap.appendChild(tick);
+		sw.appendChild(wrap);
 	}
 
 	function updateColorSwitch() {
