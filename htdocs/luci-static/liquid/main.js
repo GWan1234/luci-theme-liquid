@@ -372,20 +372,25 @@
 		slider.title = 'Glass opacity';
 		slider.setAttribute('aria-label', 'Glass opacity');
 
+		var def = glassOpacityDefault();
+		var SNAP_RANGE = 6;
+
 		slider.addEventListener('input', function () {
-			setGlassOpacity(parseInt(slider.value, 10));
+			var raw = parseInt(slider.value, 10);
+			/* 默认值附近 ±SNAP_RANGE 自动吸附到默认值 */
+			var snapped = (Math.abs(raw - def) <= SNAP_RANGE) ? def : raw;
+			setGlassOpacity(snapped);
 		});
 		slider.addEventListener('change', function () {
 			saveConfig({ glass_opacity: parseInt(slider.value, 10) });
 		});
 
-		/* 默认值竖线标记（叠加在轨道上，left 按比例定位） */
+		/* 默认值标记：更宽的可点击区域，方便精确点击回到默认 */
 		var tick = document.createElement('div');
 		tick.className = 'liquid-glass-slider-tick';
 		tick.title = 'Reset to default';
-		tick.style.left = glassOpacityDefault() + '%';
+		tick.style.left = def + '%';
 		tick.addEventListener('click', function () {
-			var def = glassOpacityDefault();
 			slider.value = String(def);
 			setGlassOpacity(def);
 			saveConfig({ glass_opacity: def });
