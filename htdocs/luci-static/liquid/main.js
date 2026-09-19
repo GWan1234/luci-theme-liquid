@@ -432,9 +432,11 @@
 		wrap.appendChild(slider);
 		wrap.appendChild(tick);
 		sw.appendChild(wrap);
-		/* DOM 就绪后定位 tick（用同一套 thumbLeftPx） */
-		setTimeout(function () { tick.style.left = thumbLeftPx(def) + 'px'; }, 50);
-		window.addEventListener('resize', function () { tick.style.left = thumbLeftPx(def) + 'px'; });
+		/* DOM 就绪后定位 tick（延迟多轮确保 layout 完成） */
+		function repositionTick() { tick.style.left = thumbLeftPx(def) + 'px'; }
+		setTimeout(repositionTick, 100);
+		setTimeout(repositionTick, 500);
+		window.addEventListener('resize', repositionTick);
 	}
 
 	function updateColorSwitch() {

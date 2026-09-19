@@ -955,7 +955,7 @@ header [data-indicator][data-style="inactive"],
 /* ── 透明度滑杆（玻璃感，参考 iOS 26/macOS 26 slider）───────── */
 /* 绝对定位在胶囊下方，不参与胶囊 flex 布局，不撑爆胶囊 */
 .liquid-glass-slider-wrap {
-	position: absolute;
+	position: relative;
 	left: 0;
 	right: 0;
 	top: calc(100% + 4px);
@@ -1021,8 +1021,8 @@ header [data-indicator][data-style="inactive"],
 /* 默认值竖线标记（叠加在轨道上，点击回到默认透明度） */
 .liquid-glass-slider-tick {
 	position: absolute;
-	top: -4px;
-	bottom: -4px;
+	top: 0;
+	bottom: 0;
 	width: 14px;
 	margin-left: -7px;
 	background: transparent;
@@ -1035,8 +1035,8 @@ header [data-indicator][data-style="inactive"],
 	content: '';
 	position: absolute;
 	left: 50%;
-	top: 0;
-	bottom: 0;
+	top: -2px;
+	bottom: -2px;
 	width: 3px;
 	margin-left: -1.5px;
 	background: rgba(120, 135, 160, 0.7);
