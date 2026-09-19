@@ -154,6 +154,12 @@
 				m = localStorage.getItem('liquid-theme-mode') || 'auto';
 			if (!a)
 				a = localStorage.getItem('liquid-accent') || 'blue';
+			/* 登录前暂存覆盖：sessionStorage 有 pending 时用 localStorage 新值覆盖 uci */
+			try { if (sessionStorage.getItem('liquid-pending')) {
+				var _lm = localStorage.getItem('liquid-theme-mode');
+				var _la = localStorage.getItem('liquid-accent');
+				if (_lm) m = _lm; if (_la) a = _la;
+			}} catch(e) {}
 			var dark = (m == 'dark') || ((m != 'light') && window.matchMedia('(prefers-color-scheme: dark)').matches);
 			document.documentElement.setAttribute('data-darkmode', dark ? 'true' : 'false');
 			document.documentElement.setAttribute('data-liquid-mode', m);
