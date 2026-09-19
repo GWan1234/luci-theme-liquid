@@ -143,9 +143,15 @@
 <script>
 	/* Liquid theme: apply uci-persisted light/dark/auto mode + accent before CSS paints.
 	   uci（服务端模板读取）优先：其他客户端修改后本机刷新即生效；
-	   仅当 uci 未配置时回退 localStorage。锁屏页同样按 uci 显示（只读）。
-	   登录前暂存：sessionStorage → localStorage（纯本地，零网络）。 */
+	   仅当 uci 未配置时回退 localStorage。
+	   登录前暂存：sessionStorage 检测 → localStorage 覆盖 uci → main.js 异步 POST。 */
 	(function () {
+		/* 暂存检测：sessionStorage 有 liquid-pending 说明从登录页改了设置。
+		   main.js 的 applyPending 已写了 localStorage，这里用 localStorage
+		   覆盖 uci 旧值，让首绘就用新值。零网络请求。 */
+		var _pending = false;
+		try { _pending = !!sessionStorage.getItem('liquid-pending'); } catch (e) {}
+
 		try {
 			if ('scrollRestoration' in history)
 				history.scrollRestoration = 'manual';
@@ -155,6 +161,13 @@
 				m = localStorage.getItem('liquid-theme-mode') || 'auto';
 			if (!a)
 				a = localStorage.getItem('liquid-accent') || 'blue';
+			/* 暂存覆盖：localStorage 值优先于 uci（登录页修改即生效） */
+			if (_pending) {
+				var _lm = localStorage.getItem('liquid-theme-mode');
+				var _la = localStorage.getItem('liquid-accent');
+				if (_lm) m = _lm;
+				if (_la) a = _la;
+			}
 			var dark = (m == 'dark') || ((m != 'light') && window.matchMedia('(prefers-color-scheme: dark)').matches);
 			document.documentElement.setAttribute('data-darkmode', dark ? 'true' : 'false');
 			document.documentElement.setAttribute('data-liquid-mode', m);
