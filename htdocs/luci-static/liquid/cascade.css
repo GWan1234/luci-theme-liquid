@@ -3050,7 +3050,7 @@ body.liquid-login #liquid-login .liquid-login-stack {
 body.liquid-login #liquid-login-capsules {
 	position: static;
 	transform: none;
-	display: inline-flex;
+	display: flex;
 	flex-direction: row;
 	align-items: center;
 	justify-content: center;
@@ -3064,7 +3064,7 @@ body.liquid-login .liquid-color-switch {
 	position: static !important;
 	margin: 0 !important;
 }
-/* 登录页透明度滑杆：放在胶囊容器下方，宽度自动跟随胶囊总宽 */
+/* 登录页透明度滑杆：胶囊正下方，宽度与胶囊总宽一致，紧凑 */
 body.liquid-login .liquid-glass-slider-login {
 	position: relative;
 	left: 0;
@@ -3073,17 +3073,14 @@ body.liquid-login .liquid-glass-slider-login {
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	height: 14px;
-	margin-top: 8px;
+	height: 10px;
+	margin-top: -4px;
 	pointer-events: none;
 	z-index: 2;
-	/* 宽度由胶囊容器的 100% 决定（capsules 是 inline-flex，
-	   stack 是 flex-column，滑杆作为 capsules 的兄弟元素，
-	   会自动继承 capsules 的宽度——当 capsules 不拉满 stack 时
-	   滑杆也跟随，因为同在 stack 内）。但 capsules 是 inline-flex
-	   不拉满，所以用 100% + align-self:center。 */
 	width: 100%;
-	align-self: center;
+}
+body.liquid-login .liquid-glass-slider {
+	height: 3px;
 }
 
 /* 登录页隐藏搜索按钮（无意义） */
