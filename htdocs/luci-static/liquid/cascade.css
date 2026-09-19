@@ -1052,8 +1052,8 @@ header [data-indicator][data-style="inactive"],
 .liquid-glass-slider-tick::before {
 	content: '';
 	display: block;
-	width: 3px;
-	height: 12px;
+	width: 4px;
+	height: 14px;
 	flex-shrink: 0;
 	background: rgba(90, 95, 110, 0.85);
 	border: 1px solid rgba(255, 255, 255, 0.6);
@@ -3168,15 +3168,15 @@ body.liquid-login .liquid-glass-slider {
 	height: 1px;
 }
 body.liquid-login .liquid-glass-slider::-webkit-slider-thumb {
-	width: 8px;
-	height: 8px;
-	border-width: 0.5px;
-	box-shadow: 0 0.5px 2px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(255, 255, 255, 0.08);
+	width: 12px;
+	height: 12px;
+	border-width: 1px;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 0 0 1.5px rgba(255, 255, 255, 0.1);
 }
 body.liquid-login .liquid-glass-slider::-moz-range-thumb {
-	width: 8px;
-	height: 8px;
-	border-width: 0.5px;
+	width: 12px;
+	height: 12px;
+	border-width: 1px;
 }
 
 /* 登录页隐藏搜索按钮（无意义） */
