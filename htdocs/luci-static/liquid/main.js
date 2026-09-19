@@ -121,6 +121,8 @@
 			document.body.setAttribute('data-liquid-mode', mode);
 		applyMode(mode);
 		updateSwitch();
+		/* 明暗切换后 accent 背景的 RGB 需要用新模式的色值重写 */
+		setGlassOpacity(getGlassOpacity());
 		saveConfig({ mode: mode });
 	}
 
@@ -274,6 +276,163 @@
 		}
 		updateColorSwitch();
 		saveConfig({ bing: v });
+	}
+
+	/* ---- glass opacity slider ----
+
+	   滑杆 0~100 → alpha 系数 0.00~1.00（0=全透，100=全不透）。
+	   默认值 = 现有设计参数值（亮/暗各不同），
+	   各变量 alpha = baseAlpha × (slider / default)，
+	   cap 到 [0, 1] 避免 RGBA 超值。
+	   竖线 tick 标记默认位置，点击即回到默认。 */
+
+	var GLASS_OPACITY_DEFAULT_LIGHT = 42;
+	var GLASS_OPACITY_DEFAULT_DARK  = 40;
+
+	function glassOpacityDefault() {
+		var dark = document.documentElement.getAttribute('data-darkmode') === 'true';
+		return dark ? GLASS_OPACITY_DEFAULT_DARK : GLASS_OPACITY_DEFAULT_LIGHT;
+	}
+
+	function getGlassOpacity() {
+		var d = document.body ? document.body.getAttribute('data-liquid-glass-opacity') : null;
+		if (d && d !== '')
+			return parseInt(d, 10);
+		try { return parseInt(localStorage.getItem('liquid-glass-opacity'), 10) || glassOpacityDefault(); } catch (e) { return glassOpacityDefault(); }
+	}
+
+	function setGlassOpacity(v) {
+		v = Math.max(0, Math.min(100, Math.round(v)));
+		try { localStorage.setItem('liquid-glass-opacity', String(v)); } catch (e) {}
+		if (document.body)
+			document.body.setAttribute('data-liquid-glass-opacity', String(v));
+		var def = glassOpacityDefault();
+		var factor = def > 0 ? Math.min(v / def, 100 / def) : 1;
+		var root = document.documentElement;
+		root.style.setProperty('--glass-opacity', factor.toFixed(2));
+		/* 直接重写 accent 背景色（JS 计算 rgba，比 CSS calc 在渐变里更可靠） */
+		_applyAccentAlpha(factor);
+	}
+
+	function _applyAccentAlpha(f) {
+		var root = document.documentElement;
+		var cs = getComputedStyle(root);
+		var clamp01 = function (x) { return Math.max(0, Math.min(1, x)); };
+		var a = function (varName, base) {
+			/* 从 CSS 变量读 base alpha（第 4 个参数），乘以 factor，clamp */
+			return clamp01(base * f);
+		};
+		/* 当前主题色的 accent-glass 变量基准 alpha（亮/暗通用）：
+		   取自计算后的变量值，直接重写 */
+		var accentHigh = cs.getPropertyValue('--primary-color-high').trim() || '#2f7fe0';
+		/* accent-glass / accent-glass-soft / accent-glow 的亮暗基准值 */
+		var dark = root.getAttribute('data-darkmode') === 'true';
+		var glowBase    = dark ? 0.40 : 0.38;
+		var glassBase   = dark ? [0.30, 0.50] : [0.32, 0.62];
+		var softBase    = dark ? [0.24, 0.45] : [0.26, 0.72];
+		var glowA   = a('--accent-glow-base', glowBase);
+		var glassA1 = a('--accent-glass-base', glassBase[0]);
+		var glassA2 = a('--accent-glass2-base', glassBase[1]);
+		var softA1  = a('--accent-soft-base', softBase[0]);
+		var softA2  = a('--accent-soft2-base', softBase[1]);
+		root.style.setProperty('--accent-glow', 'rgba(' + _hexToRgb(accentHigh) + ',' + glowA.toFixed(2) + ')');
+		root.style.setProperty('--accent-glass',
+			'linear-gradient(135deg, rgba(' + _hexToRgb(accentHigh) + ',' + glassA1.toFixed(2) + '), ' +
+			(dark ? 'rgba(46,58,84,' + glassA2.toFixed(2) + ')' : 'rgba(255,255,255,' + glassA2.toFixed(2) + ')') + ')');
+		root.style.setProperty('--accent-glass-soft',
+			'linear-gradient(135deg, rgba(' + _hexToRgb(accentHigh) + ',' + softA1.toFixed(2) + '), ' +
+			(dark ? 'rgba(46,58,84,' + softA2.toFixed(2) + ')' : 'rgba(255,255,255,' + softA2.toFixed(2) + ')') + ')');
+	}
+
+	function _hexToRgb(hex) {
+		hex = (hex || '#2f7fe0').replace('#', '');
+		if (hex.length === 3) hex = hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
+		return parseInt(hex.substring(0,2),16) + ',' + parseInt(hex.substring(2,4),16) + ',' + parseInt(hex.substring(4,6),16);
+	}
+
+	function updateGlassSlider() {
+		var s = document.querySelector('.liquid-glass-slider');
+		if (s)
+			s.value = getGlassOpacity();
+	}
+
+	function initGlassOpacitySlider() {
+		var sw = document.querySelector('.liquid-color-switch');
+		if (!sw || sw.querySelector('.liquid-glass-slider-wrap'))
+			return;
+
+		var wrap = document.createElement('div');
+		wrap.className = 'liquid-glass-slider-wrap';
+
+		var slider = document.createElement('input');
+		slider.type = 'range';
+		slider.className = 'liquid-glass-slider';
+		slider.min = '0';
+		slider.max = '100';
+		slider.step = '1';
+		slider.value = String(getGlassOpacity());
+		slider.title = 'Glass opacity';
+		slider.setAttribute('aria-label', 'Glass opacity');
+
+		var def = glassOpacityDefault();
+
+		/* 计算 slider thumb 中心相对于 wrap 左边缘的像素位置 */
+		function thumbLeftPx(value) {
+			var slRect = slider.getBoundingClientRect();
+			var wRect = wrap.getBoundingClientRect();
+			/* thumb 的中心偏移 = slider 内容区 left + border + thumb半径 + value比例 × 可用宽度 */
+			var cs = getComputedStyle(slider);
+			var padL = parseFloat(cs.paddingLeft) || 0;
+			var padR = parseFloat(cs.paddingRight) || 0;
+			var bw = parseFloat(cs.borderLeftWidth) || 0;
+			var trackW = slRect.width - padL - padR - bw * 2;
+			var thumbHalf = 8; /* thumb 宽 16px，半径 8 */
+			var px = (slRect.left - wRect.left) + bw + padL + thumbHalf + (value / 100) * (trackW - thumbHalf * 2);
+			return px;
+		}
+
+		/* 浮动数值气泡：拖动时跟随 thumb 实时显示当前值 */
+		var bubble = document.createElement('div');
+		bubble.className = 'liquid-glass-slider-bubble';
+		bubble.style.display = 'none';
+		wrap.appendChild(bubble);
+
+		function updateBubble() {
+			var v = parseInt(slider.value, 10);
+			bubble.textContent = v;
+			bubble.style.left = thumbLeftPx(v) + 'px';
+		}
+
+		slider.addEventListener('input', function () {
+			setGlassOpacity(parseInt(slider.value, 10));
+			updateBubble();
+		});
+		slider.addEventListener('pointerdown', function () {
+			bubble.style.display = '';
+			updateBubble();
+		});
+		slider.addEventListener('pointerup', function () {
+			bubble.style.display = 'none';
+			saveConfig({ glass_opacity: parseInt(slider.value, 10) });
+		});
+		slider.addEventListener('pointercancel', function () {
+			bubble.style.display = 'none';
+		});
+
+		/* 默认值标记：百分比定位（border:none 后 thumb 百分比与 left 百分比一致） */
+		var tick = document.createElement('div');
+		tick.className = 'liquid-glass-slider-tick';
+		tick.title = 'Default';
+		tick.style.left = def + '%';
+		tick.addEventListener('click', function () {
+			slider.value = String(def);
+			setGlassOpacity(def);
+			saveConfig({ glass_opacity: def });
+		});
+
+		wrap.appendChild(slider);
+		wrap.appendChild(tick);
+		sw.appendChild(wrap);
 	}
 
 	function updateColorSwitch() {
@@ -1215,6 +1374,7 @@
 		document.addEventListener('DOMContentLoaded', function () {
 			initSwitch();
 			initColorSwitch();
+			initGlassOpacitySlider();
 			syncMenuTop();
 			initTabSliders();
 			syncDropdownValues();
@@ -1230,6 +1390,7 @@
 	else {
 		initSwitch();
 		initColorSwitch();
+		initGlassOpacitySlider();
 		syncMenuTop();
 		initTabSliders();
 		syncDropdownValues();

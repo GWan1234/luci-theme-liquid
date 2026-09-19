@@ -73,6 +73,11 @@ return {
 				writes['accent_custom'] = v;
 			else if (k == 'bing' && match(v, /^(0|1)$/))
 				writes['bing'] = v;
+			else if (k == 'glass_opacity') {
+				let n = int(v, 10);
+				if (n >= 0 && n <= 100)
+					writes['glass_opacity'] = sprintf('%d', n);
+			}
 		}
 
 		let cfg_path = '/etc/config/liquid';
@@ -93,6 +98,9 @@ return {
 				delete writes[m[1]];
 				continue;
 			}
+			/* 丢弃纯空行（避免历史累积空行污染） */
+			if (trim(line) == '')
+				continue;
 			push(out, line);
 		}
 

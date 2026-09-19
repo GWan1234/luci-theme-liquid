@@ -51,6 +51,7 @@
 	let cfg_accent = 'blue';
 	let cfg_accent_custom = '';
 	let cfg_bing = '0';
+	let cfg_glass_opacity = '';
 	let cfg = fs.readfile('/etc/config/liquid') ?? '';
 	let cm = match(cfg, /option[ \t]+mode[ \t]+'?([^' \t\n]+)'?/);
 	if (cm !== null)
@@ -64,6 +65,9 @@
 	let cb = match(cfg, /option[ \t]+bing[ \t]+'?([^' \t\n]+)'?/);
 	if (cb !== null)
 		cfg_bing = cb[1];
+	let co = match(cfg, /option[ \t]+glass_opacity[ \t]+'?([^' \t\n]+)'?/);
+	if (co !== null)
+		cfg_glass_opacity = co[1];
 
 	/* ---- Bing 每日壁纸：缓存到各设备自己的 /tmp/liquid/，
 	   软链 /www/liquid-cache 供 http 访问（/www 为 overlay 可写）。
@@ -72,8 +76,21 @@
 	let bing_style = '';
 	let bing_ok = '0';
 	let accent_custom_style = '';
+	let glass_opacity_style = '';
 	if (cfg_accent == 'custom' && cfg_accent_custom != '')
 		accent_custom_style = sprintf(':root{--accent-custom:%s;}', cfg_accent_custom);
+	if (cfg_glass_opacity != '') {
+		let op = int(cfg_glass_opacity, 10);
+		if (op < 0) op = 0;
+		if (op > 100) op = 100;
+		/* 亮/暗参考 alpha 不同，JS 会根据 data-darkmode 动态修正，
+		   此处只注入 slider 值供 JS 首帧读取 */
+		let def_light = 42;
+		let def_dark  = 40;
+		let f_light = def_light > 0 ? sprintf('%.2f', op / def_light) : '1.00';
+		let f_dark  = def_dark  > 0 ? sprintf('%.2f', op / def_dark)  : '1.00';
+		glass_opacity_style = sprintf(':root[data-darkmode="false"]{--glass-opacity:%s;}:root[data-darkmode="true"]{--glass-opacity:%s;}', f_light, f_dark);
+	}
 
 	if (cfg_bing == '1') {
 		system('mkdir -p /tmp/liquid && ln -sfn /tmp/liquid /www/liquid-cache && date +%Y%m%d > /tmp/liquid-date.txt');
@@ -120,6 +137,7 @@
      让移动端浏览器工具栏与页面上下玻璃栏融为一体。首绘后由 main.js
      syncThemeColor() 用 canvas 实时合成精确值并跟随明暗切换 -->
 <meta name="theme-color" content="#f8f9fb" />
+{% if (glass_opacity_style != ''): %}<style>{{ glass_opacity_style }}</style>{% endif %}
 {% if (bing_style != ''): %}<style>{{ bing_style }}</style>{% endif %}
 {% if (accent_custom_style != ''): %}<style>{{ accent_custom_style }}</style>{% endif %}
 <script>
@@ -191,7 +209,7 @@
 <style title="text/css">{{ css }}</style>
 {% endif %}
 </head>
-<body class="lang_{{ dispatcher.lang }}{% if (blank_page): %} liquid-login{% endif %}" data-page="{{ entityencode(join('-', ctx.request_path), true) }}" data-hostname="{{ striptags(boardinfo.hostname ?? '') }}" data-liquid-mode="{{ cfg_mode }}" data-liquid-accent="{{ cfg_accent }}" data-liquid-bing="{{ cfg_bing }}" data-liquid-bing-ok="{{ bing_ok }}" data-liquid-accent-custom="{{ cfg_accent_custom }}">
+<body class="lang_{{ dispatcher.lang }}{% if (blank_page): %} liquid-login{% endif %}" data-page="{{ entityencode(join('-', ctx.request_path), true) }}" data-hostname="{{ striptags(boardinfo.hostname ?? '') }}" data-liquid-mode="{{ cfg_mode }}" data-liquid-accent="{{ cfg_accent }}" data-liquid-bing="{{ cfg_bing }}" data-liquid-bing-ok="{{ bing_ok }}" data-liquid-accent-custom="{{ cfg_accent_custom }}" data-liquid-glass-opacity="{{ cfg_glass_opacity }}">
 
 <p class="skiplink">
 <span id="skiplink1"><a href="#navigation">{{ _('Skip to navigation') }}</a></span>
