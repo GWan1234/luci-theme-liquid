@@ -965,8 +965,8 @@ header [data-indicator][data-style="inactive"],
 	pointer-events: none;
 }
 /* 主菜单（侧栏胶囊下方）：滑杆跟在胶囊下方，间距 2px */
-#mainmenu > .liquid-color-switch > .liquid-glass-slider-wrap {
-	position: relative;
+#mainmenu > .liquid-glass-slider-wrap {
+	display: flex;
 	left: 0;
 	right: 0;
 	bottom: 0;

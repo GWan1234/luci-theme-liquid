@@ -301,7 +301,7 @@
 
 	function initGlassOpacitySlider() {
 		var sw = document.querySelector('.liquid-color-switch');
-		if (!sw || sw.querySelector('.liquid-glass-slider-wrap'))
+		if (!sw || sw.parentNode.querySelector('.liquid-glass-slider-wrap'))
 			return;
 
 		var wrap = document.createElement('div');
@@ -325,7 +325,8 @@
 		});
 
 		wrap.appendChild(slider);
-		sw.appendChild(wrap);
+		/* 插在颜色胶囊外部下方，而非胶囊内部（避免撑爆胶囊） */
+		sw.parentNode.insertBefore(wrap, sw.nextSibling);
 	}
 
 	function updateColorSwitch() {
