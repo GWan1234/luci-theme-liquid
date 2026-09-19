@@ -3129,6 +3129,12 @@ body.liquid-login .liquid-color-switch {
 	position: static !important;
 	margin: 0 !important;
 }
+/* 登录页自定义颜色弹出框向上弹出，不被页面底部遮挡 */
+body.liquid-login .liquid-custom-pop {
+	top: auto;
+	bottom: calc(100% + 8px);
+	transform-origin: bottom center;
+}
 /* 登录页透明度滑杆：胶囊正下方，宽度与胶囊总宽一致，紧凑 */
 body.liquid-login .liquid-glass-slider-login {
 	position: relative;
