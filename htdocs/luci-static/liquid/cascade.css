@@ -3142,7 +3142,9 @@ body.liquid-login .liquid-glass-slider-login {
 	margin-top: -2px;
 	pointer-events: none;
 	z-index: 2;
-	width: 100%;
+	width: calc(100% - 40px);
+	margin-left: 20px;
+	margin-right: 20px;
 }
 body.liquid-login .liquid-glass-slider {
 	height: 1.5px;
