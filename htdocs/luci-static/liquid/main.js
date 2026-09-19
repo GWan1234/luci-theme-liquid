@@ -51,7 +51,41 @@
 		} catch (e) {}
 	}
 
-	/* 登录后提交暂存（DOMContentLoaded 后异步执行） */
+	/* ===== 登录前暂存传递（main.js 顶部立即执行） =====
+	   sessionStorage('liquid-pending') → localStorage + 覆盖 DOM 属性。
+	   网络 POST 延迟到 DOMContentLoaded 由 flushPending 执行。
+	   不放在 header ut 里（避免 ucode 模板渲染干扰）。 */
+	(function applyPending() {
+		try {
+			var raw = sessionStorage.getItem('liquid-pending');
+			if (!raw) return;
+			var data = JSON.parse(raw);
+			if (!data || typeof data !== 'object') return;
+			/* 写 localStorage */
+			if (data.mode) localStorage.setItem('liquid-theme-mode', data.mode);
+			if (data.accent) localStorage.setItem('liquid-accent', data.accent);
+			if (data.accent_custom) localStorage.setItem('liquid-accent-custom', data.accent_custom);
+			if (data.bing) localStorage.setItem('liquid-bing', data.bing);
+			if (data.glass_opacity != null) localStorage.setItem('liquid-glass-opacity', String(data.glass_opacity));
+			/* 立即覆盖 DOM 属性（让首绘用新值） */
+			var root = document.documentElement;
+			var dark = (data.mode == 'dark') || ((data.mode != 'light') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+			root.setAttribute('data-darkmode', dark ? 'true' : 'false');
+			if (data.mode) root.setAttribute('data-liquid-mode', data.mode);
+			if (data.accent) {
+				root.setAttribute('data-accent', data.accent);
+				if (document.body) document.body.setAttribute('data-liquid-accent', data.accent);
+			}
+			if (data.accent_custom) {
+				if (document.body) document.body.setAttribute('data-liquid-accent-custom', data.accent_custom);
+			}
+			if (data.glass_opacity != null) {
+				if (document.body) document.body.setAttribute('data-liquid-glass-opacity', String(data.glass_opacity));
+			}
+		} catch (e) {}
+	})();
+
+	/* 登录后提交暂存（DOMContentLoaded 后异步 POST 持久化） */
 	function flushPending() {
 		try {
 			var raw = sessionStorage.getItem('liquid-pending');
