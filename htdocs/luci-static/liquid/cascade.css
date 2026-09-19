@@ -3126,8 +3126,9 @@ body.liquid-login #liquid-login-capsules {
 /* 登录页胶囊取消 fixed 定位，改为 static 跟随 flex 布局 */
 body.liquid-login .liquid-mode-switch,
 body.liquid-login .liquid-color-switch {
-	position: static !important;
+	position: relative !important;
 	margin: 0 !important;
+	overflow: visible;
 }
 /* 登录页自定义颜色弹出框向上弹出，不被页面底部遮挡 */
 body.liquid-login .liquid-custom-pop {
