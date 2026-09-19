@@ -98,6 +98,9 @@ return {
 				delete writes[m[1]];
 				continue;
 			}
+			/* 丢弃纯空行（避免历史累积空行污染） */
+			if (trim(line) == '')
+				continue;
 			push(out, line);
 		}
 
