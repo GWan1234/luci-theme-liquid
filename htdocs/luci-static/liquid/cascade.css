@@ -3177,22 +3177,17 @@ body.liquid-login .cbi-section {
 
 /* 登录页 logo（main.js 注入内联 SVG，跟随主题色 + 玻璃水滴感） */
 body.liquid-login #liquid-login .modal.login .liquid-logo {
-	display: inline-block;
-	position: relative;
+	display: block;
 	width: 78px;
 	height: 78px;
 	margin: 0 auto 14px;
-	/* 毛玻璃模糊 */
-	-webkit-backdrop-filter: blur(14px) saturate(var(--glass-sat));
-	backdrop-filter: blur(14px) saturate(var(--glass-sat));
-	/* 二级菜单选中高亮同款：投影 + inset 内高光 */
-	box-shadow: 0 4px 18px color-mix(in srgb, var(--primary-color-high) 35%, transparent),
-	            0 0 20px color-mix(in srgb, var(--primary-color-high) 15%, transparent),
-	            inset 0 1px 0 rgba(255, 255, 255, 0.8);
 }
 body.liquid-login #liquid-login .modal.login .liquid-logo svg {
 	width: 100%;
 	height: 100%;
+	/* 光晕沿水滴轮廓：drop-shadow 跟随 SVG 填充形状，不是矩形 */
+	filter: drop-shadow(0 3px 12px color-mix(in srgb, var(--primary-color-high) 35%, transparent))
+	        drop-shadow(0 1px 0 rgba(255, 255, 255, 0.8));
 }
 
 body.liquid-login #liquid-login .modal.login h4 {
