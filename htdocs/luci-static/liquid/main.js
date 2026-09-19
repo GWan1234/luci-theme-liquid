@@ -306,7 +306,46 @@
 			document.body.setAttribute('data-liquid-glass-opacity', String(v));
 		var def = glassOpacityDefault();
 		var factor = def > 0 ? Math.min(v / def, 100 / def) : 1;
-		document.documentElement.style.setProperty('--glass-opacity', factor.toFixed(2));
+		var root = document.documentElement;
+		root.style.setProperty('--glass-opacity', factor.toFixed(2));
+		/* 直接重写 accent 背景色（JS 计算 rgba，比 CSS calc 在渐变里更可靠） */
+		_applyAccentAlpha(factor);
+	}
+
+	function _applyAccentAlpha(f) {
+		var root = document.documentElement;
+		var cs = getComputedStyle(root);
+		var clamp01 = function (x) { return Math.max(0, Math.min(1, x)); };
+		var a = function (varName, base) {
+			/* 从 CSS 变量读 base alpha（第 4 个参数），乘以 factor，clamp */
+			return clamp01(base * f);
+		};
+		/* 当前主题色的 accent-glass 变量基准 alpha（亮/暗通用）：
+		   取自计算后的变量值，直接重写 */
+		var accentHigh = cs.getPropertyValue('--primary-color-high').trim() || '#2f7fe0';
+		/* accent-glass / accent-glass-soft / accent-glow 的亮暗基准值 */
+		var dark = root.getAttribute('data-darkmode') === 'true';
+		var glowBase    = dark ? 0.40 : 0.38;
+		var glassBase   = dark ? [0.30, 0.50] : [0.32, 0.62];
+		var softBase    = dark ? [0.24, 0.45] : [0.26, 0.72];
+		var glowA   = a('--accent-glow-base', glowBase);
+		var glassA1 = a('--accent-glass-base', glassBase[0]);
+		var glassA2 = a('--accent-glass2-base', glassBase[1]);
+		var softA1  = a('--accent-soft-base', softBase[0]);
+		var softA2  = a('--accent-soft2-base', softBase[1]);
+		root.style.setProperty('--accent-glow', 'rgba(' + _hexToRgb(accentHigh) + ',' + glowA.toFixed(2) + ')');
+		root.style.setProperty('--accent-glass',
+			'linear-gradient(135deg, rgba(' + _hexToRgb(accentHigh) + ',' + glassA1.toFixed(2) + '), ' +
+			(dark ? 'rgba(46,58,84,' + glassA2.toFixed(2) + ')' : 'rgba(255,255,255,' + glassA2.toFixed(2) + ')') + ')');
+		root.style.setProperty('--accent-glass-soft',
+			'linear-gradient(135deg, rgba(' + _hexToRgb(accentHigh) + ',' + softA1.toFixed(2) + '), ' +
+			(dark ? 'rgba(46,58,84,' + softA2.toFixed(2) + ')' : 'rgba(255,255,255,' + softA2.toFixed(2) + ')') + ')');
+	}
+
+	function _hexToRgb(hex) {
+		hex = (hex || '#2f7fe0').replace('#', '');
+		if (hex.length === 3) hex = hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
+		return parseInt(hex.substring(0,2),16) + ',' + parseInt(hex.substring(2,4),16) + ',' + parseInt(hex.substring(4,6),16);
 	}
 
 	function updateGlassSlider() {

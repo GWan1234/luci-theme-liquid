@@ -86,13 +86,13 @@
 	--track-bg: rgba(23, 34, 52, calc(0.10 * var(--glass-opacity)));
 
 	--accent-grad: linear-gradient(135deg, #5aa8f7 0%, #2f7fe0 48%, #1a63c4 100%);
-	--accent-glow: rgba(47, 127, 224, calc(0.38 * var(--glass-opacity)));
+	--accent-glow: rgba(47, 127, 224, 0.38);
 	--lock-card-bg: rgba(255, 255, 255, calc(0.5 * var(--glass-opacity)));
 	--indicator-bg: var(--accent-glass-soft);
-	--indicator-border: color-mix(in srgb, var(--primary-color-high) calc(48% * var(--glass-opacity)), transparent);
-	--indicator-shadow: 0 4px 16px color-mix(in srgb, var(--primary-color-high) calc(30% * var(--glass-opacity)), transparent), inset 0 1px 0 rgba(255, 255, 255, 0.9);
-	--accent-glass: linear-gradient(135deg, rgba(90, 168, 247, calc(0.32 * var(--glass-opacity))), rgba(255, 255, 255, calc(0.62 * var(--glass-opacity))));
-	--accent-glass-soft: linear-gradient(135deg, rgba(90, 168, 247, calc(0.26 * var(--glass-opacity))), rgba(255, 255, 255, calc(0.72 * var(--glass-opacity))));
+	--indicator-border: color-mix(in srgb, var(--primary-color-high) 48%, transparent);
+	--indicator-shadow: 0 4px 16px color-mix(in srgb, var(--primary-color-high) 30%, transparent), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+	--accent-glass: linear-gradient(135deg, rgba(90, 168, 247, 0.32), rgba(255, 255, 255, 0.62));
+	--accent-glass-soft: linear-gradient(135deg, rgba(90, 168, 247, 0.26), rgba(255, 255, 255, 0.72));
 	/* 移动端 chrome 条（菜单栏/面包屑/底部 foot/菜单抽屉）去掉
 	   backdrop-filter 后的等价不透明色：分别是 --glass-bg-strong、
 	   --menu-bg 叠 --background-color-medium 的合成值（与 meta
@@ -171,13 +171,13 @@
 	--glass-menu-solid: #111621;
 
 	--accent-grad: linear-gradient(135deg, #7cbcff 0%, #5da3f0 48%, #2f74cc 100%);
-	--accent-glow: rgba(93, 163, 240, calc(0.4 * var(--glass-opacity)));
+	--accent-glow: rgba(93, 163, 240, 0.4);
 	--lock-card-bg: rgba(13, 18, 28, calc(0.55 * var(--glass-opacity)));
 	--indicator-bg: var(--accent-glass-soft);
-	--indicator-border: rgba(255, 255, 255, calc(0.18 * var(--glass-opacity)));
-	--indicator-shadow: 0 4px 16px rgba(0, 0, 0, calc(0.5 * var(--glass-opacity))), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-	--accent-glass: linear-gradient(135deg, rgba(93, 163, 240, calc(0.30 * var(--glass-opacity))), rgba(46, 58, 84, calc(0.50 * var(--glass-opacity))));
-	--accent-glass-soft: linear-gradient(135deg, rgba(93, 163, 240, calc(0.24 * var(--glass-opacity))), rgba(46, 58, 84, calc(0.45 * var(--glass-opacity))));
+	--indicator-border: rgba(255, 255, 255, 0.18);
+	--indicator-shadow: 0 4px 16px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+	--accent-glass: linear-gradient(135deg, rgba(93, 163, 240, 0.30), rgba(46, 58, 84, 0.5));
+	--accent-glass-soft: linear-gradient(135deg, rgba(93, 163, 240, 0.24), rgba(46, 58, 84, 0.45));
 
 
 	--body-grad:
