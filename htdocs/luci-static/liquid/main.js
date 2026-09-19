@@ -383,9 +383,14 @@
 		function updateBubble() {
 			var v = parseInt(slider.value, 10);
 			bubble.textContent = v;
-			/* 气泡位置跟随 thumb */
-			var pct = v / 100;
-			bubble.style.left = (pct * 100) + '%';
+			/* 精确计算 thumb 中心相对于 wrap 的像素位置 */
+			var slRect = slider.getBoundingClientRect();
+			var wRect = wrap.getBoundingClientRect();
+			var thumbW = 16;
+			var border = 1;
+			var usable = slRect.width - thumbW - border * 2;
+			var px = (slRect.left - wRect.left) + border + thumbW / 2 + (v / 100) * usable;
+			bubble.style.left = px + 'px';
 		}
 
 		slider.addEventListener('input', function () {
@@ -404,20 +409,31 @@
 			bubble.style.display = 'none';
 		});
 
-		/* 默认值标记：点击回默认 */
+		/* 默认值标记：像素精确定位，跟 thumb 完全对齐 */
 		var tick = document.createElement('div');
 		tick.className = 'liquid-glass-slider-tick';
 		tick.title = 'Default';
-		tick.style.left = def + '%';
 		tick.addEventListener('click', function () {
 			slider.value = String(def);
 			setGlassOpacity(def);
 			saveConfig({ glass_opacity: def });
 		});
+		function positionTick() {
+			var slRect = slider.getBoundingClientRect();
+			var wRect = wrap.getBoundingClientRect();
+			var thumbW = 16;
+			var border = 1;
+			var usable = slRect.width - thumbW - border * 2;
+			var px = (slRect.left - wRect.left) + border + thumbW / 2 + (def / 100) * usable;
+			tick.style.left = px + 'px';
+		}
 
 		wrap.appendChild(slider);
 		wrap.appendChild(tick);
 		sw.appendChild(wrap);
+		/* DOM 插入后才能拿到精确尺寸 */
+		requestAnimationFrame(positionTick);
+		window.addEventListener('resize', positionTick);
 	}
 
 	function updateColorSwitch() {
