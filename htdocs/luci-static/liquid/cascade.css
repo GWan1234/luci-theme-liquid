@@ -1053,6 +1053,35 @@ header [data-indicator][data-style="inactive"],
 	top: calc(100% + 2px);
 }
 
+/* 浮动数值气泡（拖动时跟随 thumb 显示当前值） */
+.liquid-glass-slider-bubble {
+	position: absolute;
+	bottom: calc(100% + 6px);
+	transform: translateX(-50%);
+	padding: 3px 7px;
+	border-radius: 6px;
+	font-size: 11px;
+	font-weight: 600;
+	line-height: 1;
+	color: var(--text-color-highest);
+	background: var(--glass-bg-strong);
+	border: 1px solid var(--glass-border);
+	backdrop-filter: blur(12px);
+	-webkit-backdrop-filter: blur(12px);
+	box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+	pointer-events: none;
+	white-space: nowrap;
+}
+.liquid-glass-slider-bubble::after {
+	content: '';
+	position: absolute;
+	top: 100%;
+	left: 50%;
+	margin-left: -4px;
+	border: 4px solid transparent;
+	border-top-color: var(--glass-border);
+}
+
 /* ==========================================================================
    5. Layout
    ========================================================================== */

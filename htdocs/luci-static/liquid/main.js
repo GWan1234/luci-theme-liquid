@@ -374,14 +374,37 @@
 
 		var def = glassOpacityDefault();
 
+		/* 浮动数值气泡：拖动时跟随 thumb 实时显示当前值 */
+		var bubble = document.createElement('div');
+		bubble.className = 'liquid-glass-slider-bubble';
+		bubble.style.display = 'none';
+		wrap.appendChild(bubble);
+
+		function updateBubble() {
+			var v = parseInt(slider.value, 10);
+			bubble.textContent = v;
+			/* 气泡位置跟随 thumb */
+			var pct = v / 100;
+			bubble.style.left = (pct * 100) + '%';
+		}
+
 		slider.addEventListener('input', function () {
 			setGlassOpacity(parseInt(slider.value, 10));
+			updateBubble();
 		});
-		slider.addEventListener('change', function () {
+		slider.addEventListener('pointerdown', function () {
+			bubble.style.display = '';
+			updateBubble();
+		});
+		slider.addEventListener('pointerup', function () {
+			bubble.style.display = 'none';
 			saveConfig({ glass_opacity: parseInt(slider.value, 10) });
 		});
+		slider.addEventListener('pointercancel', function () {
+			bubble.style.display = 'none';
+		});
 
-		/* 默认值标记：点击回默认，双击快速回到默认并保存 */
+		/* 默认值标记：点击回默认 */
 		var tick = document.createElement('div');
 		tick.className = 'liquid-glass-slider-tick';
 		tick.title = 'Default';
