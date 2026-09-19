@@ -75,6 +75,7 @@
 	/* 表格隔行：不透明浅色（半透明玻璃隔行会让图标文字显得半透，
 	   误以为接口未连接） */
 	--table-stripe: #f4f6f9;
+	--tab-active-text-color: var(--text-color-highest);
 	--glass-border: rgba(255, 255, 255, calc(0.8 * var(--glass-opacity)));
 	--glass-border-dark: rgba(23, 34, 52, calc(0.09 * var(--glass-opacity)));
 	--glass-inset: rgba(255, 255, 255, calc(0.95 * var(--glass-opacity)));
@@ -156,6 +157,7 @@
 	--picker-option-hover: rgba(70, 100, 160, calc(0.55 * var(--glass-opacity)));
 	--picker-option-checked: rgba(60, 90, 150, calc(0.45 * var(--glass-opacity)));
 	--table-stripe: #1b2330;
+	--tab-active-text-color: var(--text-color-highest);
 	--glass-border: rgba(255, 255, 255, calc(0.16 * var(--glass-opacity)));
 	--glass-border-dark: rgba(0, 0, 0, calc(0.42 * var(--glass-opacity)));
 	--glass-inset: rgba(255, 255, 255, calc(0.10 * var(--glass-opacity)));
@@ -1407,6 +1409,12 @@ ul.mainmenu.l2.liquid-sub-hovering .liquid-sub-indicator {
 	position: relative;
 	z-index: 1;
 	margin: 0;
+}
+
+/* 覆盖 LuCI bootstrap 的 tab 容器主题色（bootstrap: color:var(--primary-color-high)），
+   统一改为文字色，明暗模式自动切换 */
+:is(ul.cbi-tabmenu, ul.tabs) > li {
+	color: inherit;
 }
 
 :is(ul.cbi-tabmenu, ul.tabs) > li > a {
