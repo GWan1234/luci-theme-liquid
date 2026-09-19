@@ -1127,8 +1127,10 @@ header [data-indicator][data-style="inactive"],
 .liquid-pending-toast-text {
 	font-size: 13px;
 	color: var(--text-color-high);
-	white-space: nowrap;
 	text-align: center;
+	flex-shrink: 1;
+	min-width: 0;
+	overflow-wrap: break-word;
 }
 .liquid-pending-toast-countdown {
 	font-size: 12px;
@@ -1137,14 +1139,16 @@ header [data-indicator][data-style="inactive"],
 	font-variant-numeric: tabular-nums;
 	min-width: 28px;
 	text-align: center;
+	flex-shrink: 0;
 }
 .liquid-pending-toast-buttons {
 	display: flex;
 	gap: 8px;
+	flex-shrink: 0;
 }
 .liquid-pending-toast-btn {
-	flex: 1;
-	padding: 6px 16px;
+	flex: none;
+	padding: 5px 14px;
 	border: none;
 	border-radius: 8px;
 	font-size: 12px;
