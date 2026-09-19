@@ -419,10 +419,11 @@
 			bubble.style.display = 'none';
 		});
 
-		/* 默认值标记：点击回默认 */
+		/* 默认值标记：用百分比定位，跟 slider 的百分比轨道一致 */
 		var tick = document.createElement('div');
 		tick.className = 'liquid-glass-slider-tick';
 		tick.title = 'Default';
+		tick.style.left = def + '%';
 		tick.addEventListener('click', function () {
 			slider.value = String(def);
 			setGlassOpacity(def);
@@ -432,11 +433,6 @@
 		wrap.appendChild(slider);
 		wrap.appendChild(tick);
 		sw.appendChild(wrap);
-		/* DOM 就绪后定位 tick（延迟多轮确保 layout 完成） */
-		function repositionTick() { tick.style.left = thumbLeftPx(def) + 'px'; }
-		setTimeout(repositionTick, 100);
-		setTimeout(repositionTick, 500);
-		window.addEventListener('resize', repositionTick);
 	}
 
 	function updateColorSwitch() {

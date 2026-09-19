@@ -955,7 +955,7 @@ header [data-indicator][data-style="inactive"],
 /* ── 透明度滑杆（玻璃感，参考 iOS 26/macOS 26 slider）───────── */
 /* 绝对定位在胶囊下方，不参与胶囊 flex 布局，不撑爆胶囊 */
 .liquid-glass-slider-wrap {
-	position: relative;
+	position: absolute;
 	left: 0;
 	right: 0;
 	top: calc(100% + 4px);
@@ -964,6 +964,7 @@ header [data-indicator][data-style="inactive"],
 	height: 16px;
 	pointer-events: none;
 	z-index: 2;
+	/* 内容流不参与胶囊 flex 布局，overflow: visible 确保 tick/bubble 可见 */
 }
 /* 胶囊需要 overflow:visible 才能显示溢出的滑杆 */
 .liquid-color-switch {
