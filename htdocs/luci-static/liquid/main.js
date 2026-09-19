@@ -54,8 +54,10 @@
 	/* ===== 登录前暂存传递（main.js 顶部立即执行） =====
 	   sessionStorage('liquid-pending') → localStorage + 覆盖 DOM 属性。
 	   网络 POST 延迟到 DOMContentLoaded 由 flushPending 执行。
-	   不放在 header ut 里（避免 ucode 模板渲染干扰）。 */
+	   登录页不执行（登录页由 setMode 正常管理）。 */
 	(function applyPending() {
+		if (document.body && document.body.classList.contains('liquid-login'))
+			return;
 		try {
 			var raw = sessionStorage.getItem('liquid-pending');
 			if (!raw) return;
@@ -87,6 +89,9 @@
 
 	/* 登录后提交暂存（DOMContentLoaded 后异步 POST 持久化） */
 	function flushPending() {
+		/* 登录页跳过（暂存应保留到成功登录后才提交） */
+		if (document.body && document.body.classList.contains('liquid-login'))
+			return;
 		try {
 			var raw = sessionStorage.getItem('liquid-pending');
 			if (!raw) return;
