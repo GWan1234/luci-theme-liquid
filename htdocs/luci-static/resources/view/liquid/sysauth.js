@@ -10,9 +10,8 @@
 return view.extend({
 	render: function() {
 		var card = document.getElementById('liquid-login');
-		if (!card) return '';
 		var form = card.querySelector('form'),
-		    btn = form ? form.querySelector('button[type="submit"]') : null;
+		    btn = card.querySelector('button');
 
 		/* optional hostname prefix on title */
 		var hostname = (document.body && document.body.getAttribute('data-hostname')) || '';
@@ -20,22 +19,19 @@ return view.extend({
 		if (h4 && hostname)
 			h4.textContent = hostname + ' · ' + _('Authorization Required');
 
-		if (form && btn) {
-			form.addEventListener('keypress', function(ev) {
-				if (ev.key == 'Enter')
-					btn.click();
-			});
+		form.addEventListener('keypress', function(ev) {
+			if (ev.key == 'Enter')
+				btn.click();
+		});
 
-			btn.addEventListener('click', function(ev) {
-				ev.preventDefault();
-				card.querySelectorAll('.modal.login > *').forEach(function(node) { node.style.display = 'none'; });
-				card.querySelector('.modal.login').appendChild(E('div', { 'class': 'spinning' }, _('Logging in…')));
-				form.submit();
-			});
-		}
+		btn.addEventListener('click', function(ev) {
+			ev.preventDefault();
+			card.querySelectorAll('.modal.login > *').forEach(function(node) { node.style.display = 'none'; });
+			card.querySelector('.modal.login').appendChild(E('div', { 'class': 'spinning' }, _('Logging in…')));
+			form.submit()
+		});
 
-		var pw = card.querySelector('input[type="password"]');
-		if (pw) pw.focus();
+		card.querySelector('input[type="password"]').focus();
 
 		return '';
 	},
