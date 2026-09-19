@@ -1430,7 +1430,7 @@ ul.mainmenu.l2.liquid-sub-hovering .liquid-sub-indicator {
 :is(ul.cbi-tabmenu, ul.tabs) > li.cbi-tab > a {
 	background: var(--accent-glass);
 	border-color: color-mix(in srgb, var(--primary-color-high) 55%, transparent);
-	color: var(--primary-color-low);
+	color: var(--text-color-highest);
 	box-shadow: 0 4px 16px color-mix(in srgb, var(--primary-color-high) 26%, transparent),
 	            inset 0 1px 0 rgba(255, 255, 255, 0.9);
 	-webkit-backdrop-filter: blur(10px) saturate(var(--glass-sat));
@@ -1442,7 +1442,7 @@ ul.mainmenu.l2.liquid-sub-hovering .liquid-sub-indicator {
 :is(ul.cbi-tabmenu, ul.tabs) > li.cbi-tab > a {
 	background: var(--accent-glass) !important;
 	border-color: color-mix(in srgb, var(--primary-color-high) 55%, transparent) !important;
-	color: var(--primary-color-low) !important;
+	color: var(--text-color-highest) !important;
 }
 
 /* iStoreOS ul.tabs 的 Vue scoped 滑动条（div.auto）在 flex 容器内占位，
@@ -1454,7 +1454,7 @@ ul.tabs > div.auto {
 :is(:root[data-darkmode="true"] ul.cbi-tabmenu, :root[data-darkmode="true"] ul.tabs) > li.cbi-tab > a {
 	background: var(--accent-glass);
 	border-color: color-mix(in srgb, var(--primary-color-high) 48%, transparent);
-	color: #dcecff;
+	color: var(--text-color-highest);
 	box-shadow: 0 4px 18px color-mix(in srgb, var(--primary-color-high) 38%, transparent),
 	            inset 0 1px 0 rgba(255, 255, 255, 0.14);
 }
