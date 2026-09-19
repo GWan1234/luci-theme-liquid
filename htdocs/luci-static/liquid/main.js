@@ -419,25 +419,19 @@
 			bubble.style.display = 'none';
 		});
 
-		/* 默认值标记：用一个只读 range input 叠在主 slider 上，
-		   它的 thumb 就是竖线，位置跟主 slider 的百分比完全一致 */
-		var tickInput = document.createElement('input');
-		tickInput.type = 'range';
-		tickInput.className = 'liquid-glass-slider-tick';
-		tickInput.min = '0';
-		tickInput.max = '100';
-		tickInput.step = '1';
-		tickInput.value = String(def);
-		tickInput.tabIndex = -1;
-		tickInput.setAttribute('aria-hidden', 'true');
-		tickInput.addEventListener('click', function () {
+		/* 默认值标记：百分比定位（border:none 后 thumb 百分比与 left 百分比一致） */
+		var tick = document.createElement('div');
+		tick.className = 'liquid-glass-slider-tick';
+		tick.title = 'Default';
+		tick.style.left = def + '%';
+		tick.addEventListener('click', function () {
 			slider.value = String(def);
 			setGlassOpacity(def);
 			saveConfig({ glass_opacity: def });
 		});
 
 		wrap.appendChild(slider);
-		wrap.appendChild(tickInput);
+		wrap.appendChild(tick);
 		sw.appendChild(wrap);
 	}
 
