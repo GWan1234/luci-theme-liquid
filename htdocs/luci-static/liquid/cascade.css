@@ -1108,11 +1108,10 @@ header [data-indicator][data-style="inactive"],
 	transition: opacity .3s ease, transform .3s ease;
 	z-index: 9999;
 	display: flex;
-	flex-wrap: wrap;
+	flex-direction: column;
 	align-items: center;
-	justify-content: center;
-	gap: 8px;
-	padding: 10px 16px;
+	gap: 10px;
+	padding: 12px 16px;
 	border-radius: 12px;
 	background: var(--glass-bg-strong);
 	border: 1px solid var(--glass-border);
@@ -1130,6 +1129,7 @@ header [data-indicator][data-style="inactive"],
 	font-size: 13px;
 	color: var(--text-color-high);
 	white-space: nowrap;
+	text-align: center;
 }
 .liquid-pending-toast-countdown {
 	font-size: 12px;
@@ -1139,15 +1139,20 @@ header [data-indicator][data-style="inactive"],
 	min-width: 28px;
 	text-align: center;
 }
+.liquid-pending-toast-buttons {
+	display: flex;
+	gap: 8px;
+}
 .liquid-pending-toast-btn {
-	flex-shrink: 0;
-	padding: 5px 14px;
+	flex: 1;
+	padding: 6px 16px;
 	border: none;
 	border-radius: 8px;
 	font-size: 12px;
 	font-weight: 600;
 	cursor: pointer;
 	transition: box-shadow .15s ease, background .15s ease;
+	min-width: 80px;
 }
 .liquid-pending-toast-btn[data-action="apply"] {
 	background: var(--accent-grad);
