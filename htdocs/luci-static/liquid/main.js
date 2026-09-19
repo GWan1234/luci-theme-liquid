@@ -202,8 +202,11 @@
 
 	function applyMode(mode) {
 		var root = document.documentElement;
+		/* 加 transition 让明暗切换平滑过渡，避免整页重算导致白屏闪烁 */
+		root.style.transition = 'background-color .3s ease, color .3s ease';
 		root.setAttribute('data-darkmode', isDark(mode) ? 'true' : 'false');
 		root.setAttribute('data-liquid-mode', mode);
+		setTimeout(function () { root.style.transition = ''; }, 350);
 	}
 
 	/* 明暗模式守护：OpenClash 等第三方脚本会覆写 <html data-darkmode>
