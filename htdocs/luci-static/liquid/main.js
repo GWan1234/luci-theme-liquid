@@ -52,9 +52,9 @@
 	}
 
 	/* ===== 登录前暂存传递（main.js 顶部立即执行） =====
-	   sessionStorage('liquid-pending') → localStorage + 覆盖 DOM 属性。
-	   网络 POST 延迟到 DOMContentLoaded 由 flushPending 执行。
-	   登录页不执行（登录页由 setMode 正常管理）。 */
+	   sessionStorage('liquid-pending') → localStorage（纯本地写入，极快）。
+	   DOM 属性覆盖交给 flushPending（DOMContentLoaded 后）。
+	   不做任何 DOM 修改，避免阻塞主线程。 */
 	(function applyPending() {
 		if (document.body && document.body.classList.contains('liquid-login'))
 			return;
@@ -63,33 +63,17 @@
 			if (!raw) return;
 			var data = JSON.parse(raw);
 			if (!data || typeof data !== 'object') return;
-			/* 写 localStorage */
+			/* 仅写 localStorage（同步、极快），不做 DOM 操作 */
 			if (data.mode) localStorage.setItem('liquid-theme-mode', data.mode);
 			if (data.accent) localStorage.setItem('liquid-accent', data.accent);
 			if (data.accent_custom) localStorage.setItem('liquid-accent-custom', data.accent_custom);
 			if (data.bing) localStorage.setItem('liquid-bing', data.bing);
 			if (data.glass_opacity != null) localStorage.setItem('liquid-glass-opacity', String(data.glass_opacity));
-			/* 立即覆盖 DOM 属性（让首绘用新值） */
-			var root = document.documentElement;
-			var dark = (data.mode == 'dark') || ((data.mode != 'light') && window.matchMedia('(prefers-color-scheme: dark)').matches);
-			root.setAttribute('data-darkmode', dark ? 'true' : 'false');
-			if (data.mode) root.setAttribute('data-liquid-mode', data.mode);
-			if (data.accent) {
-				root.setAttribute('data-accent', data.accent);
-				if (document.body) document.body.setAttribute('data-liquid-accent', data.accent);
-			}
-			if (data.accent_custom) {
-				if (document.body) document.body.setAttribute('data-liquid-accent-custom', data.accent_custom);
-			}
-			if (data.glass_opacity != null) {
-				if (document.body) document.body.setAttribute('data-liquid-glass-opacity', String(data.glass_opacity));
-			}
 		} catch (e) {}
 	})();
 
-	/* 登录后提交暂存（DOMContentLoaded 后异步 POST 持久化） */
+	/* 登录后提交暂存 + 覆盖 DOM 属性（DOMContentLoaded 后） */
 	function flushPending() {
-		/* 登录页跳过（暂存应保留到成功登录后才提交） */
 		if (document.body && document.body.classList.contains('liquid-login'))
 			return;
 		try {
@@ -98,6 +82,23 @@
 			var data = JSON.parse(raw);
 			sessionStorage.removeItem('liquid-pending');
 			if (typeof data !== 'object' || data === null) return;
+			/* 覆盖 DOM 属性（此时页面已渲染旧值，更新属性触发 CSS 重算） */
+			try {
+				var root = document.documentElement;
+				var dark = (data.mode == 'dark') || ((data.mode != 'light') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+				root.setAttribute('data-darkmode', dark ? 'true' : 'false');
+				if (data.mode) root.setAttribute('data-liquid-mode', data.mode);
+				if (data.accent) {
+					root.setAttribute('data-accent', data.accent);
+					if (document.body) document.body.setAttribute('data-liquid-accent', data.accent);
+				}
+				if (data.accent_custom) {
+					if (document.body) document.body.setAttribute('data-liquid-accent-custom', data.accent_custom);
+				}
+				if (data.glass_opacity != null) {
+					if (document.body) document.body.setAttribute('data-liquid-glass-opacity', String(data.glass_opacity));
+				}
+			} catch (e) {}
 			/* 异步 POST 持久化 */
 			setTimeout(function () {
 				try {
