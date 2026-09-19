@@ -539,6 +539,14 @@
 		if (loginCapsules) {
 			wrap.classList.add('liquid-glass-slider-login');
 			loginCapsules.parentNode.insertBefore(wrap, loginCapsules.nextSibling);
+			/* 动态计算滑杆宽度 = 胶囊实际宽度 - 缩进 */
+			function syncSliderWidth() {
+				var cw = loginCapsules.offsetWidth;
+				if (cw > 0)
+					wrap.style.width = Math.max(40, cw - 50) + 'px';
+			}
+			setTimeout(syncSliderWidth, 50);
+			window.addEventListener('resize', syncSliderWidth);
 		} else {
 			sw.appendChild(wrap);
 		}
