@@ -1119,7 +1119,7 @@ header [data-indicator][data-style="inactive"],
 	-webkit-backdrop-filter: blur(16px);
 	box-shadow: 0 8px 32px rgba(0,0,0,0.2);
 	pointer-events: auto;
-	max-width: 320px;
+	max-width: 75vw;
 }
 .liquid-pending-toast.show {
 	opacity: 1;
