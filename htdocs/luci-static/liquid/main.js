@@ -74,27 +74,59 @@
 
 	/* 登录后提交暂存（DOMContentLoaded 后异步 POST 持久化，不改 DOM） */
 	function flushPending() {
+		/* flushPending 现在由 showPendingToast 的按钮触发，
+		   此处保留为空壳，避免登录后自动提交 */
+	}
+	/* 登录后提示暂存设置（DOMContentLoaded 后检查 sessionStorage） */
+	function showPendingToast() {
 		if (document.body && document.body.classList.contains('liquid-login'))
 			return;
 		try {
-			var raw = sessionStorage.getItem('liquid-pending');
-			if (!raw) return;
-			var data = JSON.parse(raw);
-			sessionStorage.removeItem('liquid-pending');
-			if (typeof data !== 'object' || data === null) return;
-			/* 仅异步 POST 持久化，不修改任何 DOM 属性 */
-			setTimeout(function () {
-				try {
-					var base = (window.L && L.env && L.env.admin_path)
-						? L.env.admin_path : '/cgi-bin/luci/admin/';
-					var xhr = new XMLHttpRequest();
-					xhr.open('POST', base + 'system/liquid/save_config', true);
-					xhr.setRequestHeader('Content-Type', 'application/json');
-					xhr.send(JSON.stringify(data));
-				} catch (e) {}
-			}, 0);
-		} catch (e) {}
+			if (!sessionStorage.getItem('liquid-pending')) return;
+		} catch (e) { return; }
+
+		/* 弹出玻璃 toast 提示 */
+		var toast = document.createElement('div');
+		toast.className = 'liquid-pending-toast';
+		toast.innerHTML = '<span class="liquid-pending-toast-text">登录前修改的主题设置已暂存，点击应用</span><button class="liquid-pending-toast-btn" type="button">应用</button>';
+		document.body.appendChild(toast);
+		/* 渐入 */
+		requestAnimationFrame(function () { toast.classList.add('show'); });
+
+		var btn = toast.querySelector('.liquid-pending-toast-btn');
+		btn.addEventListener('click', function () {
+			/* 先 POST 保存到 uci */
+			try {
+				var raw = sessionStorage.getItem('liquid-pending');
+				if (raw) {
+					var data = JSON.parse(raw);
+					sessionStorage.removeItem('liquid-pending');
+					if (data && typeof data === 'object') {
+						var base = (window.L && L.env && L.env.admin_path)
+							? L.env.admin_path : '/cgi-bin/luci/admin/';
+						var xhr = new XMLHttpRequest();
+						xhr.open('POST', base + 'system/liquid/save_config', true);
+						xhr.setRequestHeader('Content-Type', 'application/json');
+						xhr.send(JSON.stringify(data));
+					}
+				}
+			} catch (e) {}
+			/* 保存后刷新页面让设置生效 */
+			setTimeout(function () { location.reload(); }, 200);
+		});
+
+		/* 点 toast 外部也关闭 */
+		setTimeout(function () {
+			document.addEventListener('click', function dismiss(e) {
+				if (!toast.contains(e.target)) {
+					toast.classList.remove('show');
+					setTimeout(function () { toast.remove(); }, 300);
+					document.removeEventListener('click', dismiss);
+				}
+			});
+		}, 100);
 	}
+
 	var mql = (typeof window.matchMedia == 'function')
 		? window.matchMedia('(prefers-color-scheme: dark)')
 		: null;
@@ -1437,6 +1469,7 @@
 	if (document.readyState == 'loading')
 		document.addEventListener('DOMContentLoaded', function () {
 			flushPending();
+			showPendingToast();
 			initSwitch();
 			initColorSwitch();
 			initGlassOpacitySlider();
@@ -1454,6 +1487,7 @@
 		});
 	else {
 		flushPending();
+		showPendingToast();
 		initSwitch();
 		initColorSwitch();
 		initGlassOpacitySlider();

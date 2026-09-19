@@ -1087,6 +1087,53 @@ header [data-indicator][data-style="inactive"],
 	border-top-color: var(--glass-border);
 }
 
+/* 登录后暂存提示 toast */
+.liquid-pending-toast {
+	position: fixed;
+	bottom: 24px;
+	left: 50%;
+	transform: translateX(-50%) translateY(20px);
+	opacity: 0;
+	transition: opacity .3s ease, transform .3s ease;
+	z-index: 9999;
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 10px 16px;
+	border-radius: 12px;
+	background: var(--glass-bg-strong);
+	border: 1px solid var(--glass-border);
+	backdrop-filter: blur(16px);
+	-webkit-backdrop-filter: blur(16px);
+	box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+	pointer-events: auto;
+}
+.liquid-pending-toast.show {
+	opacity: 1;
+	transform: translateX(-50%) translateY(0);
+}
+.liquid-pending-toast-text {
+	font-size: 13px;
+	color: var(--text-color-high);
+	white-space: nowrap;
+}
+.liquid-pending-toast-btn {
+	flex-shrink: 0;
+	padding: 5px 14px;
+	border: none;
+	border-radius: 8px;
+	background: var(--accent-grad);
+	color: var(--on-primary-color, #fff);
+	font-size: 12px;
+	font-weight: 600;
+	cursor: pointer;
+	box-shadow: 0 2px 8px var(--accent-glow);
+	transition: box-shadow .15s ease;
+}
+.liquid-pending-toast-btn:hover {
+	box-shadow: 0 4px 16px var(--accent-glow);
+}
+
 /* ==========================================================================
    5. Layout
    ========================================================================== */
