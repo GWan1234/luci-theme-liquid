@@ -91,10 +91,8 @@
 		toast.innerHTML =
 			'<span class="liquid-pending-toast-text">登录前修改的主题设置已暂存</span>' +
 			'<span class="liquid-pending-toast-countdown"></span>' +
-			'<div class="liquid-pending-toast-buttons">' +
 			'<button class="liquid-pending-toast-btn" data-action="apply">应用</button>' +
-			'<button class="liquid-pending-toast-btn liquid-pending-toast-dismiss" data-action="dismiss">忽略</button>' +
-			'</div>';
+			'<button class="liquid-pending-toast-btn liquid-pending-toast-dismiss" data-action="dismiss">忽略</button>';
 		document.body.appendChild(toast);
 		requestAnimationFrame(function () { toast.classList.add('show'); });
 
