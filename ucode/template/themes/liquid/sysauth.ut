@@ -17,18 +17,30 @@
 		<div class="liquid-logo">
 			<svg viewBox="0 0 64 68" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
 				<defs>
-					<linearGradient id="liquid-lg-top" x1="0" y1="0" x2="0" y2="1">
-						<stop offset="0" stop-color="var(--primary-color-high)" stop-opacity="0.85"/>
-						<stop offset="0.5" stop-color="var(--primary-color-high)" stop-opacity="0.4"/>
-						<stop offset="1" stop-color="var(--primary-color-low)" stop-opacity="0.92"/>
+					<!-- 水滴形裁剪路径（CSS clip-path 引用） -->
+					<clipPath id="liquid-drop-clip" clipPathUnits="objectBoundingBox">
+						<path d="M0.5,0 C0.72,0.29 0.89,0.44 0.89,0.62 A0.39,0.39 0 0,1 0.11,0.62 C0.11,0.44 0.28,0.29 0.5,0 Z"/>
+					</clipPath>
+					<!-- accent-glass-soft 风格渐变：左下主题色 → 右上白色半透明 -->
+					<linearGradient id="liquid-lg-top" x1="0" y1="1" x2="1" y2="0">
+						<stop offset="0%" stop-color="var(--primary-color-low)" stop-opacity="0.85"/>
+						<stop offset="35%" stop-color="var(--primary-color-medium)" stop-opacity="0.55"/>
+						<stop offset="100%" stop-color="rgba(255,255,255,0.72)"/>
+					</linearGradient>
+					<!-- 左上角高光条（模拟玻璃折射亮线） -->
+					<linearGradient id="liquid-lg-shine" x1="0" y1="0" x2="0.5" y2="0.8">
+						<stop offset="0%" stop-color="white" stop-opacity="0.7"/>
+						<stop offset="50%" stop-color="white" stop-opacity="0.15"/>
+						<stop offset="100%" stop-color="white" stop-opacity="0"/>
 					</linearGradient>
 				</defs>
-				<path d="M32 3 C46 20 57 30 57 42 a25 25 0 0 1 -50 0 C7 30 18 20 32 3 Z" fill="url(#liquid-lg-top)" stroke="rgba(255,255,255,0.7)" stroke-width="1.5"/>
-				<ellipse cx="23" cy="39" rx="9.5" ry="6" fill="#ffffff" opacity="0.6"/>
+				<path d="M32 3 C46 20 57 30 57 42 a25 25 0 0 1 -50 0 C7 30 18 20 32 3 Z" fill="url(#liquid-lg-top)"/>
+				<path d="M32 3 C46 20 57 30 57 42 a25 25 0 0 1 -50 0 C7 30 18 20 32 3 Z" fill="url(#liquid-lg-shine)"/>
+				<ellipse cx="22" cy="40" rx="10" ry="6.5" fill="white" opacity="0.18"/>
 			</svg>
 		</div>
 		<h4>{{ _('Authorization Required') }}</h4>
-		<form method="post" action="/cgi-bin/luci/" class="cbi-map">
+		<form method="post" action="/cgi-bin/luci/" class="cbi-map" onsubmit="if(!this.luci_password.value){this.luci_password.focus();return false;}">
 			<div class="cbi-section">
 				<div class="cbi-section-node">
 					<div class="cbi-value">

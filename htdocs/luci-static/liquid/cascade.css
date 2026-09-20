@@ -485,7 +485,18 @@ img {
 	height: 22px;
 	margin: 0 8px -5px 0;
 	vertical-align: baseline;
-	filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.18));
+	/* 与登录页 logo 同款光晕效果：三层 drop-shadow 沿水滴轮廓 + 高光线 */
+	filter: drop-shadow(0 0 3px color-mix(in srgb, var(--primary-color-high) 35%, transparent))
+	        drop-shadow(0 1px 6px color-mix(in srgb, var(--primary-color-high) 25%, transparent))
+	        drop-shadow(0 0 12px color-mix(in srgb, var(--primary-color-high) 12%, transparent))
+	        drop-shadow(0 0.5px 0 rgba(255, 255, 255, 0.7));
+	transition: filter .25s ease;
+}
+#menubar .hostname a .liquid-logo:hover {
+	filter: drop-shadow(0 0 5px color-mix(in srgb, var(--primary-color-high) 50%, transparent))
+	        drop-shadow(0 2px 10px color-mix(in srgb, var(--primary-color-high) 35%, transparent))
+	        drop-shadow(0 0 18px color-mix(in srgb, var(--primary-color-high) 18%, transparent))
+	        drop-shadow(0 1px 0 rgba(255, 255, 255, 0.9));
 }
 
 #menubar .distversion {
@@ -1041,8 +1052,8 @@ header [data-indicator][data-style="inactive"],
 .liquid-glass-slider-tick::before {
 	content: '';
 	display: block;
-	width: 3px;
-	height: 12px;
+	width: 4px;
+	height: 14px;
 	flex-shrink: 0;
 	background: rgba(90, 95, 110, 0.85);
 	border: 1px solid rgba(255, 255, 255, 0.6);
@@ -1085,6 +1096,97 @@ header [data-indicator][data-style="inactive"],
 	margin-left: -4px;
 	border: 4px solid transparent;
 	border-top-color: var(--glass-border);
+}
+
+/* 登录后暂存提示 toast */
+.liquid-pending-toast {
+	position: fixed;
+	bottom: 24px;
+	left: 50%;
+	transform: translateX(-50%) translateY(20px);
+	opacity: 0;
+	transition: opacity .3s ease, transform .3s ease;
+	z-index: 9999;
+	display: inline-flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	padding: 10px 16px;
+	border-radius: 12px;
+	background: var(--glass-bg-strong);
+	border: 1px solid var(--glass-border);
+	backdrop-filter: blur(16px);
+	-webkit-backdrop-filter: blur(16px);
+	box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+	pointer-events: auto;
+	max-width: 75vw;
+}
+.liquid-pending-toast.show {
+	opacity: 1;
+	transform: translateX(-50%) translateY(0);
+}
+.liquid-pending-toast-text {
+	font-size: 13px;
+	color: var(--text-color-high);
+	white-space: nowrap;
+	text-align: center;
+}
+.liquid-pending-toast-countdown {
+	font-size: 12px;
+	font-weight: 600;
+	color: var(--accent-glow);
+	font-variant-numeric: tabular-nums;
+	min-width: 28px;
+	text-align: center;
+}
+.liquid-pending-toast-buttons {
+	display: flex;
+	gap: 8px;
+}
+.liquid-pending-toast-btn {
+	flex-shrink: 0;
+	padding: 5px 14px;
+	border: none;
+	border-radius: 8px;
+	font-size: 12px;
+	font-weight: 600;
+	cursor: pointer;
+	transition: box-shadow .15s ease, background .15s ease;
+}
+.liquid-pending-toast-btn[data-action="apply"] {
+	background: var(--accent-grad);
+	color: var(--on-primary-color, #fff);
+	box-shadow: 0 2px 8px var(--accent-glow);
+}
+.liquid-pending-toast-btn[data-action="apply"]:hover {
+	box-shadow: 0 4px 16px var(--accent-glow);
+}
+.liquid-pending-toast-btn[data-action="dismiss"] {
+	background: var(--glass-bg);
+	color: var(--text-color-medium);
+	border: 1px solid var(--glass-border);
+}
+.liquid-pending-toast-btn[data-action="dismiss"]:hover {
+	color: var(--text-color-high);
+}
+	min-width: 80px;
+}
+.liquid-pending-toast-btn[data-action="apply"] {
+	background: var(--accent-grad);
+	color: var(--on-primary-color, #fff);
+	box-shadow: 0 2px 8px var(--accent-glow);
+}
+.liquid-pending-toast-btn[data-action="apply"]:hover {
+	box-shadow: 0 4px 16px var(--accent-glow);
+}
+.liquid-pending-toast-btn[data-action="dismiss"] {
+	background: var(--glass-bg);
+	color: var(--text-color-medium);
+	border: 1px solid var(--glass-border);
+}
+.liquid-pending-toast-btn[data-action="dismiss"]:hover {
+	color: var(--text-color-high);
 }
 
 /* ==========================================================================
@@ -3061,8 +3163,46 @@ body.liquid-login #liquid-login-capsules {
 /* 登录页胶囊取消 fixed 定位，改为 static 跟随 flex 布局 */
 body.liquid-login .liquid-mode-switch,
 body.liquid-login .liquid-color-switch {
-	position: static !important;
+	position: relative !important;
 	margin: 0 !important;
+	overflow: visible;
+}
+/* 登录页自定义颜色弹出框向上弹出，不被页面底部遮挡 */
+body.liquid-login .liquid-custom-pop {
+	top: auto;
+	bottom: calc(100% + 8px);
+	transform-origin: bottom center;
+}
+/* 登录页透明度滑杆：胶囊正下方，宽度与胶囊总宽一致，紧凑 */
+body.liquid-login .liquid-glass-slider-login {
+	position: relative;
+	left: 0;
+	right: 0;
+	top: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 5px;
+	margin-top: -1px;
+	pointer-events: none;
+	z-index: 2;
+	width: calc(100% - 60px);
+	margin-left: 30px;
+	margin-right: 30px;
+}
+body.liquid-login .liquid-glass-slider {
+	height: 1px;
+}
+body.liquid-login .liquid-glass-slider::-webkit-slider-thumb {
+	width: 12px;
+	height: 12px;
+	border-width: 1px;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 0 0 1.5px rgba(255, 255, 255, 0.1);
+}
+body.liquid-login .liquid-glass-slider::-moz-range-thumb {
+	width: 12px;
+	height: 12px;
+	border-width: 1px;
 }
 
 /* 登录页隐藏搜索按钮（无意义） */
@@ -3098,7 +3238,22 @@ body.liquid-login #liquid-login .modal.login .liquid-logo {
 	width: 78px;
 	height: 78px;
 	margin: 0 auto 14px;
-	filter: drop-shadow(0 6px 18px rgba(31, 45, 70, 0.35));
+}
+body.liquid-login #liquid-login .modal.login .liquid-logo svg {
+	width: 100%;
+	height: 100%;
+	/* 光晕沿水滴轮廓：多层 drop-shadow 从内到外 */
+	filter: drop-shadow(0 0 6px color-mix(in srgb, var(--primary-color-high) 50%, transparent))
+	        drop-shadow(0 2px 12px color-mix(in srgb, var(--primary-color-high) 40%, transparent))
+	        drop-shadow(0 0 24px color-mix(in srgb, var(--primary-color-high) 20%, transparent))
+	        drop-shadow(0 1px 0 rgba(255, 255, 255, 0.9));
+	transition: filter .3s ease;
+}
+body.liquid-login #liquid-login .modal.login .liquid-logo:hover svg {
+	filter: drop-shadow(0 0 10px color-mix(in srgb, var(--primary-color-high) 60%, transparent))
+	        drop-shadow(0 4px 20px color-mix(in srgb, var(--primary-color-high) 50%, transparent))
+	        drop-shadow(0 0 36px color-mix(in srgb, var(--primary-color-high) 25%, transparent))
+	        drop-shadow(0 2px 0 rgba(255, 255, 255, 1));
 }
 
 body.liquid-login #liquid-login .modal.login h4 {

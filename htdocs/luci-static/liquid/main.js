@@ -27,12 +27,20 @@
 	/* 一次 POST 全部 option（对象 {option: value}），后端一次写盘，
 	   避免多次请求并发时后写覆盖先写（accent 与 accent_custom 一起存） */
 	function saveConfig(opts) {
-		if (!document.body ||
-		    document.body.classList.contains('liquid-login'))
+		if (!document.body)
 			return;
-		/* 用主题自己的 ucode controller 保存（仿 luci-app-pushbot）：
-		   XHR POST 到 /cgi-bin/luci/admin/system/liquid/save_config，
-		   后端直接写 /etc/config/liquid，绕开跨版本不可靠的 uci rpc */
+		/* 登录页：暂存到 sessionStorage，不发任何请求 */
+		if (document.body.classList.contains('liquid-login')) {
+			try {
+				var prev = JSON.parse(sessionStorage.getItem('liquid-pending') || '{}');
+				var merged = {};
+				for (var k in prev) merged[k] = prev[k];
+				for (var k2 in opts) merged[k2] = opts[k2];
+				sessionStorage.setItem('liquid-pending', JSON.stringify(merged));
+			} catch (e) {}
+			return;
+		}
+		/* 正常页面：POST 到 ucode controller 持久化 */
 		try {
 			var base = (window.L && L.env && L.env.admin_path)
 				? L.env.admin_path : '/cgi-bin/luci/admin/';
@@ -42,6 +50,96 @@
 			xhr.send(JSON.stringify(opts));
 		} catch (e) {}
 	}
+
+	/* ===== 登录前暂存传递（main.js 顶部立即执行） =====
+	   sessionStorage('liquid-pending') → localStorage（纯本地写入，极快）。
+	   header ut 的 inline script 会用 localStorage 值覆盖 uci 旧值。
+	   登录页不执行（登录页由 setMode 正常管理）。 */
+	(function applyPending() {
+		if (document.body && document.body.classList.contains('liquid-login'))
+			return;
+		try {
+			var raw = sessionStorage.getItem('liquid-pending');
+			if (!raw) return;
+			var data = JSON.parse(raw);
+			if (!data || typeof data !== 'object') return;
+			/* 写 localStorage（header ut 会读到并覆盖 uci 旧值） */
+			if (data.mode) localStorage.setItem('liquid-theme-mode', data.mode);
+			if (data.accent) localStorage.setItem('liquid-accent', data.accent);
+			if (data.accent_custom) localStorage.setItem('liquid-accent-custom', data.accent_custom);
+			if (data.bing) localStorage.setItem('liquid-bing', data.bing);
+			if (data.glass_opacity != null) localStorage.setItem('liquid-glass-opacity', String(data.glass_opacity));
+		} catch (e) {}
+	})();
+
+	/* 登录后提交暂存（DOMContentLoaded 后异步 POST 持久化，不改 DOM） */
+	function flushPending() {
+		/* flushPending 现在由 showPendingToast 的按钮触发，
+		   此处保留为空壳，避免登录后自动提交 */
+	}
+	/* 登录后提示暂存设置（DOMContentLoaded 后检查 sessionStorage） */
+	function showPendingToast() {
+		if (document.body && document.body.classList.contains('liquid-login'))
+			return;
+		try {
+			if (!sessionStorage.getItem('liquid-pending')) return;
+		} catch (e) { return; }
+
+		/* 弹出玻璃 toast 提示 */
+		var toast = document.createElement('div');
+		toast.className = 'liquid-pending-toast';
+		toast.innerHTML =
+			'<span class="liquid-pending-toast-text">登录前修改的主题设置已暂存</span>' +
+			'<span class="liquid-pending-toast-countdown"></span>' +
+			'<button class="liquid-pending-toast-btn" data-action="apply">应用</button>' +
+			'<button class="liquid-pending-toast-btn liquid-pending-toast-dismiss" data-action="dismiss">忽略</button>';
+		document.body.appendChild(toast);
+		requestAnimationFrame(function () { toast.classList.add('show'); });
+
+		var countdownEl = toast.querySelector('.liquid-pending-toast-countdown');
+		var remaining = 30;
+		function tick() {
+			if (remaining <= 0) {
+				dismiss();
+				return;
+			}
+			countdownEl.textContent = remaining + 's';
+			remaining--;
+			countdownTimer = setTimeout(tick, 1000);
+		}
+		var countdownTimer = setTimeout(tick, 1000);
+
+		function applyPending() {
+			clearTimeout(countdownTimer);
+			try {
+				var raw = sessionStorage.getItem('liquid-pending');
+				if (raw) {
+					var data = JSON.parse(raw);
+					sessionStorage.removeItem('liquid-pending');
+					if (data && typeof data === 'object') {
+						var base = (window.L && L.env && L.env.admin_path)
+							? L.env.admin_path : '/cgi-bin/luci/admin/';
+						var xhr = new XMLHttpRequest();
+						xhr.open('POST', base + 'system/liquid/save_config', true);
+						xhr.setRequestHeader('Content-Type', 'application/json');
+						xhr.send(JSON.stringify(data));
+					}
+				}
+			} catch (e) {}
+			setTimeout(function () { location.reload(); }, 200);
+		}
+
+		function dismiss() {
+			clearTimeout(countdownTimer);
+			sessionStorage.removeItem('liquid-pending');
+			toast.classList.remove('show');
+			setTimeout(function () { toast.remove(); }, 300);
+		}
+
+		toast.querySelector('[data-action="apply"]').addEventListener('click', applyPending);
+		toast.querySelector('[data-action="dismiss"]').addEventListener('click', dismiss);
+	}
+
 	var mql = (typeof window.matchMedia == 'function')
 		? window.matchMedia('(prefers-color-scheme: dark)')
 		: null;
@@ -132,8 +230,11 @@
 
 	function applyMode(mode) {
 		var root = document.documentElement;
+		/* 加 transition 让明暗切换平滑过渡，避免整页重算导致白屏闪烁 */
+		root.style.transition = 'background-color .3s ease, color .3s ease';
 		root.setAttribute('data-darkmode', isDark(mode) ? 'true' : 'false');
 		root.setAttribute('data-liquid-mode', mode);
+		setTimeout(function () { root.style.transition = ''; }, 350);
 	}
 
 	/* 明暗模式守护：OpenClash 等第三方脚本会覆写 <html data-darkmode>
@@ -432,7 +533,23 @@
 
 		wrap.appendChild(slider);
 		wrap.appendChild(tick);
-		sw.appendChild(wrap);
+
+		/* 锁屏页：滑杆放在胶囊容器外部下方，宽度跟随胶囊总宽 */
+		var loginCapsules = document.getElementById('liquid-login-capsules');
+		if (loginCapsules) {
+			wrap.classList.add('liquid-glass-slider-login');
+			loginCapsules.parentNode.insertBefore(wrap, loginCapsules.nextSibling);
+			/* 动态计算滑杆宽度 = 胶囊实际宽度 - 缩进 */
+			function syncSliderWidth() {
+				var cw = loginCapsules.offsetWidth;
+				if (cw > 0)
+					wrap.style.width = Math.max(40, cw - 50) + 'px';
+			}
+			setTimeout(syncSliderWidth, 50);
+			window.addEventListener('resize', syncSliderWidth);
+		} else {
+			sw.appendChild(wrap);
+		}
 	}
 
 	function updateColorSwitch() {
@@ -1337,7 +1454,7 @@
 		if (!m || m.querySelector('.liquid-logo'))
 			return;
 		var w = document.createElement('div');
-		w.innerHTML = '<svg class="liquid-logo" viewBox="0 0 64 68" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs><linearGradient id="liquid-lg-login" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--primary-color-high)" stop-opacity="0.85"/><stop offset="0.5" stop-color="var(--primary-color-high)" stop-opacity="0.4"/><stop offset="1" stop-color="var(--primary-color-low)" stop-opacity="0.92"/></linearGradient></defs><path d="M32 3 C46 20 57 30 57 42 a25 25 0 0 1 -50 0 C7 30 18 20 32 3 Z" fill="url(#liquid-lg-login)" stroke="rgba(255,255,255,0.7)" stroke-width="1.5"/><ellipse cx="23" cy="39" rx="9.5" ry="6" fill="#ffffff" opacity="0.6"/></svg>';
+		w.innerHTML = '<svg class="liquid-logo" viewBox="0 0 64 68" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs><linearGradient id="liquid-lg-login" x1="0" y1="0" x2="0.3" y2="1"><stop offset="0%" stop-color="rgba(255,255,255,0.55)"/><stop offset="30%" stop-color="rgba(255,255,255,0.20)"/><stop offset="100%" stop-color="var(--primary-color-low)" stop-opacity="0.85"/></linearGradient><linearGradient id="liquid-lg-shine" x1="0.3" y1="0" x2="0.7" y2="0.6"><stop offset="0%" stop-color="white" stop-opacity="0.6"/><stop offset="60%" stop-color="white" stop-opacity="0"/></linearGradient></defs><path d="M32 3 C46 20 57 30 57 42 a25 25 0 0 1 -50 0 C7 30 18 20 32 3 Z" fill="url(#liquid-lg-login)"/><path d="M32 3 C46 20 57 30 57 42 a25 25 0 0 1 -50 0 C7 30 18 20 32 3 Z" fill="url(#liquid-lg-shine)"/><ellipse cx="23" cy="39" rx="9.5" ry="6" fill="#ffffff" opacity="0.35"/></svg>';
 		m.insertBefore(w.firstChild, m.firstChild);
 	}
 
@@ -1372,6 +1489,8 @@
 
 	if (document.readyState == 'loading')
 		document.addEventListener('DOMContentLoaded', function () {
+			flushPending();
+			showPendingToast();
 			initSwitch();
 			initColorSwitch();
 			initGlassOpacitySlider();
@@ -1388,7 +1507,12 @@
 			setTimeout(syncDropdownValues, 300);
 		});
 	else {
+		flushPending();
+		showPendingToast();
 		initSwitch();
+		initColorSwitch();
+		initGlassOpacitySlider();
+		syncMenuTop();
 		initColorSwitch();
 		initGlassOpacitySlider();
 		syncMenuTop();
