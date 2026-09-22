@@ -3463,13 +3463,6 @@ body.modal-overlay-active #modal_overlay {
 	cursor: pointer;
 	animation: liquid-pop-in .25s ease;
 }
-#modal_overlay > .modal.alert-message.liquid-promoted::after {
-	content: '· 点击关闭';
-	display: block;
-	margin-top: 6px;
-	font-size: 11px;
-	color: var(--text-color-medium);
-}
 
 #modal_overlay > .modal > * {
 	line-height: normal;

@@ -1400,23 +1400,30 @@
 	   与 portalTooltips 同思路；easytier 用 getElementById + classList
 	   切换 .show 显隐，移动节点不影响其逻辑。弹窗依赖的 --card-bg 等
 	   变量定义在 :root，移出卡片不失效 */
-	/* 页面顶部的成功通知（如"系统密码已更改"）LuCI 默认用
-	   ui.addNotification 插在 #view 内容顶部——视觉上被内容淹没。
-	   这里把它们搬进 #modal_overlay 走既有的居中弹窗体系
+	/* 页面顶部的成功通知（如"系统密码已更改"）LuCI 的 ui.addNotification
+	   用 info 类、插在 #maincontent 顶部（#view 的兄弟节点）——视觉上
+	   被内容淹没。这里把它们搬进 #modal_overlay 走既有的居中弹窗体系
 	   （centerModals/watchModals 已在运行），点击或 6 秒后自动关闭。
-	   只搬 notice（成功/提示类），error 类留在原位（错误要紧贴表单）。 */
+	   只搬 info/notice/success（成功提示），danger/warning 留在原位。 */
 	function portalTopNotices() {
-		var view = document.getElementById('view');
+		var mc = document.getElementById('maincontent');
 		var overlay = document.getElementById('modal_overlay');
-		if (!view || !overlay)
+		if (!mc || !overlay)
 			return;
+
+		function cleanupOverlay() {
+			if (!overlay.querySelector('.modal'))
+				document.body.classList.remove('modal-overlay-active');
+		}
 
 		function promote(node) {
 			if (node.nodeType !== 1 || !node.classList)
 				return;
 			if (!node.classList.contains('alert-message'))
 				return;
-			if (!node.classList.contains('notice'))
+			if (!(node.classList.contains('info') ||
+			      node.classList.contains('notice') ||
+			      node.classList.contains('success')))
 				return;
 			if (node.classList.contains('liquid-promoted'))
 				return;
@@ -1430,22 +1437,24 @@
 				closed = true;
 				if (node.parentNode)
 					node.parentNode.removeChild(node);
-				if (!overlay.querySelector('.modal'))
-					document.body.classList.remove('modal-overlay-active');
+				cleanupOverlay();
 			}
+			/* 点击任意处（含自带的"关闭"按钮）即关 */
 			node.addEventListener('click', close);
 			setTimeout(close, 6000);
 		}
 
 		/* 页面加载时已存在的通知 */
-		view.querySelectorAll(':scope > .alert-message').forEach(promote);
-		/* SPA 切页/保存后新插入的通知 */
+		mc.querySelectorAll(':scope > .alert-message').forEach(promote);
 		if (window.MutationObserver) {
+			/* SPA 切页/保存后新插入的通知 */
 			new MutationObserver(function (muts) {
 				muts.forEach(function (m) {
 					m.addedNodes.forEach(promote);
 				});
-			}).observe(view, { childList: true });
+			}).observe(mc, { childList: true });
+			/* 通知被自身 Dismiss 按钮移除时兜底清理遮罩 */
+			new MutationObserver(cleanupOverlay).observe(overlay, { childList: true });
 		}
 	}
 
