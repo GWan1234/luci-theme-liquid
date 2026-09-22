@@ -1406,24 +1406,25 @@
 	   （centerModals/watchModals 已在运行），点击或 6 秒后自动关闭。
 	   只搬 info/notice/success（成功提示），danger/warning 留在原位。 */
 	function portalTopNotices() {
-		/* mc 由服务端 header 渲染，footer 执行时必在；
-		   overlay 由 ui.js 异步创建（header 不渲染它），初始化时
-		   可能还不存在——不能在入口判断，必须推迟到 promote() 里现取 */
+		/* 页面顶部的成功通知（如"系统密码已更改"）LuCI 用 info 类插在
+		   #maincontent 顶部——视觉上被内容淹没。这里搬进主题自建的
+		   独立遮罩层 #liquid-notice-overlay 居中弹出，6 秒/点击关闭。
+		   不复用 ui.js 的 #modal_overlay：它里面常驻一个预创建的空
+		   .modal 容器（showModal 底座），混用会把空壳一起显示出来
+		   （两个框叠着），且 centerModals 会去居中那个空壳。
+		   只搬 info/notice/success，danger/warning 留在原位。 */
 		var mc = document.getElementById('maincontent');
 		if (!mc)
 			return;
-		/* 我们放入的通知计数：归零时才允许考虑移除遮罩 */
-		var promotedCount = 0;
 
-		function cleanupOverlay(overlay) {
-			if (promotedCount > 0)
-				return;
-			/* ui.js 预创建的空 .modal 常驻 overlay（showModal 容器），
-			   不能只看 .modal 存在——真实弹窗在用时它会有子节点 */
-			var realModal = overlay.querySelector('.modal');
-			if (realModal && realModal.childElementCount > 0)
-				return;
-			document.body.classList.remove('modal-overlay-active');
+		function getBox() {
+			var box = document.getElementById('liquid-notice-overlay');
+			if (!box) {
+				box = document.createElement('div');
+				box.id = 'liquid-notice-overlay';
+				document.body.appendChild(box);
+			}
+			return box;
 		}
 
 		function promote(node) {
@@ -1437,20 +1438,10 @@
 				return;
 			if (node.classList.contains('liquid-promoted'))
 				return;
-			var overlay = document.getElementById('modal_overlay');
-			if (!overlay)
-				return;
-			node.classList.add('liquid-promoted', 'modal');
-			overlay.appendChild(node);
-			promotedCount++;
-			document.body.classList.add('modal-overlay-active');
-			/* 通知被自身 Dismiss/超时移除时兜底清理遮罩（只挂一次） */
-			if (!overlay.__liquidCleanup && window.MutationObserver) {
-				overlay.__liquidCleanup = true;
-				new MutationObserver(function () {
-					cleanupOverlay(overlay);
-				}).observe(overlay, { childList: true });
-			}
+			var box = getBox();
+			node.classList.add('liquid-promoted');
+			box.appendChild(node);
+			box.classList.add('show');
 			var closed = false;
 			function close() {
 				if (closed)
@@ -1458,8 +1449,8 @@
 				closed = true;
 				if (node.parentNode)
 					node.parentNode.removeChild(node);
-				promotedCount = Math.max(0, promotedCount - 1);
-				cleanupOverlay(overlay);
+				if (!box.querySelector('.alert-message'))
+					box.classList.remove('show');
 			}
 			/* 点击任意处（含自带的"关闭"按钮）即关 */
 			node.addEventListener('click', close);
