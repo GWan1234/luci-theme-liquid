@@ -1570,6 +1570,7 @@
 			portalTooltips();
 			portalFixedModals();
 			portalTopNotices();
+			fixComboPillClick();
 			initNavScrollTop();
 			injectLoginLogo();
 			setTimeout(syncMenuTop, 300);
@@ -1589,6 +1590,7 @@
 		portalTooltips();
 		portalFixedModals();
 		portalTopNotices();
+		fixComboPillClick();
 		initNavScrollTop();
 		injectLoginLogo();
 		setTimeout(syncMenuTop, 300);
@@ -1611,9 +1613,12 @@
 	   点击，但内容区 click 会冒泡到 window 的 closeAllDropdowns，导致
 	   打开即关闭（闪烁）。拦截内容区 click，改为以胶囊本身为目标重新
 	   触发，走 handleClick 的打开路径（其内部 stopPropagation，不再
-	   冒泡到 window）。打开状态下的点击不拦截，LuCI 正常处理关闭。 */
+	   冒泡到 window）。打开状态下的点击不拦截，LuCI 正常处理关闭。
+	   作用于所有表单型 cbi-dropdown（原只匹配 Combobox 试点的
+	   liquid-combo-pilot class，该替换已移除导致选择器落空）；
+	   排除 .btn/.cbi-button 型（按钮下拉有自己的动作语义） */
 	function fixComboPillClick() {
-		document.querySelectorAll('.cbi-dropdown.liquid-combo-pilot > ul > li[display]').forEach(function (li) {
+		document.querySelectorAll('.cbi-dropdown:not(.btn):not(.cbi-button) > ul > li[display]').forEach(function (li) {
 			if (li.__liquidPillClick)
 				return;
 			li.__liquidPillClick = true;
