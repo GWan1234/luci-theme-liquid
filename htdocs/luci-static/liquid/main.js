@@ -1406,13 +1406,15 @@
 	   （centerModals/watchModals 已在运行），点击或 6 秒后自动关闭。
 	   只搬 info/notice/success（成功提示），danger/warning 留在原位。 */
 	function portalTopNotices() {
+		/* mc 由服务端 header 渲染，footer 执行时必在；
+		   overlay 由 ui.js 异步创建（header 不渲染它），初始化时
+		   可能还不存在——不能在入口判断，必须推迟到 promote() 里现取 */
 		var mc = document.getElementById('maincontent');
-		var overlay = document.getElementById('modal_overlay');
-		if (!mc || !overlay)
+		if (!mc)
 			return;
 
-		function cleanupOverlay() {
-			if (!overlay.querySelector('.modal'))
+		function cleanupOverlay(overlay) {
+			if (overlay && !overlay.querySelector('.modal'))
 				document.body.classList.remove('modal-overlay-active');
 		}
 
@@ -1427,9 +1429,19 @@
 				return;
 			if (node.classList.contains('liquid-promoted'))
 				return;
+			var overlay = document.getElementById('modal_overlay');
+			if (!overlay)
+				return;
 			node.classList.add('liquid-promoted', 'modal');
 			overlay.appendChild(node);
 			document.body.classList.add('modal-overlay-active');
+			/* 通知被自身 Dismiss/超时移除时兜底清理遮罩（只挂一次） */
+			if (!overlay.__liquidCleanup && window.MutationObserver) {
+				overlay.__liquidCleanup = true;
+				new MutationObserver(function () {
+					cleanupOverlay(overlay);
+				}).observe(overlay, { childList: true });
+			}
 			var closed = false;
 			function close() {
 				if (closed)
@@ -1437,7 +1449,7 @@
 				closed = true;
 				if (node.parentNode)
 					node.parentNode.removeChild(node);
-				cleanupOverlay();
+				cleanupOverlay(overlay);
 			}
 			/* 点击任意处（含自带的"关闭"按钮）即关 */
 			node.addEventListener('click', close);
@@ -1453,8 +1465,6 @@
 					m.addedNodes.forEach(promote);
 				});
 			}).observe(mc, { childList: true });
-			/* 通知被自身 Dismiss 按钮移除时兜底清理遮罩 */
-			new MutationObserver(cleanupOverlay).observe(overlay, { childList: true });
 		}
 	}
 
