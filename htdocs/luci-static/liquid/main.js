@@ -1412,10 +1412,18 @@
 		var mc = document.getElementById('maincontent');
 		if (!mc)
 			return;
+		/* 我们放入的通知计数：归零时才允许考虑移除遮罩 */
+		var promotedCount = 0;
 
 		function cleanupOverlay(overlay) {
-			if (overlay && !overlay.querySelector('.modal'))
-				document.body.classList.remove('modal-overlay-active');
+			if (promotedCount > 0)
+				return;
+			/* ui.js 预创建的空 .modal 常驻 overlay（showModal 容器），
+			   不能只看 .modal 存在——真实弹窗在用时它会有子节点 */
+			var realModal = overlay.querySelector('.modal');
+			if (realModal && realModal.childElementCount > 0)
+				return;
+			document.body.classList.remove('modal-overlay-active');
 		}
 
 		function promote(node) {
@@ -1434,6 +1442,7 @@
 				return;
 			node.classList.add('liquid-promoted', 'modal');
 			overlay.appendChild(node);
+			promotedCount++;
 			document.body.classList.add('modal-overlay-active');
 			/* 通知被自身 Dismiss/超时移除时兜底清理遮罩（只挂一次） */
 			if (!overlay.__liquidCleanup && window.MutationObserver) {
@@ -1449,6 +1458,7 @@
 				closed = true;
 				if (node.parentNode)
 					node.parentNode.removeChild(node);
+				promotedCount = Math.max(0, promotedCount - 1);
 				cleanupOverlay(overlay);
 			}
 			/* 点击任意处（含自带的"关闭"按钮）即关 */
