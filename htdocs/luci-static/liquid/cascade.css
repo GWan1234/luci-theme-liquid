@@ -3455,6 +3455,22 @@ body.modal-overlay-active #modal_overlay {
 	margin: 0 8px 0 0;
 }
 
+/* 页面顶部成功通知（portalTopNotices 提升进来的，如"密码已更改"）：
+   走 modal 居中弹窗，成功色玻璃 + 缩放入场；点击/6s 自动消失 */
+#modal_overlay > .modal.alert-message.liquid-promoted {
+	background: color-mix(in srgb, var(--success-color-high) 14%, var(--glass-bg-strong)) !important;
+	border-color: color-mix(in srgb, var(--success-color-high) 42%, transparent) !important;
+	cursor: pointer;
+	animation: liquid-pop-in .25s ease;
+}
+#modal_overlay > .modal.alert-message.liquid-promoted::after {
+	content: '· 点击关闭';
+	display: block;
+	margin-top: 6px;
+	font-size: 11px;
+	color: var(--text-color-medium);
+}
+
 #modal_overlay > .modal > * {
 	line-height: normal;
 	margin-bottom: .5em;
