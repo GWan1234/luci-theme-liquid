@@ -4473,8 +4473,10 @@ pre {
 	}
 
 	/* 移动端 foot 横幅只保留「主题版本 + 固件版本」（版本号需可点检查更新），
-	   其余（kernel/luci/多余分隔符）仍隐藏 */
-	body:not(.liquid-login) p.luci > *:not(.luci-fw):not(.luci-theme-ver):not(.luci-sep-fw) {
+	   其余（kernel/luci/多余分隔符/检查更新卡片容器）仍隐藏。
+	   注意 overlay 也是 p.luci 的直接子元素——不排除会被这条规则
+	   display:none 掉，移动端整个检查更新卡片直接消失 */
+	body:not(.liquid-login) p.luci > *:not(.luci-fw):not(.luci-theme-ver):not(.luci-sep-fw):not(.liquid-ver-overlay) {
 		display: none;
 	}
 
