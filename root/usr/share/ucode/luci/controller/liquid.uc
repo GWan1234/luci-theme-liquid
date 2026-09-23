@@ -220,8 +220,19 @@ return {
 			/* opkg 同版本会 up to date 跳过，需 --force-reinstall 覆盖 */
 			cmd = "opkg install --force-reinstall /tmp/luci-theme-liquid_*.ipk";
 		}
-		/* 后台安装 + 结果标记（postinst 自动清 luci 缓存并 reload rpcd） */
-		let install_cmd = "(" + cmd + ") > " + ifile + " 2>&1 && echo 'ok' >> " + ifile + " || echo 'fail' >> " + ifile + " &";
+		/* 后台安装 + 结果标记（postinst 自动清 luci 缓存并 reload rpcd）。
+		   装完顺手清理 /etc/apk/world 的 pkg><hash 哈希锁（降级为裸包名）：
+		   apk 从本地文件安装会写入哈希锁，后续安装 pushbot 等本地包后
+		   锁可能失配，会把【所有】后续 apk 事务卡死（breaks world）——
+		   裸包名语义等价"保持安装"，且这些包不在官方源、无被替换风险。
+		   整链必须放进单个 ( ... ) & 后台执行：否则 system() 会同步
+		   等安装结束，阻塞 rpcd 处理器（全站请求卡住）。 */
+		let install_cmd = "( "
+			+ cmd + " > " + ifile + " 2>&1; "
+			+ "RC=$?; "
+			+ "[ -f /etc/apk/world ] && sed -i '/></ s/>.*$//' /etc/apk/world; "
+			+ "if [ $RC -eq 0 ]; then echo 'ok' >> " + ifile + "; "
+			+ "else echo 'fail' >> " + ifile + "; fi ) &";
 		system("mkdir -p /tmp/liquid && " + install_cmd);
 
 		http.prepare_content("application/json");
