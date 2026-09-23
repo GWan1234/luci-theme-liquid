@@ -99,8 +99,8 @@
 {% endif %}
 {% if (!blank_page): %}
 <p class="luci luci-foot">
-	<a href="https://github.com/zzsj0928/luci-theme-liquid" target="_blank" rel="noopener">Liquid Theme {{ theme_ver }}</a>
-	<span class="luci-sep">·</span>
+	<a class="liquid-version-link luci-theme-ver" data-ver="{{ theme_ver }}" href="https://github.com/zzsj0928/luci-theme-liquid" target="_blank" rel="noopener">Liquid Theme {{ theme_ver }}</a>
+	<span class="luci-sep luci-sep-fw">·</span>
 	<a class="luci-fw" href="{{ fw_release }}" target="_blank" rel="noopener">{{ fw_text }}</a>
 	<span class="luci-sep">·</span>
 	<span>Kernel: {{ boardinfo.kernel ?? '?' }}</span>

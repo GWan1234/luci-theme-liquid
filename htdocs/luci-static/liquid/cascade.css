@@ -1794,6 +1794,125 @@ body:not(.liquid-login) p.luci a:hover {
 	opacity: .4;
 }
 
+/* ── 页脚版本号 → 检查更新卡片（对齐 pushbot 的四态 frosted toast）──
+   overlay 直接挂在 fixed 的页脚 p.luci 内：absolute 锚定页脚盒子，
+   水平居中自然是"页脚宽度内"（left:236px → 右缘），不是全屏居中。
+   非更新态 8s 自动消失（比 pushbot 多 4s）+ 点卡片跳作者仓库；
+   更新态不自动消失，按钮操作。 */
+.liquid-ver-overlay {
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	top: -130px;
+	z-index: 30;
+	display: flex;
+	align-items: flex-end;
+	justify-content: center;
+	padding-bottom: 6px;
+	background: rgba(15, 23, 42, 0.35);
+	-webkit-backdrop-filter: blur(6px) saturate(1.2);
+	backdrop-filter: blur(6px) saturate(1.2);
+	opacity: 0;
+	transition: opacity .5s ease;
+	pointer-events: auto;
+}
+.liquid-ver-overlay.show { opacity: 1; }
+.liquid-ver-toast {
+	min-width: 200px;
+	max-width: min(460px, calc(100vw - 24px));
+	padding: 14px 22px;
+	border-radius: 12px;
+	text-align: center;
+	color: #ffffff;
+	box-shadow: 0 14px 34px rgba(15, 23, 42, 0.35);
+	transform: scale(.92) translateY(6px);
+	transition: transform .5s ease;
+}
+.liquid-ver-overlay.show .liquid-ver-toast { transform: scale(1) translateY(0); }
+/* 状态色：内测=紫 / 最新=绿 / 有更新=橙 / 失败=红（与 pushbot 一致） */
+.liquid-ver-toast.is-ahead {
+	background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+	border: 1px solid rgba(167, 139, 250, 0.45);
+}
+.liquid-ver-toast.is-latest {
+	background: linear-gradient(135deg, #10b981, #059669);
+	border: 1px solid rgba(52, 211, 153, 0.45);
+}
+.liquid-ver-toast.is-update {
+	background: linear-gradient(135deg, #f59e0b, #ea580c);
+	border: 1px solid rgba(251, 146, 60, 0.5);
+}
+.liquid-ver-toast.is-err {
+	background: linear-gradient(135deg, #ef4444, #dc2626);
+	border: 1px solid rgba(248, 113, 113, 0.45);
+}
+.liquid-ver-toast-msg {
+	font-size: 14px;
+	font-weight: 700;
+	line-height: 1.5;
+}
+.liquid-ver-toast-sub {
+	margin-top: 7px;
+	font-size: 12px;
+	font-weight: 500;
+	opacity: .9;
+	font-family: Menlo, Consolas, monospace;
+}
+/* 非更新态卡片可点击（整卡超链接作者仓库） */
+.liquid-ver-toast.is-clickable { cursor: pointer; }
+/* 页脚版本号：检查中闪烁（同 pushbot badge） */
+.liquid-version-link.is-checking {
+	opacity: .6;
+	animation: liquid-blink .8s ease-in-out infinite;
+}
+@keyframes liquid-blink {
+	0%, 100% { opacity: 1; }
+	50% { opacity: .4; }
+}
+
+/* ── OTA 操作按钮行（与 pushbot 同款 frosted 白按钮）── */
+.liquid-ota-btn-row {
+	display: flex;
+	flex-wrap: nowrap;
+	gap: 4px;
+	justify-content: center;
+	margin-top: 12px;
+}
+.liquid-ota-btn {
+	padding: 5px 10px;
+	border-radius: 8px;
+	border: 1px solid rgba(255, 255, 255, .35);
+	background: rgba(255, 255, 255, .18);
+	color: #fff;
+	font-size: 11px;
+	font-weight: 600;
+	cursor: pointer;
+	transition: background .2s, transform .15s;
+	display: inline-flex;
+	align-items: center;
+	gap: 3px;
+	line-height: 1.2;
+	white-space: nowrap;
+	flex-shrink: 1;
+	min-width: 0;
+}
+.liquid-ota-btn:hover { background: rgba(255, 255, 255, .3); transform: translateY(-1px); }
+.liquid-ota-btn:active { transform: scale(.96); }
+.liquid-ota-btn:disabled { opacity: .55; cursor: not-allowed; transform: none; }
+.liquid-ota-btn.liquid-ota-ready { background: rgba(16, 185, 129, .45); border-color: rgba(52, 211, 153, .6); }
+/* 圆环进度（One-Click/Pull 下载进度） */
+.liquid-ota-ring { display: inline-block; width: 18px; height: 18px; vertical-align: middle; }
+.liquid-ota-ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.liquid-ota-ring-bg { fill: none; stroke: rgba(255, 255, 255, .2); stroke-width: 2.8; }
+.liquid-ota-ring-fg {
+	fill: none;
+	stroke: #fff;
+	stroke-width: 2.8;
+	stroke-linecap: round;
+	transition: stroke-dasharray .35s ease;
+}
+
 /* ==========================================================================
    10. CBI form components
    ========================================================================== */
@@ -4352,8 +4471,9 @@ pre {
 		bottom: 2px;
 	}
 
-	/* 移动端 foot 横幅只保留固件版本 */
-	body:not(.liquid-login) p.luci > *:not(.luci-fw) {
+	/* 移动端 foot 横幅只保留「主题版本 + 固件版本」（版本号需可点检查更新），
+	   其余（kernel/luci/多余分隔符）仍隐藏 */
+	body:not(.liquid-login) p.luci > *:not(.luci-fw):not(.luci-theme-ver):not(.luci-sep-fw) {
 		display: none;
 	}
 
@@ -4361,6 +4481,15 @@ pre {
 		/* 移动端 foot 加高 4px（上下 padding 各 +2px），与浏览器底部
 		   工具栏衔接更饱满 */
 		padding: 8px 22px;
+		/* 主题版本+固件版本一行放不下时：不换行、不压缩，
+		   从左侧起排，右侧溢出屏幕的部分直接裁掉不显示 */
+		flex-wrap: nowrap;
+		justify-content: flex-start;
+		overflow: hidden;
+	}
+	body:not(.liquid-login) p.luci > * {
+		flex-shrink: 0;
+		white-space: nowrap;
 	}
 
 	.luci-foot-spacer {

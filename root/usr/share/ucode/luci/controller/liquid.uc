@@ -110,5 +110,135 @@ return {
 
 		fs.writefile(cfg_path, join('\n', out) + '\n');
 		http.write_json({ ok: true, saved: true });
+	},
+
+	/* ── OTA: detect package manager (apk vs opkg)，与 pushbot 同款 ── */
+	act_detect_pkgmgr: function() {
+		let mgr = "opkg";
+		let f = popen("command -v apk 2>/dev/null", "r");
+		if (f) { let o = f.read("all"); f.close(); if (o && length(replace(o, /\s+/, "")) > 0) mgr = "apk"; }
+		http.prepare_content("application/json");
+		http.write_json({ pkgmgr: mgr });
+	},
+
+	/* ── OTA: 后台下载 Release 包（tag 方案 luci-theme-liquid-vX.Y-rN），与 pushbot 同款重试逻辑 ── */
+	act_ota_download: function() {
+		let ver = http.formvalue("ver") ?? "";
+		let rel = http.formvalue("rel") ?? "";
+		if (ver == "" || rel == "") {
+			http.prepare_content("application/json");
+			http.write_json({ ok: false, error: "missing ver/rel" });
+			return;
+		}
+		/* 防注入：只放行数字与点 */
+		ver = replace(ver, /[^0-9.]/g, "");
+		rel = replace(rel, /[^0-9]/g, "");
+		if (ver == "" || rel == "") {
+			http.prepare_content("application/json");
+			http.write_json({ ok: false, error: "invalid ver/rel" });
+			return;
+		}
+
+		/* 检测包管理器 */
+		let mgr = "opkg";
+		let f0 = popen("command -v apk 2>/dev/null", "r");
+		if (f0) { let o = f0.read("all"); f0.close(); if (o && length(replace(o, /\s+/, "")) > 0) mgr = "apk"; }
+
+		/* 组装下载地址（主题无 po/i18n 子包，单文件） */
+		let base = "https://github.com/zzsj0928/luci-theme-liquid/releases/download/luci-theme-liquid-v" + ver + "-r" + rel + "/";
+		let files;
+		if (mgr == "apk") {
+			files = ["luci-theme-liquid-" + ver + "-r" + rel + ".apk"];
+		} else {
+			files = ["luci-theme-liquid_" + ver + "-r" + rel + "_all.ipk"];
+		}
+
+		/* 进度文件 */
+		let pfile = "/tmp/liquid/ota_progress";
+		system("mkdir -p /tmp/liquid && echo '0' > " + pfile + " 2>/dev/null");
+
+		/* 后台下载脚本：每个文件最多重试 3 次，>10KB 视为有效 */
+		let dl_script = "#!/bin/sh\n"
+			+ "PFILE='" + pfile + "'\n"
+			+ "BASE='" + base + "'\n"
+			+ "MAX_RETRY=3\n"
+			+ "TOTAL=" + length(files) + "\n"
+			+ "OK=0\n"
+			+ "for f in " + join(" ", files) + "; do\n"
+			+ "  URL=\"${BASE}${f}\"\n"
+			+ "  DEST=\"/tmp/${f}\"\n"
+			+ "  ATTEMPT=0\n"
+			+ "  while [ $ATTEMPT -lt $MAX_RETRY ]; do\n"
+			+ "    ATTEMPT=$((ATTEMPT+1))\n"
+			+ "    curl -k -L --connect-timeout 15 --max-time 120 -o \"${DEST}\" \"${URL}\" 2>/dev/null\n"
+			+ "    if [ $? -eq 0 ] && [ -s \"${DEST}\" ] && [ $(wc -c < \"${DEST}\") -gt 10000 ]; then\n"
+			+ "      OK=$((OK+1))\n"
+			+ "      echo \"$((OK * 100 / TOTAL))\" > \"${PFILE}\"\n"
+			+ "      [ $OK -lt $TOTAL ] && sleep 1\n"
+			+ "      break\n"
+			+ "    fi\n"
+			+ "    rm -f \"${DEST}\"\n"
+			+ "    sleep 2\n"
+			+ "  done\n"
+			+ "done\n"
+			+ "if [ $OK -eq $TOTAL ]; then\n"
+			+ "  sleep 1\n"
+			+ "  echo 'done' > \"${PFILE}\"\n"
+			+ "else\n"
+			+ "  echo 'fail' > \"${PFILE}\"\n"
+			+ "fi\n";
+
+		fs.writefile("/tmp/liquid/ota_download.sh", dl_script);
+		system("chmod +x /tmp/liquid/ota_download.sh && /tmp/liquid/ota_download.sh &");
+
+		http.prepare_content("application/json");
+		http.write_json({ ok: true });
+	},
+
+	/* ── OTA: 轮询下载进度（0-100 / done / fail） ── */
+	act_ota_download_progress: function() {
+		let pfile = "/tmp/liquid/ota_progress";
+		let progress = "0";
+		let f = popen("cat " + pfile + " 2>/dev/null || echo '0'", "r");
+		if (f) { progress = replace(f.read("all"), /\s+/, ""); f.close(); }
+		if (progress == "") progress = "0";
+		http.prepare_content("application/json");
+		http.write_json({ progress: progress });
+	},
+
+	/* ── OTA: 安装已下载的包（apk/opkg 双支持） ── */
+	act_ota_install: function() {
+		let mgr = "opkg";
+		let f0 = popen("command -v apk 2>/dev/null", "r");
+		if (f0) { let o = f0.read("all"); f0.close(); if (o && length(replace(o, /\s+/, "")) > 0) mgr = "apk"; }
+
+		let ifile = "/tmp/liquid/ota_install.log";
+		let cmd;
+		if (mgr == "apk") {
+			cmd = "apk add --network=no --allow-untrusted /tmp/luci-theme-liquid-*.apk";
+		} else {
+			/* opkg 同版本会 up to date 跳过，需 --force-reinstall 覆盖 */
+			cmd = "opkg install --force-reinstall /tmp/luci-theme-liquid_*.ipk";
+		}
+		/* 后台安装 + 结果标记（postinst 自动清 luci 缓存并 reload rpcd） */
+		let install_cmd = "(" + cmd + ") > " + ifile + " 2>&1 && echo 'ok' >> " + ifile + " || echo 'fail' >> " + ifile + " &";
+		system("mkdir -p /tmp/liquid && " + install_cmd);
+
+		http.prepare_content("application/json");
+		http.write_json({ ok: true, pkgmgr: mgr });
+	},
+
+	/* ── OTA: 清理已下载的包与进度文件 ── */
+	act_ota_clear: function() {
+		let patterns = [
+			"/tmp/luci-theme-liquid-*.apk",
+			"/tmp/luci-theme-liquid_*.ipk",
+			"/tmp/liquid/ota_progress",
+			"/tmp/liquid/ota_install.log",
+			"/tmp/liquid/ota_download.sh"
+		];
+		system("rm -f " + join(" ", patterns) + " 2>/dev/null");
+		http.prepare_content("application/json");
+		http.write_json({ ok: true });
 	}
 };
