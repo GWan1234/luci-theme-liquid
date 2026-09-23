@@ -1615,11 +1615,12 @@
 		}
 
 		function bind() {
+			/* 登录页不接管（保留原跳转仓库超链接），也避免选择器永远
+			   匹配不到导致的无限 200ms 重试 */
+			if (document.body && document.body.classList.contains('liquid-login')) return;
 			var badge = document.querySelector('p.luci-foot a.liquid-version-link');
 			if (!badge) { setTimeout(bind, 200); return; }
 			if (badge._lvBound) return;
-			/* 登录页：保留原跳转仓库超链接，不接管点击 */
-			if (document.body && document.body.classList.contains('liquid-login')) return;
 			badge._lvBound = true;
 			badge.title = '点击检查更新';
 
