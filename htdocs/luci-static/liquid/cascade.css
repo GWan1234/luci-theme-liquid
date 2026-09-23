@@ -3455,6 +3455,59 @@ body.modal-overlay-active #modal_overlay {
 	margin: 0 8px 0 0;
 }
 
+/* 页面顶部成功通知的独立遮罩（portalTopNotices 提升进来的，如"密码已更改"）：
+   不复用 ui.js 的 #modal_overlay（里面常驻预创建空 .modal 底座，
+   混用会把空壳一起显示成两个框），主题自建居中层，点击/6s 自动消失 */
+#liquid-notice-overlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	z-index: 2100;
+	display: none;
+	align-items: center;
+	justify-content: center;
+	overflow: auto;
+	background: rgba(8, 12, 18, 0.42);
+	-webkit-backdrop-filter: blur(10px);
+	backdrop-filter: blur(10px);
+}
+#liquid-notice-overlay.show {
+	display: flex;
+}
+#liquid-notice-overlay .alert-message {
+	/* 与 #modal_overlay > .modal.alert-message（如"配置更改已应用。"）
+	   完全一致的标准弹窗设计，避免到处不同弹框造成体验割裂 */
+	display: block !important;
+	width: min(420px, 90vw);
+	max-width: 90vw;
+	margin: 0;
+	padding: 20px 28px;
+	border-radius: 18px;
+	text-align: center;
+	font-size: 13px;
+	cursor: pointer;
+	/* bootstrap 会给 .info 强制 on-primary 白字 + 蓝渐变，压回主题玻璃 */
+	color: var(--text-color-high);
+	background: var(--glass-bg-strong);
+	border: 1px solid var(--glass-border);
+	box-shadow: var(--glass-shadow), inset 0 1px 0 var(--glass-inset);
+	-webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
+	backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
+	animation: liquid-pop-in .25s ease;
+}
+#liquid-notice-overlay .alert-message p {
+	margin: 0;
+}
+/* 内置"关闭"按钮居中（按钮的 margin-left:auto 是内联样式，需要 !important 压） */
+#liquid-notice-overlay .alert-message > div:last-child {
+	justify-content: center;
+}
+#liquid-notice-overlay .alert-message .btn {
+	margin: 10px 0 0 !important;
+}
+
 #modal_overlay > .modal > * {
 	line-height: normal;
 	margin-bottom: .5em;

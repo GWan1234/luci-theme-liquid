@@ -1400,6 +1400,75 @@
 	   与 portalTooltips 同思路；easytier 用 getElementById + classList
 	   切换 .show 显隐，移动节点不影响其逻辑。弹窗依赖的 --card-bg 等
 	   变量定义在 :root，移出卡片不失效 */
+	/* 页面顶部的成功通知（如"系统密码已更改"）LuCI 的 ui.addNotification
+	   用 info 类、插在 #maincontent 顶部（#view 的兄弟节点）——视觉上
+	   被内容淹没。这里把它们搬进 #modal_overlay 走既有的居中弹窗体系
+	   （centerModals/watchModals 已在运行），点击或 6 秒后自动关闭。
+	   只搬 info/notice/success（成功提示），danger/warning 留在原位。 */
+	function portalTopNotices() {
+		/* 页面顶部的成功通知（如"系统密码已更改"）LuCI 用 info 类插在
+		   #maincontent 顶部——视觉上被内容淹没。这里搬进主题自建的
+		   独立遮罩层 #liquid-notice-overlay 居中弹出，6 秒/点击关闭。
+		   不复用 ui.js 的 #modal_overlay：它里面常驻一个预创建的空
+		   .modal 容器（showModal 底座），混用会把空壳一起显示出来
+		   （两个框叠着），且 centerModals 会去居中那个空壳。
+		   只搬 info/notice/success，danger/warning 留在原位。 */
+		var mc = document.getElementById('maincontent');
+		if (!mc)
+			return;
+
+		function getBox() {
+			var box = document.getElementById('liquid-notice-overlay');
+			if (!box) {
+				box = document.createElement('div');
+				box.id = 'liquid-notice-overlay';
+				document.body.appendChild(box);
+			}
+			return box;
+		}
+
+		function promote(node) {
+			if (node.nodeType !== 1 || !node.classList)
+				return;
+			if (!node.classList.contains('alert-message'))
+				return;
+			if (!(node.classList.contains('info') ||
+			      node.classList.contains('notice') ||
+			      node.classList.contains('success')))
+				return;
+			if (node.classList.contains('liquid-promoted'))
+				return;
+			var box = getBox();
+			node.classList.add('liquid-promoted');
+			box.appendChild(node);
+			box.classList.add('show');
+			var closed = false;
+			function close() {
+				if (closed)
+					return;
+				closed = true;
+				if (node.parentNode)
+					node.parentNode.removeChild(node);
+				if (!box.querySelector('.alert-message'))
+					box.classList.remove('show');
+			}
+			/* 点击任意处（含自带的"关闭"按钮）即关 */
+			node.addEventListener('click', close);
+			setTimeout(close, 6000);
+		}
+
+		/* 页面加载时已存在的通知 */
+		mc.querySelectorAll(':scope > .alert-message').forEach(promote);
+		if (window.MutationObserver) {
+			/* SPA 切页/保存后新插入的通知 */
+			new MutationObserver(function (muts) {
+				muts.forEach(function (m) {
+					m.addedNodes.forEach(promote);
+				});
+			}).observe(mc, { childList: true });
+		}
+	}
+
 	function portalFixedModals() {
 		document.querySelectorAll('.version-modal').forEach(function (m) {
 			if (m.parentNode !== document.body)
@@ -1500,6 +1569,8 @@
 			fitDropdownWidths();
 			portalTooltips();
 			portalFixedModals();
+			portalTopNotices();
+			fixComboPillClick();
 			initNavScrollTop();
 			injectLoginLogo();
 			setTimeout(syncMenuTop, 300);
@@ -1513,14 +1584,13 @@
 		initColorSwitch();
 		initGlassOpacitySlider();
 		syncMenuTop();
-		initColorSwitch();
-		initGlassOpacitySlider();
-		syncMenuTop();
 		initTabSliders();
 		syncDropdownValues();
 		fitDropdownWidths();
 		portalTooltips();
 		portalFixedModals();
+		portalTopNotices();
+		fixComboPillClick();
 		initNavScrollTop();
 		injectLoginLogo();
 		setTimeout(syncMenuTop, 300);
@@ -1543,9 +1613,12 @@
 	   点击，但内容区 click 会冒泡到 window 的 closeAllDropdowns，导致
 	   打开即关闭（闪烁）。拦截内容区 click，改为以胶囊本身为目标重新
 	   触发，走 handleClick 的打开路径（其内部 stopPropagation，不再
-	   冒泡到 window）。打开状态下的点击不拦截，LuCI 正常处理关闭。 */
+	   冒泡到 window）。打开状态下的点击不拦截，LuCI 正常处理关闭。
+	   作用于所有表单型 cbi-dropdown（原只匹配 Combobox 试点的
+	   liquid-combo-pilot class，该替换已移除导致选择器落空）；
+	   排除 .btn/.cbi-button 型（按钮下拉有自己的动作语义） */
 	function fixComboPillClick() {
-		document.querySelectorAll('.cbi-dropdown.liquid-combo-pilot > ul > li[display]').forEach(function (li) {
+		document.querySelectorAll('.cbi-dropdown:not(.btn):not(.cbi-button) > ul > li[display]').forEach(function (li) {
 			if (li.__liquidPillClick)
 				return;
 			li.__liquidPillClick = true;
