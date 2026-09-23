@@ -1803,13 +1803,14 @@ body:not(.liquid-login) p.luci a:hover {
 	position: absolute;
 	left: 0;
 	right: 0;
-	bottom: 0;
-	top: -130px;
+	/* 紧贴页脚上沿向上展开：卡片浮在页脚上方滑出，不遮盖页脚横幅 */
+	bottom: 100%;
+	height: 160px;
 	z-index: 30;
 	display: flex;
 	align-items: flex-end;
 	justify-content: center;
-	padding-bottom: 6px;
+	padding-bottom: 8px;
 	background: rgba(15, 23, 42, 0.35);
 	-webkit-backdrop-filter: blur(6px) saturate(1.2);
 	backdrop-filter: blur(6px) saturate(1.2);
@@ -1826,7 +1827,7 @@ body:not(.liquid-login) p.luci a:hover {
 	text-align: center;
 	color: #ffffff;
 	box-shadow: 0 14px 34px rgba(15, 23, 42, 0.35);
-	transform: scale(.92) translateY(6px);
+	transform: scale(.92) translateY(14px);
 	transition: transform .5s ease;
 }
 .liquid-ver-overlay.show .liquid-ver-toast { transform: scale(1) translateY(0); }
