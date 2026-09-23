@@ -1469,6 +1469,361 @@
 		}
 	}
 
+	/* ── 页脚版本号 → 检查更新（对齐 pushbot 的检查更新设计）─────────
+	   访问端浏览器前端 fetch GitHub raw Makefile（8s 超时），与本地
+	   PKG_VERSION-PKG_RELEASE 比较，四态 frosted toast：
+	   已最新(绿)/内测版(紫)/检测到更新(橙)/查询失败(红)。
+	   - 非更新态：8s 自动消失（比 pushbot 多 4s），点卡片超链接作者仓库
+	   - 更新态：不自动消失；按钮行 = pushbot 同款（一键更新/拉取新包/
+	     下载链接/清理包/忽略）+ 多一个"作者仓库"在忽略左边
+	   - 在线更新走主题自己的 OTA 端点（controller liquid.uc），
+	     安装完成后倒计时刷新（轮询 act_version，与 pushbot 一致）
+	   登录页不绑定（保留页脚版本号原跳转仓库超链接）。 */
+	function initVersionCheck() {
+		var REPO = 'https://github.com/zzsj0928/luci-theme-liquid';
+		var RAW_MK = 'https://raw.githubusercontent.com/zzsj0928/luci-theme-liquid/main/Makefile';
+
+		function api(name) {
+			var b = (window.L && L.env && L.env.admin_path)
+				? L.env.admin_path : '/cgi-bin/luci/admin/';
+			return b + 'system/liquid/' + name;
+		}
+
+		/* pushbot 同款版本比较：0.8-r69 → 0.8.69 逐段数字比 */
+		function cmpVer(a, b) {
+			a = String(a || '').replace(/^v/, '').replace(/-r/, '.');
+			b = String(b || '').replace(/^v/, '').replace(/-r/, '.');
+			var pa = a.split(/[.-]/), pb = b.split(/[.-]/), i, x, y;
+			for (i = 0; i < Math.max(pa.length, pb.length); i++) {
+				x = parseInt(pa[i], 10) || 0;
+				y = parseInt(pb[i], 10) || 0;
+				if (x > y) return 1;
+				if (x < y) return -1;
+			}
+			return 0;
+		}
+
+		function ringHtml(pct) {
+			return '<span class="liquid-ota-ring"><svg viewBox="0 0 36 36">'
+				+ '<circle cx="18" cy="18" r="15.9" class="liquid-ota-ring-bg"/>'
+				+ '<circle cx="18" cy="18" r="15.9" class="liquid-ota-ring-fg" style="stroke-dasharray:'
+				+ pct + ', 100"/></svg></span>';
+		}
+
+		/* 在页脚内弹出 frosted 卡片（overlay 锚定页脚盒子 → 页脚宽度内居中） */
+		function showToast(msg, sub, cls, buttons, autoMs, clickRepo, extraStyle) {
+			var badge = document.querySelector('p.luci-foot a.liquid-version-link');
+			var footer = badge ? badge.closest('p.luci') : null;
+			if (!footer) return null;
+			var ov = document.createElement('div');
+			ov.className = 'liquid-ver-overlay';
+			var toast = document.createElement('div');
+			toast.className = 'liquid-ver-toast ' + cls + (clickRepo ? ' is-clickable' : '');
+			if (extraStyle) toast.style.cssText = extraStyle;
+			var tm = document.createElement('div');
+			tm.className = 'liquid-ver-toast-msg';
+			tm.textContent = msg;
+			toast.appendChild(tm);
+			if (sub) {
+				var ts = document.createElement('div');
+				ts.className = 'liquid-ver-toast-sub';
+				ts.textContent = sub;
+				toast.appendChild(ts);
+			}
+			if (buttons && buttons.length > 0) {
+				var row = document.createElement('div');
+				row.className = 'liquid-ota-btn-row';
+				buttons.forEach(function(cfg) {
+					var b = document.createElement('button');
+					b.type = 'button';
+					b.className = 'liquid-ota-btn';
+					b.textContent = cfg.label;
+					if (cfg.id) b.id = cfg.id;
+					b.addEventListener('click', function(e) {
+						e.preventDefault();
+						e.stopPropagation();
+						if (cfg.onClick) cfg.onClick(b, res);
+					});
+					row.appendChild(b);
+				});
+				toast.appendChild(row);
+			}
+			ov.appendChild(toast);
+			footer.appendChild(ov);
+			setTimeout(function() { ov.classList.add('show'); }, 20);
+			var autoId = null;
+			if (autoMs > 0) {
+				autoId = setTimeout(function() { res.dismiss(); }, autoMs);
+			}
+			var res = {
+				ov: ov,
+				dismiss: function() {
+					if (autoId) { clearTimeout(autoId); autoId = null; }
+					ov.classList.remove('show');
+					setTimeout(function() { ov.remove(); }, 550);
+				}
+			};
+			/* 非更新态：点卡片超链接作者仓库 */
+			if (clickRepo) {
+				toast.addEventListener('click', function(e) {
+					if (e.target.closest && e.target.closest('button')) return;
+					window.open(REPO, '_blank');
+					res.dismiss();
+				});
+			}
+			return res;
+		}
+
+		/* 流程内错误提示（下载失败等，pushbot 同款 4s 消失） */
+		function liquidOtaError(msg) {
+			showToast(msg, null, 'is-err', null, 4000, false);
+		}
+
+		/* 安装完成后的倒计时卡片：轮询 act_version，版本变化即刷新，
+		   10s 兜底强制刷新（与 pushbot pb_ota_showCountdown 一致） */
+		function liquidOtaCountdown(local) {
+			var cdToast = showToast('安装完成', null, 'is-latest', null, 0, false,
+				'min-width:150px;max-width:220px;padding:12px 16px;border-radius:10px;text-align:center;transform:scale(0.85);');
+			if (!cdToast) return;
+			cdToast.ov.style.zIndex = '99999';
+			cdToast.ov.querySelector('.liquid-ver-toast').innerHTML =
+				'<div style="font-size:22px;font-weight:800;font-family:Menlo,Consolas,monospace" id="liquid_ota_countdown">10</div>'
+				+ '<div style="margin-top:6px"><button onclick="location.reload()" style="padding:4px 14px;border-radius:6px;border:1px solid rgba(255,255,255,0.35);background:rgba(255,255,255,0.15);color:#fff;font-size:11px;font-weight:600;cursor:pointer">立即刷新</button></div>';
+			var cdSec = 10;
+			var cdTimer = setInterval(function() {
+				cdSec--;
+				var el = document.getElementById('liquid_ota_countdown');
+				if (el) el.textContent = cdSec;
+				if (cdSec <= 0) { clearInterval(cdTimer); clearInterval(verTimer); location.reload(); }
+			}, 1000);
+			/* 每 2s 轮询主题版本，变了立即刷新 */
+			var verTimer = setInterval(function() {
+				var px = new XMLHttpRequest();
+				px.open('GET', api('version') + '?_=' + Date.now());
+				px.onload = function() {
+					try {
+						var d = JSON.parse(px.responseText);
+						if (d && d.version && local && d.version !== local) {
+							clearInterval(verTimer);
+							clearInterval(cdTimer);
+							location.reload();
+						}
+					} catch (e) {}
+				};
+				px.send();
+			}, 2000);
+		}
+
+		function bind() {
+			/* 登录页不接管（保留原跳转仓库超链接），也避免选择器永远
+			   匹配不到导致的无限 200ms 重试 */
+			if (document.body && document.body.classList.contains('liquid-login')) return;
+			var badge = document.querySelector('p.luci-foot a.liquid-version-link');
+			if (!badge) { setTimeout(bind, 200); return; }
+			if (badge._lvBound) return;
+			badge._lvBound = true;
+			badge.title = '点击检查更新';
+
+			badge.addEventListener('click', function(e) {
+				e.preventDefault();
+				if (badge.classList.contains('is-checking')) return;
+				badge.classList.add('is-checking');
+				var local = badge.getAttribute('data-ver') || '';
+				/* 新检查前清掉旧卡片，避免叠加 */
+				var footer = badge.closest('p.luci');
+				if (footer)
+					footer.querySelectorAll('.liquid-ver-overlay').forEach(function(o) { o.remove(); });
+
+				var ctl = new AbortController();
+				var timer = setTimeout(function() { ctl.abort(); }, 8000);
+				fetch(RAW_MK, { signal: ctl.signal })
+					.then(function(r) {
+						if (!r.ok) throw new Error('HTTP ' + r.status);
+						return r.text();
+					})
+					.then(function(txt) {
+						clearTimeout(timer);
+						var mv = txt.match(/PKG_VERSION:=([0-9.]+)/);
+						var mr = txt.match(/PKG_RELEASE:=([0-9]+)/);
+						var remote = (mv && mr) ? mv[1] + '-r' + mr[1] : '';
+						if (!remote) throw new Error('parse');
+						var c = cmpVer(local, remote);
+						var msg, cls;
+						if (c > 0) { msg = '已是抢先体验的内测版！'; cls = 'is-ahead'; }
+						else if (c < 0) { msg = '作者仓库发布了新版本！'; cls = 'is-update'; }
+						else { msg = '已经是最新版本！'; cls = 'is-latest'; }
+						var sub = '📦 v' + local + '　☁️ v' + remote;
+						var remoteVer = mv[1], remoteRel = mr[1];
+
+						var btns = null;
+						if (c < 0) {
+							btns = [
+								{
+									label: '一键更新',
+									id: 'liquid_ota_oneclick_btn',
+									onClick: function(btn, r2) {
+										btn.disabled = true;
+										btn.innerHTML = ringHtml(0) + '0%';
+										var x = new XMLHttpRequest();
+										x.open('GET', api('ota_download') + '?ver=' + encodeURIComponent(remoteVer)
+											+ '&rel=' + encodeURIComponent(remoteRel) + '&_=' + Date.now());
+										x.onload = function() {
+											var pollId = setInterval(function() {
+												var px = new XMLHttpRequest();
+												px.open('GET', api('ota_download_progress') + '?_=' + Date.now());
+												px.onload = function() {
+													try {
+														var pd = JSON.parse(px.responseText);
+														var pct = pd.progress || '0';
+														if (pct === 'done') {
+															clearInterval(pollId);
+															btn.textContent = '安装中...';
+															var ix = new XMLHttpRequest();
+															ix.open('GET', api('ota_install') + '?_=' + Date.now());
+															ix.send();
+															r2.dismiss();
+															liquidOtaCountdown(local);
+														} else if (pct === 'fail') {
+															clearInterval(pollId);
+															btn.disabled = false;
+															btn.textContent = '一键更新';
+															liquidOtaError('下载失败');
+														} else {
+															var num = parseInt(pct, 10) || 0;
+															btn.innerHTML = ringHtml(num) + num + '%';
+														}
+													} catch (e) {}
+												};
+												px.send();
+											}, 1000);
+										};
+										x.send();
+									}
+								},
+								{
+									label: '拉取新包',
+									id: 'liquid_ota_pull_btn',
+									onClick: function(btn, r2) {
+										/* 已下载完 → 直接安装 */
+										if (btn.getAttribute('data-ready') === '1') {
+											btn.disabled = true;
+											btn.textContent = '安装中...';
+											var ix = new XMLHttpRequest();
+											ix.open('GET', api('ota_install') + '?_=' + Date.now());
+											ix.send();
+											r2.dismiss();
+											liquidOtaCountdown(local);
+											return;
+										}
+										btn.disabled = true;
+										btn.innerHTML = ringHtml(0) + '0%';
+										var zeroCount = 0;
+										var pollId = setInterval(function() {
+											var px = new XMLHttpRequest();
+											px.open('GET', api('ota_download_progress') + '?_=' + Date.now());
+											px.onload = function() {
+												try {
+													var pd = JSON.parse(px.responseText);
+													var pct = pd.progress || '0';
+													if (pct === 'done') {
+														clearInterval(pollId);
+														btn.disabled = false;
+														btn.textContent = '安装更新';
+														btn.classList.add('liquid-ota-ready');
+														btn.setAttribute('data-ready', '1');
+													} else if (pct === 'fail') {
+														clearInterval(pollId);
+														btn.disabled = false;
+														btn.textContent = '拉取新包';
+														liquidOtaError('下载失败');
+													} else {
+														var num = parseInt(pct, 10) || 0;
+														if (num === 0) zeroCount++; else zeroCount = 0;
+														if (zeroCount >= 20) {
+															clearInterval(pollId);
+															btn.disabled = false;
+															btn.textContent = '拉取新包';
+															liquidOtaError('GitHub Release 无法访问');
+															return;
+														}
+														btn.innerHTML = ringHtml(num) + num + '%';
+													}
+												} catch (e) {}
+											};
+											px.send();
+										}, 1000);
+										/* 触发下载（后台进行） */
+										var xhr = new XMLHttpRequest();
+										xhr.open('GET', api('ota_download') + '?ver=' + encodeURIComponent(remoteVer)
+											+ '&rel=' + encodeURIComponent(remoteRel) + '&_=' + Date.now());
+										xhr.send();
+									}
+								},
+								{
+									label: '下载链接',
+									onClick: function(btn, r2) {
+										var baseUrl = REPO + '/releases/download/luci-theme-liquid-v'
+											+ remoteVer + '-r' + remoteRel + '/';
+										var isApk = false;
+										var xh = new XMLHttpRequest();
+										xh.open('GET', api('detect_pkgmgr') + '?_=' + Date.now(), false);
+										xh.send();
+										if (xh.status === 200) {
+											try { var d = JSON.parse(xh.responseText); isApk = (d.pkgmgr === 'apk'); } catch (e) {}
+										}
+										var file = isApk
+											? ('luci-theme-liquid-' + remoteVer + '-r' + remoteRel + '.apk')
+											: ('luci-theme-liquid_' + remoteVer + '-r' + remoteRel + '_all.ipk');
+										window.open(baseUrl + file, '_blank');
+										r2.dismiss();
+									}
+								},
+								{
+									label: '清理包',
+									onClick: function(btn, r2) {
+										var xhr = new XMLHttpRequest();
+										xhr.open('GET', api('ota_clear') + '?_=' + Date.now());
+										xhr.onload = function() {
+											btn.textContent = '已清理';
+											btn.disabled = true;
+											setTimeout(function() { r2.dismiss(); }, 1500);
+										};
+										xhr.send();
+									}
+								},
+								{
+									label: '作者仓库',
+									onClick: function(btn, r2) {
+										window.open(REPO, '_blank');
+										r2.dismiss();
+									}
+								},
+								{
+									label: '忽略',
+									onClick: function(btn, r2) {
+										r2.dismiss();
+									}
+								}
+							];
+						}
+						/* 更新态：不自动消失(0)；其他态：8s（比 pushbot 多 4s）+ 点卡片跳仓库 */
+						showToast(msg, sub, cls, btns, btns ? 0 : 8000, !btns);
+					})
+					.catch(function() {
+						clearTimeout(timer);
+						showToast('网络异常，无法访问作者仓库！ ☹️', '📦 v' + local, 'is-err', null, 8000, true);
+					})
+					.finally(function() { badge.classList.remove('is-checking'); });
+			});
+		}
+
+		if (document.readyState === 'complete')
+			bind();
+		else
+			window.addEventListener('load', bind);
+		setTimeout(bind, 200);
+	}
+
 	function portalFixedModals() {
 		document.querySelectorAll('.version-modal').forEach(function (m) {
 			if (m.parentNode !== document.body)
@@ -1570,6 +1925,7 @@
 			portalTooltips();
 			portalFixedModals();
 			portalTopNotices();
+			initVersionCheck();
 			fixComboPillClick();
 			initNavScrollTop();
 			injectLoginLogo();
@@ -1590,6 +1946,7 @@
 		portalTooltips();
 		portalFixedModals();
 		portalTopNotices();
+		initVersionCheck();
 		fixComboPillClick();
 		initNavScrollTop();
 		injectLoginLogo();
