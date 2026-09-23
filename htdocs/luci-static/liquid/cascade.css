@@ -4484,15 +4484,53 @@ pre {
 		/* 移动端 foot 加高 4px（上下 padding 各 +2px），与浏览器底部
 		   工具栏衔接更饱满 */
 		padding: 8px 22px;
+		/* 字号调小一号 */
+		font-size: 10.5px;
+		/* 主题版本与固件版本间隔：较桌面 14px 大幅收紧 */
+		gap: 8px 4px;
 		/* 主题版本+固件版本一行放不下时：不换行、不压缩，
 		   从左侧起排，右侧溢出屏幕的部分直接裁掉不显示 */
 		flex-wrap: nowrap;
 		justify-content: flex-start;
-		overflow: hidden;
+		/* 关键：overflow:hidden 会把"向上滑出页脚"的检查更新卡片
+		   整个裁掉（移动端点击无弹出的根因）。
+		   overflow-x: clip 只裁横向溢出，且 clip/visible 配对不会
+		   把 overflow-y 降级为 auto —— 横向照裁、纵向放行卡片 */
+		overflow-x: clip;
+		overflow-y: visible;
 	}
 	body:not(.liquid-login) p.luci > * {
 		flex-shrink: 0;
 		white-space: nowrap;
+	}
+
+	/* 更新卡片按钮：窄屏一排 6 个太挤 → 3+3 两行网格。
+	   grid 自动布局同样遵循 flex 的 order（order-modified document order），
+	   用 order 重排到目标顺序、列数固定 3，行划分确定不依赖宽度；
+	   DOM 顺序不变，桌面端（media 外）仍是原来的一行。
+	   第一行：一键更新 / 拉取新包 / 清理包
+	   第二行：下载链接 / 作者仓库 / 忽略 */
+	.liquid-ota-btn-row {
+		display: grid;
+		grid-template-columns: repeat(3, auto);
+		justify-content: center;
+		justify-items: center;
+		gap: 8px;
+	}
+	.liquid-ota-btn-row .liquid-ota-btn:nth-child(1) { order: 1; } /* 一键更新 */
+	.liquid-ota-btn-row .liquid-ota-btn:nth-child(2) { order: 2; } /* 拉取新包 */
+	.liquid-ota-btn-row .liquid-ota-btn:nth-child(4) { order: 3; } /* 清理包 */
+	.liquid-ota-btn-row .liquid-ota-btn:nth-child(3) { order: 5; } /* 下载链接 */
+	.liquid-ota-btn-row .liquid-ota-btn:nth-child(5) { order: 6; } /* 作者仓库 */
+	.liquid-ota-btn-row .liquid-ota-btn:nth-child(6) { order: 7; } /* 忽略 */
+
+	/* 更新卡片占屏宽 85%，按钮增大（触屏点按更友好） */
+	.liquid-ver-toast {
+		width: 85vw;
+	}
+	.liquid-ota-btn {
+		padding: 8px 12px;
+		font-size: 12px;
 	}
 
 	.luci-foot-spacer {
