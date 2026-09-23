@@ -4515,7 +4515,7 @@ pre {
 		grid-template-columns: repeat(3, auto);
 		justify-content: center;
 		justify-items: center;
-		gap: 4px;
+		gap: 8px;
 	}
 	.liquid-ota-btn-row .liquid-ota-btn:nth-child(1) { order: 1; } /* 一键更新 */
 	.liquid-ota-btn-row .liquid-ota-btn:nth-child(2) { order: 2; } /* 拉取新包 */
@@ -4523,6 +4523,15 @@ pre {
 	.liquid-ota-btn-row .liquid-ota-btn:nth-child(3) { order: 5; } /* 下载链接 */
 	.liquid-ota-btn-row .liquid-ota-btn:nth-child(5) { order: 6; } /* 作者仓库 */
 	.liquid-ota-btn-row .liquid-ota-btn:nth-child(6) { order: 7; } /* 忽略 */
+
+	/* 更新卡片占屏宽 85%，按钮增大（触屏点按更友好） */
+	.liquid-ver-toast {
+		width: 85vw;
+	}
+	.liquid-ota-btn {
+		padding: 8px 12px;
+		font-size: 12px;
+	}
 
 	.luci-foot-spacer {
 		height: 100px;
