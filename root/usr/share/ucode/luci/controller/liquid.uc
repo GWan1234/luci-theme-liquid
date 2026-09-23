@@ -221,16 +221,20 @@ return {
 			cmd = "opkg install --force-reinstall /tmp/luci-theme-liquid_*.ipk";
 		}
 		/* 后台安装 + 结果标记（postinst 自动清 luci 缓存并 reload rpcd）。
-		   装完顺手清理 /etc/apk/world 的 pkg><hash 哈希锁（降级为裸包名）：
-		   apk 从本地文件安装会写入哈希锁，后续安装 pushbot 等本地包后
-		   锁可能失配，会把【所有】后续 apk 事务卡死（breaks world）——
-		   裸包名语义等价"保持安装"，且这些包不在官方源、无被替换风险。
+		   world 哈希锁清理【装前 + 装后各一次】：
+		   - 装前：即使安装链中途被杀（重启/OOM），锁也已经清掉，
+		     不会留下"中毒 world 卡死后续所有 apk 事务"的状态
+		   - 装后：本次安装(本地文件)自己又会写一把新锁，再清一次
+		   降级为裸包名（语义等价"保持安装"，且这些包不在官方源、
+		   无被替换风险）。
 		   整链必须放进单个 ( ... ) & 后台执行：否则 system() 会同步
 		   等安装结束，阻塞 rpcd 处理器（全站请求卡住）。 */
+		let heal = "[ -f /etc/apk/world ] && sed -i '/></ s/>.*$//' /etc/apk/world; ";
 		let install_cmd = "( "
+			+ heal
 			+ cmd + " > " + ifile + " 2>&1; "
 			+ "RC=$?; "
-			+ "[ -f /etc/apk/world ] && sed -i '/></ s/>.*$//' /etc/apk/world; "
+			+ heal
 			+ "if [ $RC -eq 0 ]; then echo 'ok' >> " + ifile + "; "
 			+ "else echo 'fail' >> " + ifile + "; fi ) &";
 		system("mkdir -p /tmp/liquid && " + install_cmd);
