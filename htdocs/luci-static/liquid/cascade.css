@@ -4484,11 +4484,20 @@ pre {
 		/* 移动端 foot 加高 4px（上下 padding 各 +2px），与浏览器底部
 		   工具栏衔接更饱满 */
 		padding: 8px 22px;
+		/* 字号调小一号 */
+		font-size: 10.5px;
+		/* 主题版本与固件版本间隔 = 桌面 14px 的一半 */
+		gap: 8px 7px;
 		/* 主题版本+固件版本一行放不下时：不换行、不压缩，
 		   从左侧起排，右侧溢出屏幕的部分直接裁掉不显示 */
 		flex-wrap: nowrap;
 		justify-content: flex-start;
-		overflow: hidden;
+		/* 关键：overflow:hidden 会把"向上滑出页脚"的检查更新卡片
+		   整个裁掉（移动端点击无弹出的根因）。
+		   overflow-x: clip 只裁横向溢出，且 clip/visible 配对不会
+		   把 overflow-y 降级为 auto —— 横向照裁、纵向放行卡片 */
+		overflow-x: clip;
+		overflow-y: visible;
 	}
 	body:not(.liquid-login) p.luci > * {
 		flex-shrink: 0;
