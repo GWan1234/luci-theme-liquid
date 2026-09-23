@@ -3477,19 +3477,22 @@ body.modal-overlay-active #modal_overlay {
 	display: flex;
 }
 #liquid-notice-overlay .alert-message {
+	/* 与 #modal_overlay > .modal.alert-message（如"配置更改已应用。"）
+	   完全一致的标准弹窗设计，避免到处不同弹框造成体验割裂 */
 	display: block !important;
 	width: min(420px, 90vw);
+	max-width: 90vw;
 	margin: 0;
-	padding: 18px 24px;
+	padding: 20px 28px;
 	border-radius: 18px;
 	text-align: center;
 	font-size: 13px;
 	cursor: pointer;
-	/* bootstrap 会给 .info 强制 on-primary 白字 + 蓝渐变，这里压回玻璃成功色 */
+	/* bootstrap 会给 .info 强制 on-primary 白字 + 蓝渐变，压回主题玻璃 */
 	color: var(--text-color-high);
-	background: color-mix(in srgb, var(--success-color-high) 14%, var(--glass-bg-strong));
-	border: 1px solid color-mix(in srgb, var(--success-color-high) 42%, transparent);
-	box-shadow: var(--glass-shadow), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+	background: var(--glass-bg-strong);
+	border: 1px solid var(--glass-border);
+	box-shadow: var(--glass-shadow), inset 0 1px 0 var(--glass-inset);
 	-webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
 	backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
 	animation: liquid-pop-in .25s ease;
