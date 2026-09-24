@@ -91,8 +91,10 @@ jobs:
       - name: Restore OpenWrt cache
         id: cache
         uses: actions/cache/restore@v4
-        # push 事件 inputs 上下文为空（null != false → true），手动 dispatch 可显式关闭
-        if: inputs.use_cache != false
+        # push 事件没有 inputs 上下文（inputs.use_cache 为 null），GitHub 表达式
+        # 把 null != false 判为 false → 步骤被 skip —— run #38/#39 冷启动无缓存的根因。
+        # 改为：push 恒恢复（与 pushbot 无条件恢复一致）；手动 dispatch 才尊重开关
+        if: github.event_name == 'push' || inputs.use_cache
         with:
           # 沿用本仓库已有的缓存键前缀，复用既有暖缓存（源码+工具链+下载）
           path: openwrt
@@ -146,7 +148,8 @@ jobs:
 
       - name: Save OpenWrt cache
         uses: actions/cache/save@v4
-        if: inputs.use_cache != false && success() && steps.cache.outputs.cache-hit != 'true'
+        # 与 Restore 同条件修复：push 恢复条件为真时保存也必须能跑
+        if: (github.event_name == 'push' || inputs.use_cache) && success() && steps.cache.outputs.cache-hit != 'true'
         with:
           path: openwrt
           key: liquid-openwrt-${{ matrix.op_branch }}-${{ runner.os }}
