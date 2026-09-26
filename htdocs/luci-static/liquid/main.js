@@ -1510,13 +1510,18 @@
 				+ pct + ', 100"/></svg></span>';
 		}
 
-		/* 在页脚内弹出 frosted 卡片（overlay 锚定页脚盒子 → 页脚宽度内居中） */
-		function showToast(msg, sub, cls, buttons, autoMs, clickRepo, extraStyle) {
+		/* 在页脚内弹出 frosted 卡片（overlay 锚定页脚盒子 → 页脚宽度内居中）。
+		   inCard=true 时把提示盖到"检测到更新"卡片内部、卡片内上下左右
+		   居中模糊弹出（流程内错误如"下载失败"，对齐 pushbot
+		   pb_ota_showError 设计）；无更新卡片时退回页脚锚定 */
+		function showToast(msg, sub, cls, buttons, autoMs, clickRepo, extraStyle, inCard) {
 			var badge = document.querySelector('p.luci-foot a.liquid-version-link');
 			var footer = badge ? badge.closest('p.luci') : null;
-			if (!footer) return null;
+			var card = inCard ? document.querySelector('p.luci-foot .liquid-ver-toast.is-update') : null;
+			var parent = card || footer;
+			if (!parent) return null;
 			var ov = document.createElement('div');
-			ov.className = 'liquid-ver-overlay';
+			ov.className = 'liquid-ver-overlay' + (card ? ' card-centered' : '');
 			var toast = document.createElement('div');
 			toast.className = 'liquid-ver-toast ' + cls + (clickRepo ? ' is-clickable' : '');
 			if (extraStyle) toast.style.cssText = extraStyle;
@@ -1549,7 +1554,7 @@
 				toast.appendChild(row);
 			}
 			ov.appendChild(toast);
-			footer.appendChild(ov);
+			parent.appendChild(ov);
 			setTimeout(function() { ov.classList.add('show'); }, 20);
 			var autoId = null;
 			if (autoMs > 0) {
@@ -1574,9 +1579,10 @@
 			return res;
 		}
 
-		/* 流程内错误提示（下载失败等，pushbot 同款 4s 消失） */
+		/* 流程内错误提示（下载失败等，pushbot 同款 4s 消失）：
+		   盖在更新卡片上、卡片内居中模糊弹出 */
 		function liquidOtaError(msg) {
-			showToast(msg, null, 'is-err', null, 4000, false);
+			showToast(msg, null, 'is-err', null, 4000, false, null, true);
 		}
 
 		/* 安装完成后的倒计时卡片：轮询 act_version，版本变化即刷新，
@@ -1664,43 +1670,59 @@
 									onClick: function(btn, r2) {
 										btn.disabled = true;
 										btn.innerHTML = ringHtml(0) + '0%';
-										var x = new XMLHttpRequest();
-										x.open('GET', api('ota_download') + '?ver=' + encodeURIComponent(remoteVer)
-											+ '&rel=' + encodeURIComponent(remoteRel) + '&_=' + Date.now());
-										x.onload = function() {
-											var pollId = setInterval(function() {
-												var px = new XMLHttpRequest();
-												px.open('GET', api('ota_download_progress') + '?_=' + Date.now());
-												px.onload = function() {
-													try {
-														var pd = JSON.parse(px.responseText);
-														var pct = pd.progress || '0';
-														if (pct === 'done') {
-															clearInterval(pollId);
-															btn.textContent = '安装中...';
-															var ix = new XMLHttpRequest();
-															ix.open('GET', api('ota_install') + '?_=' + Date.now());
-															ix.send();
-															r2.dismiss();
-															liquidOtaCountdown(local);
+										/* 与"拉取新包"完全一致的轮询/报错链路（pushbot 原版一键更新缺
+										   zeroCount 守卫会默默卡 0%）：即刻轮询不等 onload、fail→下载失败、
+										   卡0%×20s→GitHub Release 无法访问、网络错→下载失败 */
+										var zeroCount = 0;
+										var pollId = setInterval(function() {
+											var px = new XMLHttpRequest();
+											px.open('GET', api('ota_download_progress') + '?_=' + Date.now());
+											px.onload = function() {
+												try {
+													var pd = JSON.parse(px.responseText);
+													var pct = pd.progress || '0';
+													if (pct === 'done') {
+														clearInterval(pollId);
+														btn.textContent = '安装中...';
+														var ix = new XMLHttpRequest();
+														ix.open('GET', api('ota_install') + '?_=' + Date.now());
+														ix.send();
+														r2.dismiss();
+														liquidOtaCountdown(local);
 														} else if (pct === 'fail') {
-															clearInterval(pollId);
-															btn.disabled = false;
-															btn.textContent = '一键更新';
-															liquidOtaError('下载失败');
+														clearInterval(pollId);
+														btn.disabled = false;
+														btn.textContent = '一键更新';
+														liquidOtaError('下载失败');
 														} else {
 															var num = parseInt(pct, 10) || 0;
+															if (num === 0) zeroCount++; else zeroCount = 0;
+															if (zeroCount >= 20) {
+																clearInterval(pollId);
+																btn.disabled = false;
+																btn.textContent = '一键更新';
+																liquidOtaError('GitHub Release 无法访问');
+																return;
+															}
 															btn.innerHTML = ringHtml(num) + num + '%';
 														}
 													} catch (e) {}
 												};
-												px.send();
-											}, 1000);
+											px.send();
+										}, 1000);
+										var x = new XMLHttpRequest();
+										x.open('GET', api('ota_download') + '?ver=' + encodeURIComponent(remoteVer)
+											+ '&rel=' + encodeURIComponent(remoteRel) + '&_=' + Date.now());
+										x.onerror = function() {
+											clearInterval(pollId);
+											btn.disabled = false;
+											btn.textContent = '一键更新';
+											liquidOtaError('下载失败');
 										};
 										x.send();
 									}
 								},
-								{
+																{
 									label: '拉取新包',
 									id: 'liquid_ota_pull_btn',
 									onClick: function(btn, r2) {
@@ -1752,10 +1774,16 @@
 											};
 											px.send();
 										}, 1000);
-										/* 触发下载（后台进行） */
+										/* 触发下载（后台进行），网络层失败与一键更新同样立即报错 */
 										var xhr = new XMLHttpRequest();
 										xhr.open('GET', api('ota_download') + '?ver=' + encodeURIComponent(remoteVer)
 											+ '&rel=' + encodeURIComponent(remoteRel) + '&_=' + Date.now());
+										xhr.onerror = function() {
+											clearInterval(pollId);
+											btn.disabled = false;
+											btn.textContent = '拉取新包';
+											liquidOtaError('下载失败');
+										};
 										xhr.send();
 									}
 								},
