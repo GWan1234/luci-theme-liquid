@@ -1819,24 +1819,27 @@ body:not(.liquid-login) p.luci a:hover {
 	pointer-events: auto;
 }
 .liquid-ver-overlay.show { opacity: 1; }
-/* 流程内错误提示（下载失败等）：挂 body 的全屏遮罩，上下左右正中 */
-.liquid-ver-overlay.screen-centered {
-	position: fixed;
+/* 流程内错误提示（下载失败等）：盖在"检测到更新"卡片上、卡片内上下左右
+   居中模糊弹出（对齐 pushbot pb_ota_showError 设计）；遮罩随卡片圆角 */
+.liquid-ver-overlay.card-centered {
+	position: absolute;
 	top: 0;
 	left: 0;
 	right: 0;
 	bottom: 0;
 	height: auto;
-	z-index: 9999;
+	z-index: 2;
 	align-items: center;
 	justify-content: center;
 	padding-bottom: 0;
+	border-radius: inherit;
 }
 .liquid-ver-toast {
 	min-width: 200px;
 	max-width: min(460px, calc(100vw - 24px));
 	padding: 14px 22px;
 	border-radius: 12px;
+	position: relative;
 	text-align: center;
 	color: #ffffff;
 	box-shadow: 0 14px 34px rgba(15, 23, 42, 0.35);

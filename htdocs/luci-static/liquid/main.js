@@ -1511,15 +1511,17 @@
 		}
 
 		/* 在页脚内弹出 frosted 卡片（overlay 锚定页脚盒子 → 页脚宽度内居中）。
-		   bodyCentered=true 时挂到 body 的全屏遮罩上、上下左右正中——
-		   用于流程内错误提示（如"下载失败"） */
-		function showToast(msg, sub, cls, buttons, autoMs, clickRepo, extraStyle, bodyCentered) {
+		   inCard=true 时把提示盖到"检测到更新"卡片内部、卡片内上下左右
+		   居中模糊弹出（流程内错误如"下载失败"，对齐 pushbot
+		   pb_ota_showError 设计）；无更新卡片时退回页脚锚定 */
+		function showToast(msg, sub, cls, buttons, autoMs, clickRepo, extraStyle, inCard) {
 			var badge = document.querySelector('p.luci-foot a.liquid-version-link');
 			var footer = badge ? badge.closest('p.luci') : null;
-			var parent = bodyCentered ? document.body : footer;
+			var card = inCard ? document.querySelector('p.luci-foot .liquid-ver-toast.is-update') : null;
+			var parent = card || footer;
 			if (!parent) return null;
 			var ov = document.createElement('div');
-			ov.className = 'liquid-ver-overlay' + (bodyCentered ? ' screen-centered' : '');
+			ov.className = 'liquid-ver-overlay' + (card ? ' card-centered' : '');
 			var toast = document.createElement('div');
 			toast.className = 'liquid-ver-toast ' + cls + (clickRepo ? ' is-clickable' : '');
 			if (extraStyle) toast.style.cssText = extraStyle;
@@ -1577,7 +1579,8 @@
 			return res;
 		}
 
-		/* 流程内错误提示（下载失败等，pushbot 同款 4s 消失）：屏幕上下左右居中 */
+		/* 流程内错误提示（下载失败等，pushbot 同款 4s 消失）：
+		   盖在更新卡片上、卡片内居中模糊弹出 */
 		function liquidOtaError(msg) {
 			showToast(msg, null, 'is-err', null, 4000, false, null, true);
 		}
