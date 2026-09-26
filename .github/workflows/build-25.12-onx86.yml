@@ -4,9 +4,11 @@
 #   - 不限制仓库：zzsj0928 主仓库与任意 fork 均可运行（构建克隆触发者
 #     自己仓库的代码，changelog 也是该仓库的 commit）
 #   - 不读取也不存储 OpenWrt 缓存：每次全新 clone openwrt-25.12 + 全新编译
-#   - 独立 Release：tag 前缀 luci-theme-liquid-25.12-YYYYMMDD-HHMM，
-#     与版本号 Release(luci-theme-liquid-v*)互不干扰；
-#     changelog 取上一个同前缀 tag..HEAD 的 commit（与现有 release 同机制）
+#   - 独立 Release：tag = OpenWRT25.12-luci-theme-liquid-vX.Y
+#     （读 Makefile 的 PKG_VERSION，不带日期；同版本重跑则复用同 tag
+#     并刷新 Release 内容），与版本号 Release(luci-theme-liquid-v*)互不干扰；
+#     changelog 取上一个同前缀 tag..HEAD 的 commit（与现有 release 同机制），
+#     正文第一行固定附适用范围说明
 #   - 清理策略：tag 保留本前缀 80 个；release/run 不按名字过滤
 #     （push 触发的 run 名就是 commit 名，无法按名字区分），
 #     按仓库总数保留 30 个 release / 15 次 run —— 与现有 workflow 同配额
@@ -149,8 +151,9 @@ jobs:
           echo "=== 最终产物 ==="
           ls -lh release-pkgs/
 
-          # 独立时间戳 tag：与版本号 Release 体系互不干扰，不读版本号
-          TAG="luci-theme-liquid-25.12-$(date +%Y%m%d-%H%M)"
+          # 版本号 tag（无日期）：OpenWRT25.12-luci-theme-liquid-vX.Y，读 Makefile
+          VER=$(grep '^PKG_VERSION' Makefile | head -1 | cut -d= -f2)
+          TAG="OpenWRT25.12-luci-theme-liquid-v${VER}"
           echo "TAG=${TAG}" >> $GITHUB_ENV
           echo "=== tag: ${TAG} ==="
 
@@ -158,10 +161,13 @@ jobs:
         id: changelog
         run: |
           # 本命名空间上一个 tag（同前缀）
-          PREV_TAG=$(git tag -l "luci-theme-liquid-25.12-*" --sort=-creatordate | head -n1)
+          PREV_TAG=$(git tag -l "OpenWRT25.12-*" --sort=-creatordate | head -n1)
           echo "上一个 tag: ${PREV_TAG:-无}"
 
           {
+            # 固定第一行：适用范围说明（每个 25.12 release 都带）
+            echo "只建议25.12版本Luci环境，或本地安装提示用户环境版本低时采用。"
+            echo ""
             echo "# ${TAG}"
             echo ""
             if [ -n "$PREV_TAG" ]; then
@@ -211,7 +217,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          TAGS=$(git tag -l "luci-theme-liquid-25.12-*" --sort=-creatordate)
+          TAGS=$(git tag -l "OpenWRT25.12-*" --sort=-creatordate)
           COUNT=$(echo "$TAGS" | grep -c . || echo 0)
           echo "本前缀 tag 数: ${COUNT}"
           if [ "$COUNT" -gt 80 ]; then
