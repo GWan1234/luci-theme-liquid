@@ -1510,13 +1510,16 @@
 				+ pct + ', 100"/></svg></span>';
 		}
 
-		/* 在页脚内弹出 frosted 卡片（overlay 锚定页脚盒子 → 页脚宽度内居中） */
-		function showToast(msg, sub, cls, buttons, autoMs, clickRepo, extraStyle) {
+		/* 在页脚内弹出 frosted 卡片（overlay 锚定页脚盒子 → 页脚宽度内居中）。
+		   bodyCentered=true 时挂到 body 的全屏遮罩上、上下左右正中——
+		   用于流程内错误提示（如"下载失败"） */
+		function showToast(msg, sub, cls, buttons, autoMs, clickRepo, extraStyle, bodyCentered) {
 			var badge = document.querySelector('p.luci-foot a.liquid-version-link');
 			var footer = badge ? badge.closest('p.luci') : null;
-			if (!footer) return null;
+			var parent = bodyCentered ? document.body : footer;
+			if (!parent) return null;
 			var ov = document.createElement('div');
-			ov.className = 'liquid-ver-overlay';
+			ov.className = 'liquid-ver-overlay' + (bodyCentered ? ' screen-centered' : '');
 			var toast = document.createElement('div');
 			toast.className = 'liquid-ver-toast ' + cls + (clickRepo ? ' is-clickable' : '');
 			if (extraStyle) toast.style.cssText = extraStyle;
@@ -1549,7 +1552,7 @@
 				toast.appendChild(row);
 			}
 			ov.appendChild(toast);
-			footer.appendChild(ov);
+			parent.appendChild(ov);
 			setTimeout(function() { ov.classList.add('show'); }, 20);
 			var autoId = null;
 			if (autoMs > 0) {
@@ -1574,9 +1577,9 @@
 			return res;
 		}
 
-		/* 流程内错误提示（下载失败等，pushbot 同款 4s 消失） */
+		/* 流程内错误提示（下载失败等，pushbot 同款 4s 消失）：屏幕上下左右居中 */
 		function liquidOtaError(msg) {
-			showToast(msg, null, 'is-err', null, 4000, false);
+			showToast(msg, null, 'is-err', null, 4000, false, null, true);
 		}
 
 		/* 安装完成后的倒计时卡片：轮询 act_version，版本变化即刷新，

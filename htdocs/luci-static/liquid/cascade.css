@@ -1819,6 +1819,19 @@ body:not(.liquid-login) p.luci a:hover {
 	pointer-events: auto;
 }
 .liquid-ver-overlay.show { opacity: 1; }
+/* 流程内错误提示（下载失败等）：挂 body 的全屏遮罩，上下左右正中 */
+.liquid-ver-overlay.screen-centered {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	height: auto;
+	z-index: 9999;
+	align-items: center;
+	justify-content: center;
+	padding-bottom: 0;
+}
 .liquid-ver-toast {
 	min-width: 200px;
 	max-width: min(460px, calc(100vw - 24px));
