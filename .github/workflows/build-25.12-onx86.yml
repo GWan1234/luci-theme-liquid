@@ -120,7 +120,12 @@ jobs:
             echo "私钥首行: $(head -1 openwrt/private-key.pem)"
             if ! openssl pkey -in openwrt/private-key.pem -noout 2>/tmp/keyerr.txt; then
               echo "::error::Secret ZED_OPENWRT_APK_PRIVATE_KEY 无法解析为 PEM 私钥：$(cat /tmp/keyerr.txt)"
-              echo "::error::请确认 Secret 存的是私钥 PEM 全文（BEGIN 行 + base64 行 + END 行），无引号、非加密、无多余字符"
+              echo "--- 结构诊断（只打长度，不泄密钥）---"
+              echo "总行数: $(wc -l < openwrt/private-key.pem)（EC 私钥标准 5 行）"
+              echo "总字节: $(wc -c < openwrt/private-key.pem)（EC 私钥标准 227）"
+              echo "首行字符: $(head -1 openwrt/private-key.pem | tr -d '\n' | wc -c)（标准 30 = -----BEGIN EC PRIVATE KEY-----）"
+              echo "末行字符: $(tail -1 openwrt/private-key.pem | tr -d '\n' | wc -c)（标准 28 = -----END EC PRIVATE KEY-----）"
+              echo "::error::PEM 结束标记必须精确：两边各 5 个连字符，多一个都解析失败；请用 cat 直接复制编译机上的 PEM 文件，勿手改"
               exit 1
             fi
             openssl pkey -in openwrt/private-key.pem -pubout -out openwrt/public-key.pem
