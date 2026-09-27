@@ -2,7 +2,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=luci-theme-liquid
 PKG_VERSION:=0.9
-PKG_RELEASE:=9
+PKG_RELEASE:=10
 
 PKG_MAINTAINER:=然后七年 <z@7ze.top>
 PKG_LICENSE:=Apache-2.0
@@ -30,19 +30,11 @@ CONFIG_LUCI_CSSTIDY:=
 define Package/$(PKG_NAME)/postinst
 #!/bin/sh
 [ -n "$${IPKG_INSTROOT}" ] || {
-	# Zed 自签公钥（与 luci-app-pushbot 同一把）：仅在不存在时写入。
-	# 不打包为包内文件——pushbot 已拥有 /etc/apk/keys/zed-openwrt-apk.pem，
-	# 双包共存时 apk 会报 "trying to overwrite ... owned by luci-app-pushbot"
-	# 归属冲突；改为安装时条件写入：装过 pushbot 的设备已有 → 跳过（零冲突），
-	# 仅装本主题的用户装完即获得信任，后续 OTA 免 --allow-untrusted。
-	[ -f /etc/apk/keys/zed-openwrt-apk.pem ] || {
-		mkdir -p /etc/apk/keys
-		printf '%s\n' \
-			'-----BEGIN PUBLIC KEY-----' \
-			'MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE16+nzzY9Lx5wvzZoWs/18vZxsNZD' \
-			'jv+CqECJLUj+fA7J228Iu13DVUO8CK9jQyLHtqkw0f4/X2bKLlLiz281zQ==' \
-			'-----END PUBLIC KEY-----' > /etc/apk/keys/zed-openwrt-apk.pem
-	}
+	# 公钥信任不在此处写（去冗余）：apk 装机时生成的 post-install 会先
+	# 调 default_postinst —— 它会执行包内 etc/uci-defaults/99-zed-apk-key-liquid
+	# 完成公钥条件写入并消费该脚本；固件场景由首次开机执行同一脚本覆盖
+	# （构建期 --no-scripts 不跑脚本，文件随镜像保留）；装 r9 之前的设备
+	# 由 OTA 安装前自举兜底。23.05 为 opkg 系统，不使用 apk 钥匙。
 
 	# 23.05 opkg 不执行 uci-defaults，必须在 postinst 中设置主题配置。
 	# 确保 mediaurlbase 指向 liquid，否则 fallback 到 null。
