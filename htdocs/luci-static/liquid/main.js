@@ -2215,27 +2215,61 @@
 		msObs.observe(document.body, { childList: true, subtree: true });
 	}
 
-	/* ── 宽表格：优先折叠按钮，而不是压缩文字 ────────────────────
-	   表格“自然宽度”（不加类时量到的宽度）超出所在容器或当前屏幕时，
-	   给表格加 liquid-actions-overflow：操作列放开 form.js
-	   stabilizeActionColumnWidth 写死的内联列宽、允许按钮在单元格内
-	   换行，文字列拿回可用宽度（对应 CSS 见 cascade.css 末尾段落）。
+	/* ── 宽表格：优先折叠按钮，再折叠文字 ──────────────────────
+	   判定量的是“所有列按自身内容排开所需的宽度”（max-content：按钮
+	   横排一行、文字不换行时的宽度），而不是表格实际渲染宽度——auto
+	   表格布局在列内容总宽超出表宽时会先压文字列、表格盒本身仍装得下，
+	   量实际宽度会漏判，结果就是文字先于按钮被折叠。
 
-	   判定始终先移除类再量，避免“加类→不溢出→去类→又溢出”的震荡；
-	   只处理含操作列的表格，无按钮的表格维持原有排版与横向滚动。 */
+	   只要该需求宽度放不下（超出所在容器的内容宽或屏幕宽），就给表格
+	   加 liquid-actions-overflow：操作列放开 form.js
+	   stabilizeActionColumnWidth 写死的内联列宽、按钮改为每个独占一行，
+	   宽度先让给文字；文字拿回后仍不够，才由文字换行兜底（对应 CSS 见
+	   cascade.css 末尾段落）。
+
+	   判定始终先移除类再量（量到的才是“按钮横排”的需求），避免加类→
+	   不溢出→去类→又溢出的震荡；只处理含操作列的表格，无按钮的表格
+	   维持原有排版与横向滚动。 */
 	var TBL_CLS = 'liquid-actions-overflow';
 	var tblTimer = null;
+
+	/* 元素内容盒宽度：clientWidth 减掉左右 padding（表格比的是父级内容区） */
+	function contentBoxWidth(el) {
+		var cs = window.getComputedStyle(el);
+		return el.clientWidth -
+			(parseFloat(cs.paddingLeft) || 0) -
+			(parseFloat(cs.paddingRight) || 0);
+	}
+
+	/* 临时按内容展开量一次表格的需求宽（列不换行、按钮横排一行），
+	   同步读取后立即还原样式，同一帧内不会产生可见闪烁 */
+	function needWidth(t) {
+		var st = t.style;
+		var w0 = st.width, mw0 = st.minWidth, mx0 = st.maxWidth;
+		st.width = 'max-content';
+		st.minWidth = '0';
+		st.maxWidth = 'none';
+		var w = t.getBoundingClientRect().width;
+		st.width = w0;
+		st.minWidth = mw0;
+		st.maxWidth = mx0;
+		return w;
+	}
 
 	function tableOverflows(t) {
 		var doc = document.documentElement;
 		var parent = t.parentElement;
+		/* 1) 表格内容已超出表格盒（自身裁剪 / 内部横滚） */
+		if (t.scrollWidth > t.clientWidth + 1)
+			return true;
+		/* 2) 核心：需求宽（按钮横排放得下）> 可用宽 → 从按钮开始折 */
+		var need = needWidth(t);
+		var avail = parent ? contentBoxWidth(parent) : Infinity;
+		if (need > avail + 1 || need > doc.clientWidth + 1)
+			return true;
+		/* 3) 表格盒右缘已越出屏幕、且文档无法横向滚过去（被祖先裁切） */
 		var rect = t.getBoundingClientRect();
-		/* 1) 表格内容超出表格盒（自身裁剪/内部横滚）；
-		   2) 表格比所在容器宽（父级 overflow:hidden 时右侧会被切掉）；
-		   3) 表格右缘超出屏幕、且文档无法横向滚过去（被祖先裁切）。 */
-		return t.scrollWidth > t.clientWidth + 1 ||
-			(parent && t.offsetWidth > parent.clientWidth + 1) ||
-			(rect.right > doc.clientWidth + 1 && doc.scrollWidth <= doc.clientWidth + 1);
+		return rect.right > doc.clientWidth + 1 && doc.scrollWidth <= doc.clientWidth + 1;
 	}
 
 	function updateOverflowTables() {
@@ -2243,6 +2277,19 @@
 		for (var i = 0; i < list.length; i++) {
 			var t = list[i];
 			t.classList.remove(TBL_CLS);
+			/* 清掉 form.js stabilizeActionColumnWidth 写死的内联列宽：
+			   类还在时它量到的是“按钮纵排”的宽度（最宽按钮 ~63px），
+			   窗口变宽、类移除后这个残留值会让 needWidth 少算一截、
+			   判定漏折；清掉后列宽回归 auto 布局（= 按钮横排的
+			   max-content，与 stabilize 结果一致），量到的才是
+			   “按钮横排放得下”所需的真实宽度 */
+			var acts = t.querySelectorAll('th.cbi-section-actions, td.cbi-section-actions');
+			for (var j = 0; j < acts.length; j++) {
+				if (acts[j].style.width || acts[j].style.minWidth) {
+					acts[j].style.width = '';
+					acts[j].style.minWidth = '';
+				}
+			}
 			if (t.querySelector('.cbi-section-actions') && tableOverflows(t))
 				t.classList.add(TBL_CLS);
 		}
