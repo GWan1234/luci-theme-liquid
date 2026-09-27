@@ -141,16 +141,27 @@ jobs:
       # /etc/apk/keys/zed-openwrt-apk.pem 信任、安装免 --allow-untrusted；
       # 无 Secret（fork）→ 显式关闭逐包签名（SIGN_EACH_PACKAGE 默认 y，
       # 不关会用自动生成 key 签名）—— 不替 fork 的构建承担签名维护责任。
+      # 私钥用 env 传入（不再 heredoc 拼接，杜绝缩进/引号陷阱）；
+      # 要求 PEM 全文：首行 -----BEGIN EC PRIVATE KEY----- 或
+      # -----BEGIN PRIVATE KEY-----，5 行左右、非加密、无引号无 CRLF 混入。
+      # buildroot 需要 TOPDIR 同时有 private-key.pem 与 public-key.pem
+      # （rules.mk: BUILD_KEY_APK_SEC / BUILD_KEY_APK_PUB），故此处推导公钥。
       - name: Sign packages with Zed key (only with Secret)
+        env:
+          APK_PRIVATE_KEY: ${{ secrets.ZED_OPENWRT_APK_PRIVATE_KEY }}
         run: |
-          if [ -n "${{ secrets.Zed_OpenWRT_APK_PRIVATE_KEY }}" ]; then
-            cat > openwrt/private-key.pem <<'ZEDKEY'
-          ${{ secrets.Zed_OpenWRT_APK_PRIVATE_KEY }}
-          ZEDKEY
+          if [ -n "$APK_PRIVATE_KEY" ]; then
+            printf '%s\n' "$APK_PRIVATE_KEY" > openwrt/private-key.pem
+            echo "私钥字节数: $(wc -c < openwrt/private-key.pem)"
+            echo "私钥首行: $(head -1 openwrt/private-key.pem)"
+            if ! openssl pkey -in openwrt/private-key.pem -noout 2>/tmp/keyerr.txt; then
+              echo "::error::Secret ZED_OPENWRT_APK_PRIVATE_KEY 无法解析为 PEM 私钥：$(cat /tmp/keyerr.txt)"
+              echo "::error::请确认 Secret 存的是私钥 PEM 全文（BEGIN 行 + base64 行 + END 行），无引号、非加密、无多余字符"
+              exit 1
+            fi
             openssl pkey -in openwrt/private-key.pem -pubout -out openwrt/public-key.pem
             echo "CONFIG_SIGN_EACH_PACKAGE=y" >> openwrt/.config
-            echo "=== 已配置 Zed 固定私钥签名 ==="
-            head -1 openwrt/private-key.pem
+            echo "=== 已配置 Zed 固定私钥签名，公钥指纹: $(md5sum openwrt/public-key.pem | cut -c1-8) ==="
           else
             echo "CONFIG_SIGN_EACH_PACKAGE=n" >> openwrt/.config
             echo "=== 无 Secret（fork 构建），不签名 ==="
