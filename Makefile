@@ -2,7 +2,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=luci-theme-liquid
 PKG_VERSION:=0.9
-PKG_RELEASE:=5
+PKG_RELEASE:=12
 
 PKG_MAINTAINER:=然后七年 <z@7ze.top>
 PKG_LICENSE:=Apache-2.0
@@ -30,6 +30,12 @@ CONFIG_LUCI_CSSTIDY:=
 define Package/$(PKG_NAME)/postinst
 #!/bin/sh
 [ -n "$${IPKG_INSTROOT}" ] || {
+	# 公钥信任不在此处写（去冗余）：apk 装机时生成的 post-install 会先
+	# 调 default_postinst —— 它会执行包内 etc/uci-defaults/99-zed-apk-key-liquid
+	# 完成公钥条件写入并消费该脚本；固件场景由首次开机执行同一脚本覆盖
+	# （构建期 --no-scripts 不跑脚本，文件随镜像保留）；装 r9 之前的设备
+	# 由 OTA 安装前自举兜底。23.05 为 opkg 系统，不使用 apk 钥匙。
+
 	# 23.05 opkg 不执行 uci-defaults，必须在 postinst 中设置主题配置。
 	# 确保 mediaurlbase 指向 liquid，否则 fallback 到 null。
 	if [ "$$(uci -q get luci.main.mediaurlbase)" != "/luci-static/liquid" ]; then

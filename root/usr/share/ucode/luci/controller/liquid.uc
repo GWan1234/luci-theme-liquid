@@ -213,9 +213,20 @@ return {
 		if (f0) { let o = f0.read("all"); f0.close(); if (o && length(replace(o, /\s+/, "")) > 0) mgr = "apk"; }
 
 		let ifile = "/tmp/liquid/ota_install.log";
+		let trust = "";
 		let cmd;
 		if (mgr == "apk") {
-			cmd = "apk add --network=no --allow-untrusted /tmp/luci-theme-liquid-*.apk";
+			/* 装前检测 Zed 自签公钥：无则写入（添加不覆盖），随后安装
+			   免 --allow-untrusted（老设备/新用户首次走 OTA 时设备上还没
+			   有公钥，靠这步建立信任；包内也带同一公钥
+			   root/etc/apk/keys/zed-openwrt-apk.pem，装完即常驻信任列表，
+			   仅装本主题的用户同样获得信任）。 */
+			trust = "[ -f /etc/apk/keys/zed-openwrt-apk.pem ] || { mkdir -p /etc/apk/keys; "
+				+ "printf '%s" + "\\n" + "' '-----BEGIN PUBLIC KEY-----' "
+				+ "'MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE16+nzzY9Lx5wvzZoWs/18vZxsNZD' "
+				+ "'jv+CqECJLUj+fA7J228Iu13DVUO8CK9jQyLHtqkw0f4/X2bKLlLiz281zQ==' "
+				+ "'-----END PUBLIC KEY-----' > /etc/apk/keys/zed-openwrt-apk.pem; }; ";
+			cmd = "apk add /tmp/luci-theme-liquid-*.apk";
 		} else {
 			/* opkg 同版本会 up to date 跳过，需 --force-reinstall 覆盖 */
 			cmd = "opkg install --force-reinstall /tmp/luci-theme-liquid_*.ipk";
@@ -231,6 +242,7 @@ return {
 		   等安装结束，阻塞 rpcd 处理器（全站请求卡住）。 */
 		let heal = "[ -f /etc/apk/world ] && sed -i '/></ s/>.*$//' /etc/apk/world; ";
 		let install_cmd = "( "
+			+ trust
 			+ heal
 			+ cmd + " > " + ifile + " 2>&1; "
 			+ "RC=$?; "
