@@ -2214,4 +2214,57 @@
 		});
 		msObs.observe(document.body, { childList: true, subtree: true });
 	}
+
+	/* ── 宽表格：优先折叠按钮，而不是压缩文字 ────────────────────
+	   表格“自然宽度”（不加类时量到的宽度）超出所在容器或当前屏幕时，
+	   给表格加 liquid-actions-overflow：操作列放开 form.js
+	   stabilizeActionColumnWidth 写死的内联列宽、允许按钮在单元格内
+	   换行，文字列拿回可用宽度（对应 CSS 见 cascade.css 末尾段落）。
+
+	   判定始终先移除类再量，避免“加类→不溢出→去类→又溢出”的震荡；
+	   只处理含操作列的表格，无按钮的表格维持原有排版与横向滚动。 */
+	var TBL_CLS = 'liquid-actions-overflow';
+	var tblTimer = null;
+
+	function tableOverflows(t) {
+		var doc = document.documentElement;
+		var parent = t.parentElement;
+		var rect = t.getBoundingClientRect();
+		/* 1) 表格内容超出表格盒（自身裁剪/内部横滚）；
+		   2) 表格比所在容器宽（父级 overflow:hidden 时右侧会被切掉）；
+		   3) 表格右缘超出屏幕、且文档无法横向滚过去（被祖先裁切）。 */
+		return t.scrollWidth > t.clientWidth + 1 ||
+			(parent && t.offsetWidth > parent.clientWidth + 1) ||
+			(rect.right > doc.clientWidth + 1 && doc.scrollWidth <= doc.clientWidth + 1);
+	}
+
+	function updateOverflowTables() {
+		var list = document.querySelectorAll('table.cbi-section-table, table.table');
+		for (var i = 0; i < list.length; i++) {
+			var t = list[i];
+			t.classList.remove(TBL_CLS);
+			if (t.querySelector('.cbi-section-actions') && tableOverflows(t))
+				t.classList.add(TBL_CLS);
+		}
+	}
+
+	function scheduleOverflowTables() {
+		if (tblTimer)
+			clearTimeout(tblTimer);
+		/* 延后 120ms：排在 form.js 的 setTimeout(stabilize 列宽) 与其
+		   resize 处理之后量，拿到的才是内联列宽写完后的稳定状态 */
+		tblTimer = setTimeout(function () {
+			tblTimer = null;
+			updateOverflowTables();
+		}, 120);
+	}
+
+	scheduleOverflowTables();
+	window.addEventListener('load', scheduleOverflowTables);
+	window.addEventListener('resize', scheduleOverflowTables);
+	if (window.MutationObserver) {
+		/* 行增删、轮询刷新状态文本都会改变表格宽度 */
+		new MutationObserver(scheduleOverflowTables)
+			.observe(document.body, { childList: true, subtree: true });
+	}
 })();

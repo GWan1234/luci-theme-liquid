@@ -4789,3 +4789,66 @@ body[data-page^="admin-services-openclash"] .oc .core-status-toggle {
 body[data-page^="admin-services-openclash"] .oc .card-value {
 	justify-content: center;
 }
+
+/* ==========================================================================
+   宽表格优先折叠按钮（liquid-actions-overflow）
+   -------------------------------------------------------------------------
+   触发：main.js 判定表格“自然宽度”超出所在容器 / 当前屏幕时给 <table>
+   加 liquid-actions-overflow 类（判定始终在去类状态下进行，避免加/去类
+   来回震荡；仅作用于含操作列的表格，无按钮的表格维持原样）。
+
+   效果：操作列先让步，而不是先压缩文字——
+   1) 放开 form.js stabilizeActionColumnWidth 写死在 td/th 上的内联
+      width/min-width（必须 !important 才能压过内联样式）；
+   2) 操作列允许换行：white-space:normal + flex-wrap。注意 LuCI 用
+      dom.append 逐个追加按钮，按钮之间没有空白文本节点，inline 元素
+      之间不存在换行点，只改 white-space 不会换行，必须让按钮容器
+      （td 内的 div）转 flex-wrap；
+   3) 文字列因此拿回可用宽度，不再被挤成窄条多行换行 / 被容器裁切；
+   4) 窄屏（≤854px）表格按 max-content 撑宽（=行内所有格子排成一行的
+      总宽），按钮换行也拉不窄——把表宽收回 100%，行内换行才生效，
+      同时去掉横向滚动。
+   按钮已折叠仍放不下时（文字本身超宽），保留原有横向滚动兜底。 */
+table.liquid-actions-overflow td.cbi-section-actions,
+table.liquid-actions-overflow th.cbi-section-actions {
+	white-space: normal !important;
+	/* 首选宽度：百分比不抬高表格的 min-content（放不下时自动退到内容宽），
+	   让换行后的操作列能并排 2-3 个按钮，而不是一个按钮占满一行把行高
+	   拉得过高；窄屏/内容更宽时按 min-content 收缩，不影响"放不下就裁"以外的场景 */
+	width: 30% !important;
+	min-width: 0 !important;
+	flex-wrap: wrap;
+	gap: 4px 6px;
+}
+
+table.liquid-actions-overflow td.cbi-section-actions > div {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 4px 6px;
+	width: auto !important;
+	min-width: 0 !important;
+	max-width: 100%;
+}
+
+/* 已有 gap，清掉相邻按钮的 margin-left（否则间距叠加翻倍） */
+table.liquid-actions-overflow td.cbi-section-actions > div > * + * {
+	margin-left: 0 !important;
+}
+
+/* 兜底：按钮已折叠后表格仍放不下（文字本身超宽，如长域名）时，
+   让文字单元格换行收缩，而不是被 .cbi-section 的 overflow:hidden
+   裁掉右侧——优先级仍是"先折叠按钮，最后才让文字换行" */
+table.liquid-actions-overflow td:not(.cbi-section-actions),
+table.liquid-actions-overflow th:not(.cbi-section-actions) {
+	white-space: normal !important;
+	overflow-wrap: break-word;
+	word-break: break-word;
+}
+
+@media screen and (max-width: 854px) {
+	table.liquid-actions-overflow {
+		width: 100% !important;
+		min-width: 100% !important;
+	}
+}
