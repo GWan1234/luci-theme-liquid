@@ -4789,3 +4789,75 @@ body[data-page^="admin-services-openclash"] .oc .core-status-toggle {
 body[data-page^="admin-services-openclash"] .oc .card-value {
 	justify-content: center;
 }
+
+/* ==========================================================================
+   宽表格优先折叠按钮（liquid-actions-overflow）
+   -------------------------------------------------------------------------
+   触发：main.js 判定表格“自然宽度”超出所在容器 / 当前屏幕时给 <table>
+   加 liquid-actions-overflow 类（判定始终在去类状态下进行，避免加/去类
+   来回震荡；仅作用于含操作列的表格，无按钮的表格维持原样）。
+
+   效果：操作列先让步，而不是先压缩文字——
+   1) 放开 form.js stabilizeActionColumnWidth 写死在 td/th 上的内联
+      width/min-width（必须 !important 才能压过内联样式）；
+   2) 一旦进入折叠状态，按钮**每个独占一行**（列宽收到最宽按钮的
+      内容宽），不做“随宽度 2+2+1 逐步折行”的渐进换行——行为确定，
+      文字列也能拿回最多宽度。注意 LuCI 用 dom.append 逐个追加按钮，
+      按钮之间没有空白文本节点，inline 元素之间不存在换行点，只改
+      white-space 不会换行，必须让按钮容器（td 内的 div）转 flex；
+   3) 文字列因此拿回可用宽度，不再被挤成窄条多行换行 / 被容器裁切；
+   4) 窄屏（≤854px）表格按 max-content 撑宽（=行内所有格子排成一行的
+      总宽），按钮换行也拉不窄——把表宽收回 100%，行内换行才生效，
+      同时去掉横向滚动；此时操作列已独占整行、按钮放得下，维持一行
+      横排（放不下时仍可 flex-wrap 折行）。
+   按钮已折叠仍放不下时（文字本身超宽），文字单元格换行兜底。 */
+table.liquid-actions-overflow td.cbi-section-actions,
+table.liquid-actions-overflow th.cbi-section-actions {
+	white-space: normal !important;
+	/* 不设首选宽度：列宽=最宽按钮的内容宽（百分比会抢文字列的可用宽度） */
+	width: auto !important;
+	min-width: 0 !important;
+	flex-wrap: wrap;
+	gap: 4px 6px;
+}
+
+table.liquid-actions-overflow td.cbi-section-actions > div {
+	display: flex;
+	/* 每个按钮一行（纵排、靠左，按钮保持自然宽度不被拉伸） */
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 4px 6px;
+	width: auto !important;
+	min-width: 0 !important;
+	max-width: 100%;
+}
+
+/* 已有 gap，清掉相邻按钮的 margin-left（否则间距叠加翻倍） */
+table.liquid-actions-overflow td.cbi-section-actions > div > * + * {
+	margin-left: 0 !important;
+}
+
+/* 兜底：按钮已折叠后表格仍放不下（文字本身超宽，如长域名）时，
+   让文字单元格换行收缩，而不是被 .cbi-section 的 overflow:hidden
+   裁掉右侧——优先级仍是"先折叠按钮，最后才让文字换行" */
+table.liquid-actions-overflow td:not(.cbi-section-actions),
+table.liquid-actions-overflow th:not(.cbi-section-actions) {
+	white-space: normal !important;
+	overflow-wrap: break-word;
+	word-break: break-word;
+}
+
+@media screen and (max-width: 854px) {
+	table.liquid-actions-overflow {
+		width: 100% !important;
+		min-width: 100% !important;
+	}
+
+	/* 窄屏下行内布局已把操作列推到独占的一整行、宽度足够摆下所有按钮，
+	   维持横排一行；真的放不下时 flex-wrap 照样折行 */
+	table.liquid-actions-overflow td.cbi-section-actions > div {
+		flex-direction: row;
+		flex-wrap: wrap;
+		align-items: center;
+	}
+}
