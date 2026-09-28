@@ -67,13 +67,14 @@ Supports **light / dark / auto** modes, **5 accent colors + a custom color picke
 
 ## Changelog
 
-- **2026-08-18 · v0.7**: mobile UX polish + general UX polish
-  - **Mobile**
-    - Toolbar / address bar auto-collapses on scroll, giving a larger view on phones
-    - Bottom banner clears the fullscreen gesture bar
-    - EasyTier restart / refresh-version dialogs center on mobile
-  - **General**
-    - Fixed button borders not hugging rounded corners / edge seams (plain buttons, Save & Apply, split-select)
+- **2026-09-28 · v1.0 (major release)**: opacity slider + online update + lock screen polish + wide-table adaptivity
+  - **Glass opacity slider**: drag 0–100 in the top-bar color area for an instant preview, click the tick to reset; menus, buttons and accent backgrounds follow along, with separate light / dark defaults; also on the lock screen, and the setting stays on your router across devices
+  - **Online update check**: click the footer version to check and install a new release; checking / up to date / update available / failed are all clearly shown, and failures report an error instead of hanging; mobile footers show the version too, with bigger buttons
+  - **Lock screen**: mode, accent and opacity picked before signing in are offered with one click after login (30-second countdown, dismissible); the logo gets a frosted glass glow; fixed mode-switch flicker and accidental submits
+  - **Dropdowns**: refreshed glass look — width follows the longest option, menus flip up near the edge, no flash on click; clearer highlights in dark mode; previously broken dropdowns (e.g. wireless settings) work again
+  - **Notifications**: success messages (e.g. "password changed") now show as a centered glass dialog that closes after 6 seconds; buttons wrap on phones instead of overflowing
+  - **Wide tables**: when a table no longer fits the screen, action buttons stack one per line so text keeps its width — no more squeezed or clipped columns; on phones the table stays on screen with no sideways scrolling
+  - **Fixes**: the sidebar slider no longer sticks to the previous category; OpenClash no longer flashes dark on open; the selected tab uses a high-contrast color for dark mode
 
 > 📜 Full changelog (all versions since v0.1) lives in **[ChangeLogs_EN.md](ChangeLogs_EN.md)**.
 
