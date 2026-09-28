@@ -53,17 +53,22 @@ Supports **light / dark / auto** modes, **5 accent colors + a custom color picke
 
 ## Features
 
-- **Liquid glass design language**: sidebar, content cards, login card and footer share a frosted-glass look (blur + highlight + theme-colored glow); the dark mode glass is more solid for readable text.
-- **Three-way mode switch**: light / dark / auto (follow system), located at the top-right of the top bar (next to LuCI's native refresh/poll indicators), persisted via uci (survives across browsers/devices) with `localStorage` as a fallback; applied before paint with no flash; the lock screen offers the same switch.
-- **Accent colors**: 5 themes (blue / magenta / amber / tulip purple / yellow-green) driving the selected menu, hover slider, buttons, tabs and logo in one linked system; plus a **custom accent color** — type a hex code (`#RRGGBB`) into the rainbow-dot picker and it saves on blur, invalid values fall back to default blue, also uci-persisted.
-- **Sidebar menu**: all top-level menus collapsed by default — click a level-1 menu to expand its own submenu; hover-tracking slider + selected glass capsule; the mobile slide-out menu avoids the top bar.
-- **Dropdown controls**: every dropdown setting renders as a "Save & Apply"-style gradient capsule (body + divider + arrow); the opened option list keeps the glass design; near the viewport bottom the list flips upward so it is never clipped by the footer.
-- **Tooltips**: frosted glass background, portaled to the page top-level (never hidden behind a neighbouring card), auto-avoid viewport edges, mutual exclusion against stale popups.
-- **Tables**: equal-height cells per row (dividers align); on mobile, tables lay out at content width with horizontal scrolling (long columns like MAC / MTU no longer overlap).
-- **Interfaces / Devices pages**: uniform 24px interface icons, forced opaque (link state is told by the icon file, not translucency); GridSection rows keep equal heights; action buttons never wrap; interface boxes align 4px from their row card on mobile.
-- **Mobile adaptation**: modals at 95% width with nested cards stepping in per layer (larger usable area); the drawer menu closes on tapping outside and starts collapsed with no first-load flash; dropdowns flip upward near the viewport bottom so they are never clipped.
-- **Lock screen (login)**: macOS-style frosted login card + Monterey wallpaper (light/dark) + optional **Bing daily wallpaper** (auto-fetched and cached) + inline SVG waterdrop logo (follows the accent color with a glass highlight).
+- **Liquid glass design language**: sidebar, content cards, login card and footer share a frosted-glass look (blur + highlight + accent glow); the dark mode glass is more solid for readable text.
+- **Light / dark / system**: one tap in the top bar; settings are stored on your router so they survive new browsers and devices; applied before paint with no flash — the lock screen has the switch too.
+- **Accent colors**: **Distant Blue**, **Burgundy Red**, **Sunset Gold**, **Dusk Purple**, **Peridot Essence**, plus a custom hex color (`#RRGGBB`) — menus, hover slider, buttons, tabs and the logo all follow.
+- **Glass opacity slider**: drag 0–100 in the top-bar color area to tune the glass live, click the default tick to reset; separate light / dark defaults; menus, buttons and accent backgrounds follow; also on the lock screen.
+- **Menu search**: the top-bar search button pushes down a drawer-style search box that filters menu items as you type, matching both Chinese names and English titles; click outside or the button again to close.
+- **Sidebar menu**: all top-level menus collapsed by default — click a level-1 menu to expand its submenu; hover-tracking slider + selected glass capsule; multi-instance entries (e.g. Dropbear) split into their own cards; the mobile slide-out menu avoids the top bar and closes on outside taps.
+- **Dropdown controls**: glass capsule look, width follows the longest option, the opened list flips upward near the window edge and never flashes when clicking the content area; clearer highlights in dark mode.
+- **Adaptive tables**: equal-height cells per row; when a table no longer fits the screen, action buttons stack one per line so text keeps its width — no squeezed or clipped columns; on phones the table stays inside the screen with no sideways scrolling.
+- **Interfaces / Devices pages**: uniform 24px interface icons, forced opaque (link state is told by the icon itself); rows keep equal heights, buttons stay on one line and stack only when space runs short; interface boxes keep a 4px gap from their row card on mobile.
+- **Mobile adaptation**: modals at 95% width with nested cards stepping in per layer; the drawer menu closes on tapping outside and starts collapsed with no first-load flash; toast buttons wrap instead of overflowing.
+- **Online update check**: click the footer version to check for a new release and install it in one click, with four clear states (checking / up to date / update available / failed); mobile footers show the theme version too.
+- **Notifications**: success messages (e.g. "password changed") appear as a centered glass dialog that closes after 6 seconds.
+- **Lock screen (login)**: macOS-style frosted login card + Monterey wallpaper (light/dark) + optional **Bing daily wallpaper** (auto-fetched and cached) + a glowing waterdrop logo; mode, accent and opacity picked before signing in can be applied with one click after login.
+- **Tooltips**: frosted glass background, shown at the page top level (never hidden behind a neighbouring card), auto-avoid viewport edges, mutual exclusion against stale popups.
 - **SVG icons**: network / interface status icons taken from [xylz0928/luci-mod][luci-mod] `immortalwrt-24.10`; UI element icons (sun / moon / auto / refresh / lock / search / close / chevron) are built-in SVGs.
+
 
 ## Changelog
 
