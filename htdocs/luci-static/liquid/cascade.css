@@ -1811,16 +1811,21 @@ body:not(.liquid-login) p.luci a:hover {
 	align-items: flex-end;
 	justify-content: center;
 	padding-bottom: 8px;
-	background: rgba(15, 23, 42, 0.35);
-	-webkit-backdrop-filter: blur(6px) saturate(1.2);
-	backdrop-filter: blur(6px) saturate(1.2);
+	/* 不要灰黑蒙版/背景模糊：只保留浮出的卡片本身，下方页脚区内容
+	   原样可见（用户反馈）；卡片自带渐变底 + 投影，不靠蒙版衬托 */
+	background: none;
+	-webkit-backdrop-filter: none;
+	backdrop-filter: none;
 	opacity: 0;
 	transition: opacity .5s ease;
-	pointer-events: auto;
+	/* 蒙版去掉后 overlay 自身透明，不能再拦在内容上方吃掉点击：
+	   整层穿透，只有卡片（.liquid-ver-toast）恢复可点 */
+	pointer-events: none;
 }
 .liquid-ver-overlay.show { opacity: 1; }
 /* 流程内错误提示（下载失败等）：盖在"检测到更新"卡片上、卡片内上下左右
-   居中模糊弹出（对齐 pushbot pb_ota_showError 设计）；遮罩随卡片圆角 */
+   居中模糊弹出（对齐 pushbot pb_ota_showError 设计）；遮罩随卡片圆角。
+   此态仍需拦截下层卡片的点击，避免错误提示期间误触"立即更新" */
 .liquid-ver-overlay.card-centered {
 	position: absolute;
 	top: 0;
@@ -1833,6 +1838,7 @@ body:not(.liquid-login) p.luci a:hover {
 	justify-content: center;
 	padding-bottom: 0;
 	border-radius: inherit;
+	pointer-events: auto;
 }
 .liquid-ver-toast {
 	min-width: 200px;
@@ -1845,6 +1851,9 @@ body:not(.liquid-login) p.luci a:hover {
 	box-shadow: 0 14px 34px rgba(15, 23, 42, 0.35);
 	transform: scale(.92) translateY(14px);
 	transition: transform .5s ease;
+	/* 父层 overlay 已 pointer-events:none，卡片需自行恢复可点
+	   （按钮操作、点卡片跳作者仓库） */
+	pointer-events: auto;
 }
 .liquid-ver-overlay.show .liquid-ver-toast { transform: scale(1) translateY(0); }
 /* 状态色：内测=紫 / 最新=绿 / 有更新=橙 / 失败=红（与 pushbot 一致） */
