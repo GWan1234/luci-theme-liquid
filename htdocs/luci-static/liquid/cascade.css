@@ -2498,7 +2498,9 @@ select:not([multiple]):not(.cbi-dropdown select):not(.cbi-select select) option:
 }
 
 /* 用量表格（内存/存储等）：表格转 block、行用 flex 强制同行
-   （与移动端同一方案；标题列约 16ch 允许内部换行，值列占剩余宽度） */
+   （与移动端同一方案；标题列 20ch 允许内部换行、值列占剩余宽度。
+     16ch 会把最长标签"CPU 使用率（%）"挤成两行（实测 16ch 折行、
+     18ch 起单行），20ch 留出中文字体度量的跨平台余量） */
 .table:has(td[width="33%"]) {
 	display: block;
 	overflow-x: auto;
@@ -2515,8 +2517,8 @@ select:not([multiple]):not(.cbi-dropdown select):not(.cbi-select select) option:
 }
 
 .table:has(td[width="33%"]) tr > td[width="33%"] {
-	flex: 0 0 16ch;
-	max-width: 16ch;
+	flex: 0 0 20ch;
+	max-width: 20ch;
 	white-space: normal;
 	overflow-wrap: break-word;
 	word-break: break-word;
@@ -4645,8 +4647,8 @@ pre {
 
 	.cbi-section-table tr > td[width="33%"],
 	.table tr > td[width="33%"] {
-		flex: 0 0 16ch;
-		max-width: 16ch;
+		flex: 0 0 20ch;
+		max-width: 20ch;
 		white-space: normal;
 		overflow-wrap: break-word;
 		word-break: break-word;
